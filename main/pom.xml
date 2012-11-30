@@ -64,9 +64,6 @@
 					<descriptors>
 						<descriptor>src/main/assembly/assembly.xml</descriptor>
 					</descriptors>
-					<finalName>${project.artifactId}</finalName>
-					<appendAssemblyId>false</appendAssemblyId>
-					<attach>false</attach>
 				</configuration>
 			</plugin>
 		</plugins>

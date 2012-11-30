@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml-tag xmlns="http://www.gvsig.gva.es">
+    <xml-tag>
+        <property key="com.iver.andami.pluginName" value="org.gvsig.backup"/>
+        <xml-tag>
+            <property key="backup_project_to_be_overwritten" value="true"/>
+        </xml-tag>
+    </xml-tag>
+    <xml-tag>
+        <property key="com.iver.andami.pluginName" value="org.gvsig.layerLoadingOrder"/>
+        <xml-tag>
+            <property key="vector-behaviour" value="0"/>
+            <property key="raster-behaviour" value="5"/>
+            <property key="other-behaviour" value="0"/>
+            <property key="name" value="layer.order.manager"/>
+            <property key="configName" value="smart.order.config"/>
+            <property key="vector-position" value="0"/>
+            <property key="raster-position" value="0"/>
+            <property key="other-position" value="0"/>
+        </xml-tag>
+    </xml-tag>
+    <xml-tag>
+        <property key="Skin-Selected" value="com.iver.core.mdiManager.NewSkin"/>
+        <property key="com.iver.andami.pluginName" value="com.iver.core"/>
+    </xml-tag>
+    <xml-tag>
+        <property key="general_auto_preview" value="true"/>
+        <property key="general_ask_coordinates" value="false"/>
+        <property key="general_defaultNumberOfClasses" value="64"/>
+        <property key="cache_size" value="25"/>
+        <property key="cache_pagesize" value="4.0"/>
+        <property key="cache_pagspergroup" value="5"/>
+        <property key="cache_blockheight" value="512"/>
+        <property key="nodata_value" value="-99999.0"/>
+        <property key="nodata_transparency_enabled" value="true"/>
+        <property key="overviews_number" value="4"/>
+        <property key="overviews_rate" value="2"/>
+        <property key="overviews_resampling_algorithm" value="1"/>
+        <property key="general_ask_projection" value="true"/>
+        <property key="com.iver.andami.pluginName" value="org.gvsig.rastertools"/>
+    </xml-tag>
+    <xml-tag>
+        <property key="com.iver.andami.pluginName" value="org.gvsig.i18n"/>
+        <xml-tag>
+            <property key="name" value="RegisteredLocales"/>
+            <xml-tag>
+                <property key="name" value="Spanish"/>
+                <property key="language" value="es"/>
+                <property key="country" value=""/>
+                <property key="variant" value=""/>
+            </xml-tag>
+            <xml-tag>
+                <property key="name" value="English"/>
+                <property key="language" value="en"/>
+                <property key="country" value=""/>
+                <property key="variant" value=""/>
+            </xml-tag>
+            <xml-tag>
+                <property key="name" value="English (United States)"/>
+                <property key="language" value="en"/>
+                <property key="country" value="US"/>
+                <property key="variant" value=""/>
+            </xml-tag>
+            <xml-tag>
+                <property key="name" value="Catalan"/>
+                <property key="language" value="ca"/>
+                <property key="country" value=""/>
+                <property key="variant" value=""/>
+            </xml-tag>
+            <xml-tag>
+                <property key="name" value="Gallegan"/>
+                <property key="language" value="gl"/>
+                <property key="country" value=""/>
+                <property key="variant" value=""/>
+            </xml-tag>
+            <xml-tag>
+                <property key="name" value="Basque"/>
+                <property key="language" value="eu"/>
+                <property key="country" value=""/>
+                <property key="variant" value=""/>
+            </xml-tag>
+            <xml-tag>
+                <property key="name" value="German"/>
+                <property key="language" value="de"/>
+                <property key="country" value=""/>
+                <property key="variant" value=""/>
+            </xml-tag>
+            <xml-tag>
+                <property key="name" value="Czech"/>
+                <property key="language" value="cs"/>
+                <property key="country" value=""/>
+                <property key="variant" value=""/>
+            </xml-tag>
+            <xml-tag>
+                <property key="name" value="French"/>
+                <property key="language" value="fr"/>
+                <property key="country" value=""/>
+                <property key="variant" value=""/>
+            </xml-tag>
+            <xml-tag>
+                <property key="name" value="Italian"/>
+                <property key="language" value="it"/>
+                <property key="country" value=""/>
+                <property key="variant" value=""/>
+            </xml-tag>
+            <xml-tag>
+                <property key="name" value="Polish"/>
+                <property key="language" value="pl"/>
+                <property key="country" value=""/>
+                <property key="variant" value=""/>
+            </xml-tag>
+            <xml-tag>
+                <property key="name" value="Portuguese"/>
+                <property key="language" value="pt"/>
+                <property key="country" value=""/>
+                <property key="variant" value=""/>
+            </xml-tag>
+            <xml-tag>
+                <property key="name" value="Portuguese (Brazil)"/>
+                <property key="language" value="pt"/>
+                <property key="country" value="BR"/>
+                <property key="variant" value=""/>
+            </xml-tag>
+            <xml-tag>
+                <property key="name" value="Romanian"/>
+                <property key="language" value="ro"/>
+                <property key="country" value=""/>
+                <property key="variant" value=""/>
+            </xml-tag>
+            <xml-tag>
+                <property key="name" value="Chinese"/>
+                <property key="language" value="zh"/>
+                <property key="country" value=""/>
+                <property key="variant" value=""/>
+            </xml-tag>
+            <xml-tag>
+                <property key="name" value="Russian"/>
+                <property key="language" value="ru"/>
+                <property key="country" value=""/>
+                <property key="variant" value=""/>
+            </xml-tag>
+            <xml-tag>
+                <property key="name" value="Greek"/>
+                <property key="language" value="el"/>
+                <property key="country" value=""/>
+                <property key="variant" value=""/>
+            </xml-tag>
+            <xml-tag>
+                <property key="name" value="Turkish"/>
+                <property key="language" value="tr"/>
+                <property key="country" value=""/>
+                <property key="variant" value=""/>
+            </xml-tag>
+            <xml-tag>
+                <property key="name" value="Serbian"/>
+                <property key="language" value="sr"/>
+                <property key="country" value=""/>
+                <property key="variant" value=""/>
+            </xml-tag>
+            <xml-tag>
+                <property key="name" value="Swahili"/>
+                <property key="language" value="sw"/>
+                <property key="country" value=""/>
+                <property key="variant" value=""/>
+            </xml-tag>
+        </xml-tag>
+    </xml-tag>
+    <xml-tag>
+        <property key="com.iver.andami.pluginName" value="com.iver.cit.gvsig"/>
+        <property key="db-connections" value=""/>
+        <property key="layer.order.manager" value="org.gvsig.layerLoadingOrder.SmartOrderManager"/>
+        <property key="MapControlRefreshRate" value="3"/>
+        <property key="MapControlEnableAnimation" value="true"/>
+        <property key="ForeColor" value="128,128,128,255"/>
+        <property key="FillColor" value="60,235,235,255"/>
+        <property key="AleatoryFillColor" value="true"/>
+        <property key="FontType" value="Serif"/>
+        <property key="FontSize" value="8"/>
+        <property key="DefaultProjection" value="EPSG:27700"/>
+        <property key="ZoomInFactor" value="2.0"/>
+        <property key="ZoomOutFactor" value="0.5"/>
+        <property key="NewLayersInInvisibleMode" value="false"/>
+        <property key="KeepScaleOnResizing" value="false"/>
+        <property key="DefaultViewBackColor" value="255,255,255,255"/>
+        <property key="DefaultSelectionColor" value="255,255,0,255"/>
+        <property key="DefaultMapUnits" value="1"/>
+        <property key="DefaultDistanceUnits" value="1"/>
+        <property key="DefaultDistanceArea" value="1"/>
+    </xml-tag>
+    <xml-tag>
+        <property key="com.iver.andami.pluginName" value="org.gvsig.crs"/>
+        <xml-tag>
+            <property key="groupName" value="recentCrss"/>
+            <xml-tag>
+                <property key="authority" value="EPSG"/>
+                <property key="code" value="3035"/>
+                <property key="name" value="ETRS89 / ETRS-LAEA"/>
+                <property key="date" value="2010-06-30 22:01:32.320"/>
+            </xml-tag>
+            <xml-tag>
+                <property key="authority" value="EPSG"/>
+                <property key="code" value="4267"/>
+                <property key="name" value="NAD27"/>
+                <property key="date" value="2010-06-30 22:07:05.618"/>
+            </xml-tag>
+            <xml-tag>
+                <property key="authority" value="EPSG"/>
+                <property key="code" value="4326"/>
+                <property key="name" value="WGS 84"/>
+                <property key="date" value="2010-06-30 22:01:05.630"/>
+            </xml-tag>
+            <xml-tag>
+                <property key="authority" value="USR"/>
+                <property key="code" value="2"/>
+                <property key="name" value="Google_Mercator"/>
+                <property key="date" value="2010-06-30 22:04:15.736"/>
+            </xml-tag>
+        </xml-tag>
+    </xml-tag>
+     <xml-tag>
+        <property key="MDIFrameSize" value="1024 ,768"/>
+        <property key="MDIFramePos" value="8 ,32"/>
+        <property key="MDIFrameState" value="0"/>
+        <property key="com.iver.andami.pluginName" value="Andami.Launcher"/>
+    </xml-tag>
+</xml-tag>
