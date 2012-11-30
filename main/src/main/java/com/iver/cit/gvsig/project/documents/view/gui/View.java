@@ -168,7 +168,7 @@ public class View extends BaseView {
 		MapContext fmap = modelo.getMapContext();
 
 		Layer root = fmap.getRootLayer();
-		Layer[] vectorialInEdition = root.filter(LayerFilter.VECTORIAL_EDITING);
+		Layer[] vectorialInEdition = root.filter(LayerFilter.FEATURE_EDITING);
 
 		if (vectorialInEdition.length > 0) {
 			this.showConsole();

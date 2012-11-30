@@ -47,24 +47,20 @@ import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
 import org.exolab.castor.xml.XMLException;
 import org.geotools.referencing.CRS;
-import org.gvsig.layer.Layer;
-import org.gvsig.layer.Source;
+import org.gvsig.exceptions.DriverException;
 import org.gvsig.layer.FeatureSourceCache;
-import org.gvsig.persistence.generated.DataSourceType;
+import org.gvsig.layer.Layer;
 import org.gvsig.persistence.generated.DocumentType;
 import org.gvsig.persistence.generated.LabeledExtentType;
-import org.gvsig.persistence.generated.StringPropertyType;
 import org.gvsig.tools.file.PathGenerator;
 import org.gvsig.units.Unit;
 import org.opengis.referencing.FactoryException;
@@ -217,8 +213,8 @@ public class Project implements Serializable, PropertyChangeListener {
 	// }
 
 	/**
-	 * Asigna la fecha de creaci�n del proyecto. Este m�todo tiene sentido
-	 * s�lo por que al recuperar la fecha del XML hay que asignarla al objeto
+	 * Asigna la fecha de creaci�n del proyecto. Este m�todo tiene sentido s�lo
+	 * por que al recuperar la fecha del XML hay que asignarla al objeto
 	 * proyecto de alguna manera. La fecha se asigna en el constructor y no se
 	 * deber�a de modificar nunca
 	 * 
@@ -349,8 +345,8 @@ public class Project implements Serializable, PropertyChangeListener {
 	}
 
 	/**
-	 * M�todo invocado al recuperar de XML para establecer el color de
-	 * seleccion del proyecto
+	 * M�todo invocado al recuperar de XML para establecer el color de seleccion
+	 * del proyecto
 	 * 
 	 * @param color
 	 *            Entero que representa un color
@@ -869,23 +865,6 @@ public class Project implements Serializable, PropertyChangeListener {
 		}
 
 		return result;
-	}
-
-	public DataSourceType getSourceInfoXMLEntity(Source di) {
-		DataSourceType ret = new DataSourceType();
-		Map<String, String> properties = di.getPersistentProperties();
-		Iterator<String> keyIterator = properties.keySet().iterator();
-		while (keyIterator.hasNext()) {
-			String persistencePropertyKey = keyIterator.next();
-			String persistencePropertyValue = properties
-					.get(persistencePropertyKey);
-			StringPropertyType property = new StringPropertyType();
-			property.setPropertyName(persistencePropertyKey);
-			property.setPropertyValue(persistencePropertyValue);
-			ret.getProperties().add(property);
-		}
-
-		return ret;
 	}
 
 	/**
