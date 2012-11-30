@@ -27,16 +27,16 @@ time the user will click the menu, the class TestExtension will be called.
 Two repositories
 ..................
 
-TODO change repository
-Gvtools code can be found in GitHub: `<https://github.com/victorzinho/gvtools>`_.
+Gvtools code can be found in GitHub: `<https://github.com/gvtools/gvtools>`_.
 
-The gvSIG code base that we're using as reference can be found also in GitHub: `<https://github.com/victorzinho/gvtools-legacy>`_. 
-This code base can be configured with *mvn eclipse:eclipse* so that it is possible to install all the projects in eclipse
-and navigate through the classes. 
+The gvSIG code base that we're using as reference can be found also in GitHub: `<https://github.com/gvtools/gvtools-legacy>`_. 
+This code base can be configured with *mvn eclipse:eclipse* so that it is possible to install **some** of the projects in eclipse
+and navigate through the classes.
 
 One of the aims we have is to be able to build gvtools with a single maven command. This is no longer possible,
 nor necessary, on the current gvSIG codebase so that's why we prefer to keep one repository with
-gvSIG codebase, just to clone and import in Eclipse.
+gvSIG codebase, just to clone and import in Eclipse, and another repository with a new structure that can be
+easily built.
 
 See `Migration methodology`_ for more information about why this is necessary and sufficient.  
 
@@ -47,7 +47,7 @@ The gvtools project consists of the following projects:
 
 - persistence: Just defines an schema for the project persistence and generates
   JAXB classes to deal with the marshalling and unmarshalling process
-- main: The only extension of gvtools. Instead of having a lot of different
+- main: The only plugin of gvtools. Instead of having a lot of different
   plugin projects we only have one for now. There is no need to split the project
   so far.
 - core: The library that contains all the code that can be implemented with
@@ -56,6 +56,21 @@ The gvtools project consists of the following projects:
 
 Workspace configuration
 .........................
+
+Clone the repository::
+
+	$ git clone git@github.com:gvtools/gvtools.git
+	$ cd gvtools
+
+Compile::
+
+	$ mvn compile
+	
+Or if you're working with eclipse. Sorry no idea about maven plugin for eclipse, I love
+eclipse plugin for maven, this is, I love doing it command-line style::
+
+	$ mvn eclipse:eclipse
+
 
 Running
 ........

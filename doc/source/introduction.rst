@@ -25,6 +25,6 @@ Mailing lists
 
 This project is:
 
-- code: TODO link to repositories
+- code: https://github.com/gvtools/gvtools
 
 - a mailing list: TODO link to english mailing list
