@@ -66,11 +66,13 @@ Compile::
 
 	$ mvn compile
 	
-Or if you're working with eclipse. Sorry no idea about maven plugin for eclipse, I love
-eclipse plugin for maven, this is, I love doing it command-line style::
+Or if you're working with eclipse::
 
 	$ mvn eclipse:eclipse
 
+And then import the existing project in eclipse. Sorry no idea about maven
+plugin for eclipse, I love eclipse plugin for maven, this is, I love
+doing it command-line style.
 
 Running
 ........
