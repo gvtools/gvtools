@@ -77,6 +77,22 @@ doing it command-line style.
 Running
 ........
 
+Package the application::
+
+	$ mvn package
+
+If there are test failures and you really want to package the application, 
+use the skipTests property::
+
+	$ mvn package -DskipTests
+
+And run the application::
+
+	$ cd gvtools-app/target/gvtools-<version>
+	$ ./gvSIG.sh
+
+Sorry, the Windows version is not available yet.
+
 Contributing
 -------------
 
