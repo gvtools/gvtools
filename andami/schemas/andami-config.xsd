@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="andami">
+    <xs:complexType>
+      <xs:attribute name="update" type="xs:boolean" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="andami-config">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="andami" />
+        <xs:element ref="plugin" maxOccurs="unbounded" />
+        <xs:element ref="andami-options" minOccurs="0" maxOccurs="1" />
+      </xs:sequence>
+      <xs:attribute name="locale-language" type="xs:string" use="optional" />
+      <xs:attribute name="locale-country" type="xs:string" use="optional" />
+      <xs:attribute name="locale-variant" type="xs:string" use="optional" />
+      <xs:attribute name="lookAndFeel" type="xs:string" use="optional" />
+      <xs:attribute name="pluginsDirectory" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="plugin">
+    <xs:complexType>
+      <xs:attribute name="name" type="xs:NMTOKEN" use="required" />
+      <xs:attribute name="update" type="xs:boolean" use="required" />
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="andami-options">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="option" minOccurs="0" maxOccurs="unbounded" />
+        <xs:element ref="icon-theme" minOccurs="0" maxOccurs="1" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="icon-theme">
+    <xs:complexType>
+      <xs:attribute name="name" type="xs:string" use="required" />
+      <xs:attribute name="description" type="xs:string" use="optional" />
+      <xs:attribute name="version" type="xs:string" use="optional" />
+      <xs:attribute name="resource" type="xs:string" use="optional" />
+      <xs:attribute name="basedir" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="option">
+    <xs:complexType>
+      <xs:attribute name="name" type="xs:string" use="required" />
+      <xs:attribute name="value" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

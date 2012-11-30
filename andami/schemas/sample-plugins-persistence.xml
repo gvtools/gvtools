@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<plugins-status>
+	<plugin name="gvsig" lastUpdate="237628686">
+		<xml-entity name="config">
+			<property name="dataDirectory" value="c:\"/>
+			<xml-entity>
+				<property name="dataDirectory" value="c:\"/>
+				<property name="dataDirectory" value="c:\"/>
+				<property name="dataDirectory" value="c:\"/>
+			</xml-entity>
+		</xml-entity>
+		<bookmarks>
+			<bookmark text="Recientes/raster">
+				<xml-entity>
+					<property name="projection" value="EPSG:3403"/>
+					<property name="boundinBox" value="12,12,115,115"/>
+				</xml-entity>
+			</bookmark>
+		</bookmarks>
+		<windows>
+			<window id="0" rectangle="0,0,150,150"/>
+			<window id="2" rectangle="50,50,150,150"/>
+			<window id="8" rectangle="100,100,150,150"/>
+			<window id="12" rectangle="150,150,150,150"/>
+		</windows>
+	</plugin>
+	<tool-bars>
+		<tool-bar name="gvsig.herramientas" x-position="0" y-position="1"/>
+		<tool-bar name="gvsig.herramientas" x-position="0" y-position="0"/>
+	</tool-bars>
+</plugins-status>

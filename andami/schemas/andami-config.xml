@@ -1,0 +1,9 @@
+<andami-config locale-language="es" locale-country="ES" locale-variant="es" pluginsDirectory="c:\tirar">
+	<andami update="yes"/>
+	<plugin name="com.iver.cit.gvsig" update="yes"/>
+	<plugin name="com.iver.core" update="no"/>
+	<andami-options>
+	  <option name="CustomOption1" value="customValue1"/>
+	  <icon-theme name="DefaultTheme" resource="iconThemes/default" basedir="iconThemes" />
+	</andami-options>
+</andami-config>

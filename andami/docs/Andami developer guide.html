@@ -1,0 +1,289 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Andami developer guide</title>
+<link href="style.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<table width="90%" border="0">
+  <tr>
+    <td class="Nivel2"><a href="#Introduccion"><strong><font color="#FFFFFF">Introducci&oacute;n</font></strong></a></td>
+  </tr>
+  <tr>
+    <td class="Nivel2"><a href="#Creacion_de_plugins"><font color="#FFFFFF"><strong>Creaci&oacute;n 
+      de plugins</strong></font></a></td>
+  </tr>
+  <tr>
+    <td class="Nivel2"><a href="#Funcionamiento_del_class_loader"><strong><font color="#FFFFFF">Funcionamiento 
+      del class loader</font></strong></a></td>
+  </tr>
+  <tr>
+    <td class="Nivel2"><a href="#Servicios_a_los_plugins"><font color="#FFFFFF"><strong>Servicios 
+      a los plugins</strong></font></a></td>
+  </tr>
+  <tr>
+    <td><strong>&nbsp;&nbsp;&nbsp; <a
+ href="#Ejecucion_en_segundo_plano">Ejecuci&oacute;n en segundo plano</a></strong></td>
+  </tr>
+  <tr>
+    <td><strong>&nbsp;&nbsp;&nbsp; <a href="#Acceso_a_las_extensiones">Acceso 
+      a las extensiones</a></strong></td>
+  </tr>
+  <tr>
+    <td class="urbanismo"><strong>&nbsp;&nbsp;&nbsp; <a href="#Persistencia_de_los_plugins">Persistencia 
+      de los plugins</a></strong></td>
+  </tr>
+  <tr>
+    <td><strong>&nbsp;&nbsp;&nbsp; <a href="#popupmenus">Pop-up menus</a></strong></td>
+  </tr>
+  <tr>
+    <td><strong>&nbsp;&nbsp;&nbsp; <a href="#Vistas">Vistas</a></strong></td>
+  </tr>
+  <tr>
+    <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#SingletonView">SingletonView's</a></td>
+  </tr>
+</table>
+
+
+
+<p> <strong><font size="+1"><a name="Introduccion"></a>Introducci&oacute;n</font></strong></p>
+<p> &nbsp;&nbsp;&nbsp; Andami es un framework orientado a plugins construido sobre 
+  swing que permite la construcci&oacute;n de forma r&aacute;pida y extensible 
+  de aplicaciones MDI (Multiple Document Interface). Tiene ya implementadas muchas 
+  de las funcionalidades requeridas para este tipo de aplicaciones tales como 
+  un men&uacute; Ventana, en la que van apareciendo las ventanas que se abren, 
+  soporte para el traducciones, configuraci&oacute;n personalizada para cada usuario, 
+  actualizaciones autom&aacute;ticas, tanto del propio Andami como de los plugins, 
+  persistencia del tama&ntilde;o y posici&oacute;n de la ventana, del idioma, 
+  distintos tipos de vista, con la finalidad de facilitar la programaci&oacute;n 
+  de ventanas especiales, ... Todo esto adem&aacute;s de tener ya solventados 
+  los problemas t&iacute;picos de la programaci&oacute;n de un entorno como &eacute;ste 
+  que no son pocos.<br>
+  <br>
+  &nbsp;&nbsp;&nbsp; Adem&aacute;s, Andami est&aacute; dise&ntilde;ada de forma 
+  que la propia l&oacute;gica MDI puede ser reemplazada. Si en lugar de una aplicaci&oacute;n 
+  estilo arcView, se quiere que cada vista que se a&ntilde;ada, se haga en una 
+  ventana de windows nueva (de las que aparecen en la barra de estado) o una vista 
+  como la de Eclipse, no hay m&aacute;s que desarrollar el plugin adecuado.<br>
+  <br>
+  &nbsp;&nbsp;&nbsp; Andami est&aacute; dise&ntilde;ada para ser amistosa con 
+  el usuario y para ello incorpora la posibilidad de a&ntilde;adir tooltips y 
+  enabletexts a los botones. El tooltip es el texto que aparece cuando el rat&oacute;n 
+  se detiene sobre un bot&oacute;n o men&uacute;. El enableText es el texto que 
+  aparece en el caso anterior cuando el bot&oacute;n est&aacute; desactivado, 
+  permitiendo mostrar al usuario qu&eacute; es lo que debe hacer para que dicho 
+  bot&oacute;n se active (o cualquier otro mensaje).<br>
+  <br>
+  &nbsp;&nbsp;&nbsp; Por &uacute;ltimo, Andami tiene una gesti&oacute;n de errores 
+  que agradar&aacute; a cualquier programador, ya que en casos de errores graves, 
+  el propio framework avisa de dicho fallo y aconseja al usuario salvar los cambios 
+  y reiniciar el programa, a parte de que toda excepci&oacute;n no capturada por 
+  el usuario se redirige a un fichero de log configurable en el que se escribir&aacute; 
+  su traza.<br>
+</p>
+<p> <strong><font size="+1"><a name="Creacion_de_plugins"></a>Creaci&oacute;n 
+  de plugins</font></strong></p>
+<p> &nbsp;&nbsp;&nbsp; Andami gira en torno al concepto de plugin. Andami mantiene 
+  un directorio como directorio de los plugins, que se puede cambiar en cualquier 
+  momento. Un plugin viene definido por la existencia de un subdirectorio dentro 
+  del directorio de los plugins, siendo el nombre del plugin el nombre de dicho 
+  directorio. Dentro de dicho directorio debe haber un fichero config.xml en el 
+  que se configuran los puntos de entrada y salida del plugin (men&uacute;es, 
+  barras de herramientas, etiquetas de la barra de estado, men&uacute;es contextuales), 
+  las librer&iacute;as que va a usar, el paquete de traducciones, los plugins 
+  de los que depende, etc. El fichero plugin-config.xsd contiene el esquema que 
+  ha de seguir este fichero y est&aacute;n comentados todos los elementos. En 
+  el CorePlugin que viene con Adami se puede ver un ejemplo de config.xml.<br>
+  <br>
+  &nbsp;&nbsp;&nbsp; Las rutas de los directorios son siempre relativas al directorio 
+  del plugin y los textos de los men&uacute;es, tooltips y enabletext's son claves 
+  en el fichero de traducciones en caso de que haya y textos literales en caso 
+  de que no haya traducciones. El fichero de traducciones es un fichero de propiedades 
+  com&uacute;n: ver ResourceBundle en la API de Java.<br>
+  <br>
+  &nbsp;&nbsp;&nbsp; Dentro de los plugins aparece el concepto de extensi&oacute;n. 
+  Una extensi&oacute;n es instalada por los plugins mediante la implementaci&oacute;n 
+  de la interfaz com.iver.andami.plugins.Extension y la instalaci&oacute;n de 
+  unos controles geobernados por &eacute;sta en el fichero config.xml. Mediante 
+  esta implementaci&oacute;n se le dice a Andami la condici&oacute;n que se debe 
+  cumplir para que los controles sean visibles o est&eacute;n activos. Adem&aacute;s 
+  se implementa la acci&oacute;n a llevar a cabo cuando se selecciona uno de los 
+  men&uacute;es o botones asociados a la extensi&oacute;n. Cabe resaltar que Andami 
+  crea una instancia de cada extensi&oacute;n configurada en config.xml, por lo 
+  que las clases que implementen la interfaz Extension deben de tener un constructor 
+  sin argumentos.<br>
+  <br>
+  &nbsp;&nbsp;&nbsp; En los tag 'extension' existe un atributo class-name en el 
+  que se especifica la clase que gobierna el punto de extensi&oacute;n que se 
+  est&aacute; definiendo. Esta clase deber&aacute; implementar la interfaz com.iver.andami.plugins.Extension 
+  y ser&aacute; mediante &eacute;sta que gobernar&aacute; los men&uacute;es y 
+  botones asociados a este punto de extensi&oacute;n<br>
+  <br>
+  &nbsp;&nbsp;&nbsp; Una problema com&uacute;n en este framework es no ver c&oacute;mo 
+  se mantiene la informaci&oacute;n del proyecto concreto que se est&aacute; desarrollando. 
+  El lugar adecuado es una de las extensiones instaladas. Por ejemplo en el caso 
+  de gvSIG est&aacute; la extensi&oacute;n com.iver.cit.gvsig.ProjectExtension, 
+  en la cual hay un atributo Project que es la ra&iacute;z del &aacute;rbol jer&aacute;rquico 
+  del cual penden las vistas, mapas, tablas, ... Adem&aacute;s esta extensi&oacute;n 
+  tiene un m&eacute;todo getProject que devuelve la referencia al proyecto, de 
+  manera que se puede acceder desde cualquier punto de la aplicaci&oacute;n. Para 
+  ver el acceso a las instancias de las extensiones ver <a href="#Acceso_a_las_extensiones">acceso 
+  a las extensiones</a></p>
+<p><br>
+  <font size="+1"><strong><a name="Funcionamiento_del_class_loader"></a>Funcionamiento 
+  del class loader</strong></font></p>
+<p> En Andami, el class loader de cada plugin delega primero en el classloader 
+  del sistemaes decir, que si se ejecuta desde eclipse buscar&aacute; por todos 
+  los jars que haya en el classpath del proyecto, y si se ejecuta desde la linea 
+  de comandos, buscar&aacute; en la variable de entorno CLASSPATH o en el argumento 
+  -classpath que se pase como par&aacute;metro a java.<br>
+  <br>
+  Si el class loader del sistema no satisface la b&uacute;squeda, se buscar&aacute; 
+  en los jars del directorio especificado por el config.xml del plugin que intenta 
+  cargar la clase y si no se encuentra en dichos jars, se buscar&aacute; en los 
+  jars de los plugins de los cuales depende el plugin que intenta cargar la clase.<br>
+  <br>
+  <strong><font size="+1"><a name="Servicios_a_los_plugins"></a>Servicios 
+  a los plugins</font></strong></p>
+<p><br>
+&nbsp;&nbsp;&nbsp; Andami ofrece a los plugins distintos servicios 
+  a trav&eacute;s de la clase PluginServices en cuyo javadoc se puede obtener 
+  informaci&oacute;n sobre como usarlos. Existen unos servicios gen&eacute;ricos 
+  que vienen dados por m&eacute;todos est&aacute;ticos de dicha clase y luego 
+  est&aacute; el m&eacute;todo getPluginServices que obtiene una instancia de 
+  esta clase espec&iacute;fica del plugin, mediante la cual puede acceder a servicios 
+  concretos de cada plugin, traducciones, persistencia, directorio del plugin, 
+  ...<br>
+  &nbsp;<br>
+  <strong><a name="Ejecucion_en_segundo_plano"></a>Ejecuci&oacute;n en segundo 
+  plano</strong><br>
+  &nbsp;&nbsp;&nbsp; Es conveniente que la interfaz gr&aacute;fica est&eacute; 
+  siempre en funcionamiento, nunca bloqueada, aunque sea s&oacute;lo para mostrar 
+  al usuario que el programa est&aacute; procesando. Para ello hay que realizar 
+  las tareas que puedan tomar demasiado tiempo en un thread a parte. La clase 
+  PluginServices proporciona un m&eacute;todo est&aacute;tico backgroundExecution 
+  al cual se le pasa un objeto Runnable, que es ejecutado en segundo plano, dejando 
+  el thread de la interfaz libre para responder pero con sus eventos bloqueados 
+  con el fin de que la interfaz responda y se redibuje, pero se ignoren los eventos 
+  que produce el usuario mientras se procesa la petici&oacute;n<br>
+  <br>
+  <a name="Acceso_a_las_extensiones"></a><strong>Acceso a las extensiones</strong><br>
+  &nbsp;&nbsp;&nbsp; Para acceder a la instancia de una extensi&oacute;n 
+  se puede usar simplemente el m&eacute;todo de PluginServices getExtension(Class) 
+  a la cual habr&aacute; que pasar como par&aacute;metro la clase de la extensi&oacute;n 
+  a la que se quiere acceder. Dicho m&eacute;todo retorna un objeto Extensi&oacute;n 
+  y por tanto habr&aacute; que hacer casting a la clase concreta de dicha extensi&oacute;n, 
+  habiendo obtenido as&iacute; la referencia a la instancia de la extensi&oacute;n 
+  deseada.<br>
+  &nbsp;&nbsp;&nbsp; A la hora de desarrollar habr&aacute; que tener en el build 
+  path del entorno de desarrollo que se use, el jar del plugin dentro del cual 
+  est&aacute; la extensi&oacute;n que se quiere obtener, para poder pasarle como 
+  par&aacute;metro a getExtension(Class) la clase de la misma.<br>
+  <br>
+  <strong><a name="Persistencia_de_los_plugins"></a>Persistencia de 
+  los plugins</strong><br>
+  &nbsp;&nbsp;&nbsp; Uno de los servicios que ofrece Andami a los 
+  plugins es la facilidad de guardar datos gen&eacute;ricos de los mismos en el 
+  directorio del usuario de manera que cada usuario mantiene su propia configuraci&oacute;n 
+  de los plugins. Para ello, las instancias de PluginServices contienen una propiedad 
+  persistentXML que puede ser obtenida y asignada y que es de tipo XMLEntity, 
+  pudiendo a&ntilde;adir informaci&oacute;n de tipo b&aacute;sico (String, int, 
+  long, ...) a dicha instancia y siendo esta informaci&oacute;n persistente entre 
+  ejecuciones.<br>
+  <br>
+  <strong><a name="popupmenus"></a>Pop-up menus</strong><br>
+  &nbsp;&nbsp;&nbsp;&nbsp; Otro servicio proporcionado por Andami es el de pop-up 
+  menu's extensibles. Mediante el XML se puede definir un pop-up menu con un nombre 
+  y unas entradas al igual que cualquier otro men&uacute;, con la &uacute;nica 
+  diferencia que para mostrar el popup men&uacute; habr&aacute; que registrar 
+  un listener de la siguiente manera:<br>
+</p>
+<div style="text-align: center;">
+<pre><>public void addPopupMenuListener(String name, Component c, ActionListener listener)</><br></pre>
+</div>
+&nbsp;&nbsp;&nbsp; Lo cual har&aacute; que al pinchar con el
+bot&oacute;n derecho sobre el componente 'c' aparezca el men&uacute;
+'name' del fichero de configuraci&oacute;n del plugin y al seleccionar
+cualquier entrada se ejecutar&aacute; el ActionListener que se pasa
+como par&aacute;metro.<br>
+<br>
+&nbsp;&nbsp;&nbsp; Estos men&uacute;es son extensibles porque cualquier
+otro plugin puede a&ntilde;adir entradas a dicho men&uacute; en su
+propio fichero config.xml referenciando el men&uacute; al que quiere
+extender mediante el nombre del plugin m&aacute;s el nombre del
+men&uacute;. Un ejemplo. Tenemos un plugin llamado com.iver.cit.gvsig
+que instala un men&uacute; de la siguiente manera:<br>
+<pre>		&lt;popupMenu name="cascada"&gt;<br>			&lt;entry text="Cascada" <br>				tooltip="cascada_tooltip" <br>				enableText="cascada_enable" actionCommand="CASCADA"/&gt;<br>			&lt;entry text="Tile" <br>				tooltip="tile_tooltip" <br>				enableText="cascada_enable" actionCommand="CASCADA"/&gt;<br>		&lt;/popupMenu&gt;<br></pre>
+y tenemos otro plugin que quiere a&ntilde;adir una entrada a dicho
+men&uacute;. Para ello deber&aacute; de incluir un fragmento similar a
+este en su fichero config.xml:<br>
+<pre>		&lt;popupMenu name="com.iver.cit.gvsig.cascada"&gt;<br>			&lt;entry text="Nueva entrada" actionCommand="NUEVA"/&gt;<br>		&lt;/popupMenu&gt;<br></pre>
+y adem&aacute;s deber&aacute; de registrarse como listener de la manera
+que se explic&oacute; anteriormente.<br>
+<br>
+<strong><a name="Vistas"></a>Vistas</strong><br>
+&nbsp;&nbsp;&nbsp; El servicio m&aacute;s importante que
+proporciona Andami es el de a&ntilde;adir vistas al marco principal.
+Podemos calsificar las vistas por varios criterios:<br>
+<ul>
+  <li>Por su modalidad</li>
+  <ul>
+    <li>Modales</li>
+    <li>No modales</li>
+  </ul>
+</ul>
+<ul>
+  <li>Por su contenido</li>
+  <ul>
+    <li>Singleton (Contenido identificable)</li>
+    <li>Normales (Contenido no identificable)</li>
+  </ul>
+</ul>
+&nbsp;&nbsp;&nbsp; Para crear una vista hay que hacer una clase que
+derive de JPanel en la que se pone toda la funcionalidad como si de un
+di&aacute;logo normal se tratara. Adem&aacute;s esta clase ha de
+implementar la interfaz View la cual proporciona un m&eacute;todo
+getViewInfo que es invocado una vez en la vida de la vista. Este objeto
+contiene las caracter&iacute;sticas que tendr&aacute; la vista:
+maximizable, resizable, title, ... y puede ser actualizado en cualquier
+momento, reflej&aacute;ndose estos cambios de manera autom&aacute;tica
+en la interfaz de usuario. Una vez implementada la vista, hay que
+a&ntilde;adirla al manger MDI, que es el encargado de manejar toda la
+l&oacute;gica relacionada con las vistas. Para obtener una referencia
+al manager MDI la clase PluginServices tiene un m&eacute;todo
+getMDIManager, el cual a su vez tiene un m&eacute;todo addView mediante
+el cual se puede a&ntilde;adir la vista.<br>
+<br>
+&nbsp;&nbsp;&nbsp; Si durante la ejecuci&oacute;n se quiere cambiar
+alguna propiedad de la vista tal como el tama&ntilde;o, la
+posici&oacute;n o el
+t&iacute;tulo, s&oacute;lo hay que acceder al objeto ViewInfo de la
+misma y realizar los cambios de la manera deseada. El siguiente trozo
+de c&oacute;digo cambia el t&iacute;tulo de una ventana (se supone que
+es ejecutado desde la clase que implementa View).<br>
+<pre>	PluginServices.getMDIManager().getViewInfo(this).setTitle("Nuevo t&iacute;tulo");<br></pre>
+&nbsp;&nbsp;&nbsp; Puede ser necesario que algunas vistas realicen
+alg&uacute;n tipo de procesamiento al ser activadas pero esto no se
+sabe cuando ocurre ya que lo que se entrega al manager MDI es un
+JPanel. Para recibir los eventos sobre las vistas, adem&aacute;s de
+implementar View hay que implementar ViewListener la cual
+proporcionar&aacute; los m&eacute;todos que ser&aacute;n invocados
+cuando sucedan los eventos oportunos en las vistas.<br>
+<br>
+<big><a name="SingletonView"></a>SingletonView<br>
+</big>&nbsp;&nbsp;&nbsp; Un tipo especial de vistas son las
+SingletonView. Su principal caracter&iacute;stica es que se les define
+el contenido de las mismas, de manera que cuando hay una SingletonView
+minimizada en el proyecto y se intenta a&ntilde;adir un JPanel con el
+mismo contenido, en lugar de aparecer otra ventana en el escritorio, lo
+que sucede es que la ventana que estaba minimizada se restaura a su
+posici&oacute;n anterior. Para esto, el m&eacute;todo addView devuelve
+una referencia a la vista que se muestra, sea esta la que se
+est&aacute; a&ntilde;adiendo o la que ya est&aacute; a&ntilde;adida.
+Adem&aacute;s, al cerrar dicha ventana se guardan las dimensiones y la
+posici&oacute;n de las mismas, de manera que al volverla a abrir se
+recuerdan estos datos.<br>
+</body>
+</html>

@@ -1,0 +1,55 @@
+a:link {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 9pt; color: #E86D26; font-style: normal}
+
+
+
+a:visited {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 9pt; font-style: normal; color: #AD4D12}
+
+
+
+a:active {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 9pt; font-style: normal; color: #E86D26}
+
+
+
+table {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 9pt; font-style: normal; color: #676767}
+
+
+
+td { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 9pt; font-style: normal; color: #676767}a:link { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 9pt; font-style: normal; color: #E86D26 }
+
+
+
+th { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 9pt; font-style: normal; color: #676767}a:link { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 9pt; font-style: normal; color: #E86D26 }
+
+
+
+
+
+
+
+.pequenya { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 8pt; font-style: normal}
+
+
+
+body.urbanismo {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 9pt; font-style: normal; color: #676767; background-attachment: fixed; background-color: #FFFFFF; background-repeat: no-repeat;; background-image:  url(images/fondo_agua.gif)}
+
+p {
+	text-align: justify;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 9pt;
+}
+
+
+.Nivel3 { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 9pt; font-style: normal; color: #FFFFFF; font-weight: bold; text-transform: none; background-color: #999999 }
+
+.Nivel2 { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 9pt; font-style: normal; color: #FFFFFF; font-weight: bold; text-transform: uppercase; background-color: #E86D26}
+
+.pequenyacursiva { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 8pt; font-style: italic}
+.justificado { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 8pt; font-style: normal ; text-align: justify}
+.muypequenyacursiva { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 7pt; font-style: italic }
+ul {
+font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 9pt; font-style: normal; color: #676767
+}
+body {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 9pt;
+}

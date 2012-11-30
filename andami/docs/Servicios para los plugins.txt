@@ -1,0 +1,12 @@
+1 Ejecución en segundo plano.
+
+	Es conveniente que la interfaz esté siempre en funcionamiento,
+nunca bloqueada, aunque sea sólo para mostrar al usuario que el
+programa está procesando. Para ello hay que realizar las tareas
+que puedan tomar demasiado tiempo en un thread a parte. La
+clase PluginServices proporciona un método estático 
+backgroundExecution al cual se le pasa un objeto Runnable, que
+es ejecutado en segundo plano, dejando el thread de la interfaz
+libre para responder pero con sus eventos bloqueados con el fin
+de que la interfaz responda y se redibuje, pero se ignoren los
+eventos que produce el usuario mientras se procesa la petición

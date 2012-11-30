@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<plugin-config>
+	<icon src="images/logoGVA.gif" text="gvSIG"/>
+	<resourceBundle name="text"/>
+	<import plugin-name="com.iver.cit.gvsig" />
+	<labelSet class="com.iver.cit.gvsig.gui.View">
+		<label id="1" size="100"/>
+		<label id="2" size="230"/>
+	</labelSet>
+	<libraries>
+		<library file="com.iver.cit.gvsig.jar"/>
+		<library file="wmsclient.jar"/>	
+	</libraries>
+	<extensions>
+		<extension>
+			<class name="com.iver.cit.gvsig.ProjectExtension"/>
+			<menu text="Archivo/nuevo_proyecto" 
+				key="n" mnemonic="n" 
+				tooltip="nuevo_tooltip"
+				action-command="NUEVO" icon="images/new.png"/>
+			<menu text="Archivo/abrir_proyecto" 
+				key="a" mnemonic="a" 
+				tooltip="abrir_tooltip"
+				action-command="ABRIR" icon="images/open.png"/>
+			<menu text="Archivo/guardar_proyecto" 
+				key="g" mnemonic="g" 
+				tooltip="guardar_tooltip"
+				action-command="GUARDAR" icon="images/save.png"/>
+
+			<toolBar>
+				<tool icon="images/new.png" tooltip="nuevo_tooltip"
+					action-command="NUEVO"/>
+				<tool icon="images/open.png" tooltip="abrir_tooltip"
+					action-command="ABRIR"/>
+				<tool icon="images/save.png" tooltip="guardar_tooltip"
+					action-command="GUARDAR"/>
+
+				<!-- these will be added to the containing toolbar -->
+				<combo-scale
+					name="JPEG Quality"
+					elements="15;30;60;70;80;90;100"
+					value="80"
+					action-command="JPEG_QUALITY" />
+
+				<combo-button
+					name="Copy/paste tools">
+				  <combo-button-element icon="images/scissor.png" action-command="CUT" />
+				  <combo-button-element icon="images/paste.png" action-command="PASTE" />
+				  <combo-button-element icon="images/copy.png" action-command="COPY" />
+				</combo-button>
+			</toolBar>
+
+		</extension>
+
+		<extension>
+			<class name="com.iver.cit.gvsig.ZoomPrev"/>
+			<menu text="Vista/Zoom_Previo" icon="images/ZoomPrevio.png"/>
+			<tool-bar name="Herramientas">
+				<action-tool icon="images/ZoomPrevio.png" action-command="ZOOM_PREV" tooltip="Zoom_Previo" position="11"/>
+			</tool-bar>
+			
+			<!-- these will be added to the status-bar (because they are not contained in any toolbar) -->					
+			<combo-scale 
+		  		name="Scale"
+		  		label="Scale:"
+		  		elements="1000;2000;5000;10000;25000;50000;100000;200000;500000;1000000;2000000;5000000"
+	  			value="10000"
+	  			action-command="CHANGE_SCALE" />
+
+			<combo-button
+				name="Tool Mode">
+			  <combo-button-element icon="images/once.png" action-command="USE_ONCE" />
+			  <combo-button-element icon="images/sticky-tool.png" action-command="UNTIL_CHANGED" />
+			</combo-button>
+		</extension>
+		<extension processing-position="2">
+			<class name="com.iver.cit.gvsig.ViewControls"/>
+			<menus>
+				<menu text="Vista/Zoom_Completo" action-command="FULL" icon="images/MapContents.png" tooltip="Zoom completo a la vísta"/>
+				<menu text="Vista/Zoom_Select" action-command="ZOOM_SELECT" icon="image/Select.png"/>
+				<menu text="Vista/Encuadre" action-command="ENCUADRE" icon="images/encuadre.png"/>
+				<menu text="Vista/Seleccion_por_tema" action-command="SELECTIONBYSHAPE"/>
+				<menu text="Vista/configurar_localizador" action-command="CONFIG_LOCATOR"/>		
+				<menu text="Vista/propiedades" action-command="PROPERTIES"/>
+			</menus>
+			<tool-bar name="Herramientas" y-position="1">
+				<action-tool icon="images/MapContents.png" action-command="FULL" tooltip="Zoom_Completo" position="1"/>
+				<action-tool icon="images/encuadre.png" action-command="ENCUADRE" tooltip="gestion_encuadre" last="true" position="2"/>			
+				<selectable-tool group="grupo1" default="true" icon="images/ZoomIn.png" action-command="ZOOM_IN" tooltip="Zoom_Más" position="3"/>
+				<selectable-tool group="grupo1" icon="images/ZoomOut.png" action-command="ZOOM_OUT" position="4"/>
+				<selectable-tool group="grupo1" icon="images/Pan.png" action-command="PAN"  tooltip="Encuadre" position="5"/>
+				<selectable-tool group="grupo1" icon="images/Identify.png" action-command="INFO"  tooltip="informacion" position="6" />
+				<selectable-tool group="grupo2" icon="images/Distancia.png" action-command="MEDICION"  tooltip="medir_distancias" position="7"/>
+				<selectable-tool group="grupo2" icon="images/Poligono16.png" action-command="AREA"  tooltip="medir_area" position="8"/>
+				<selectable-tool group="grupo2" default="true" icon="images/Select.png" action-command="SELPOINT"  tooltip="seleccionar_por_punto" position="9"/>
+				<selectable-tool group="grupo2" icon="images/SelEspacial2b.png" action-command="SELRECT"  tooltip="seleccionar_por_rectangulo" position="10"/>
+			</tool-bar>
+		</extension>
+		<extension>
+			<class name="com.iver.cit.gvsig.ThemeControls"/>
+			<menu text="Tema/propiedades"/>
+		</extension>
+	</extensions>
+
+	<file-extensions>
+		<file-extension description="Rasterfiles" ends-with="ecw,tif,tiff,jpg,png" dialog="openLayer">
+			<class name="com.iver.cit.gvsig.RasterFileExtension"/>
+		</file-extension>
+	</file-extensions>
+</plugin-config>

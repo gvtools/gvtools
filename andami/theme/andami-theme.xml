@@ -1,0 +1,11 @@
+<AndamiProperties>
+	<ApplicationImages>
+		<SplashImages>
+			<!--Splash path="theme/logoIver.png" timer="1000"/-->
+			<Splash path="theme/splash.png" timer="10000" version="CE 1.0.svn" x="290" y="178" fontsize="12" color="0,20,50"/>		</SplashImages>
+		<BackgroundImage path="theme/steel-green.png"/>
+		<WallpaperType value="EXPAND"/>
+		<Icon path="theme/icon.png"/>
+	</ApplicationImages>
+	<ApplicationName value="gvSIG CE"/>
+</AndamiProperties>

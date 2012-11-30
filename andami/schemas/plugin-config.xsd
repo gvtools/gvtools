@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+<!--
+	action-tool => Button which fires the execution of this extension
+
+	action-command	Text to identify different action-tools inside a plugin
+	text		Button's text.
+	name			Button name (to retrive it)
+	icon		Tool icon
+	last		If true, a separator is added.
+	tooltip		Tooltip
+	enable-text Text that describes the necessary conditions to enable a tool
+	position    The position inside the toolbar
+-->
+  <xs:element name="action-tool">
+    <xs:complexType>
+      <xs:attribute name="text" type="xs:string" use="optional" />
+      <xs:attribute name="name" type="xs:string" use="optional" />
+      <xs:attribute name="action-command" type="xs:string" use="optional" />
+      <xs:attribute name="icon" type="xs:string" use="required" />
+      <xs:attribute name="last" type="xs:boolean" use="optional" />
+      <xs:attribute name="tooltip" type="xs:string" use="optional" />
+      <xs:attribute name="enable-text" type="xs:string" use="optional" />
+      <xs:attribute name="position" type="xs:int" use="optional" />
+    </xs:complexType>
+  </xs:element>
+
+<!--
+	Plugin dependencies from other plugins
+	plugin-name		Name of the other plugin (name of the directory.)
+					Example; com.iver.cig.gvsig
+-->
+  <xs:element name="depends">
+    <xs:complexType>
+      <xs:attribute name="plugin-name" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+<!--
+	Extension to Andami
+
+	class-name		Class that handles the extension
+	menu			Menus installed by the extension
+	tool-bar		Toolbar installed by this plugin
+	priority	Orden en el que se procesaran las extensiones durante la
+				carga de Andami. Se inicializan primero y se instalan sus controles
+				en las barras de tareas primero. La prioridad es
+				mayor cuanto más grande es el valor del atributo
+-->
+
+
+	<xs:element name="extension" type="extension-type"/>
+	<xs:complexType name="extension-type">
+		<xs:complexContent>
+		<xs:extension base="skin-extension-type">
+	    <xs:attribute name="priority" type="xs:int" use="optional" />
+		<xs:attribute name="active" type="xs:boolean" use="optional" />
+		<xs:attribute name="description" type="xs:string" use="optional" />
+		<xs:attribute name="alwaysvisible" type="xs:boolean" use="optional" />
+	  </xs:extension>
+	</xs:complexContent>
+  </xs:complexType>
+
+<!--
+	Extension's section of the plugin
+-->
+  <xs:element name="extensions">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="extension" maxOccurs="unbounded" />
+        <xs:element ref="skin-extension" minOccurs="0" maxOccurs="unbounded" />
+      </xs:sequence>
+
+    </xs:complexType>
+  </xs:element>
+
+<!--
+	Main application's Icon
+
+	text 	Title of main window.
+	src	    path to an icon file
+-->
+  <xs:element name="icon">
+    <xs:complexType>
+      <xs:attribute name="text" type="xs:string" use="required" />
+      <xs:attribute name="src" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+<!--
+	label => In this element you can put the mesages that must appear in the
+			status bar
+
+	size	Size in pixels of the status label
+	id		Id assigned to this label
+-->
+  <xs:element name="label">
+    <xs:complexType>
+      <xs:attribute name="size" type="xs:int" use="required" />
+      <xs:attribute name="id" type="xs:NMTOKEN" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+<!--
+	Group of labels on the status bar. The order from up to down in xml file
+	stands for the order right to left in Andami's principal frame.
+
+	class-name	When the active view is an instance of class-name, this
+			labelSet will be shown.
+-->
+  <xs:element name="label-set">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="label" maxOccurs="unbounded" />
+      </xs:sequence>
+      <xs:attribute name="class-name" type="xs:NMTOKEN" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+<!--
+	jars that are used by this plugin
+	library-dir     Relative path where the jar files are. Usually ./ or ./lib
+-->
+  <xs:element name="libraries">
+    <xs:complexType>
+      <xs:attribute name="library-dir" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+<!--
+	action-command	Text to identify different menus inside the same plugin
+
+	key		    Abreviatura de teclado del menu
+	icon		Menu Icon
+	enable-text Texto con la descripción de las condiciones que se tienen que dar
+				para que se visualice la opción
+	tooltip		Tooltip
+	mnemonic	Accelerator key
+	text 		Menu Text
+	is_separator true means to add a JSeparator to the parent menu defined by text
+-->
+  <xs:element name="menu">
+    <xs:complexType>
+      <xs:attribute name="action-command" type="xs:string" use="optional" />
+      <xs:attribute name="key" type="xs:string" use="optional" />
+      <xs:attribute name="icon" type="xs:string" use="optional" />
+      <xs:attribute name="tooltip" type="xs:string" use="optional" />
+      <xs:attribute name="enable-text" type="xs:string" use="optional" />
+      <xs:attribute name="mnemonic" type="xs:string" use="optional" />
+      <xs:attribute name="text" type="xs:string" use="required" />
+      <xs:attribute name="position" type="xs:int" use="optional" />
+	  <xs:attribute name="is_separator" type="xs:boolean" use="optional" />
+    </xs:complexType>
+  </xs:element>
+
+<!--
+	XML File Root
+
+	name		Plugin's Name
+	updateURL	URL of zip-file with a new plugin's version.
+-->
+  <xs:element name="plugin-config">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="icon" minOccurs="0"/>
+        <xs:element ref="depends" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="resourceBundle" minOccurs="0"/>
+        <xs:element ref="label-set" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="libraries"/>
+        <xs:element ref="popup-menus" minOccurs="0"/>
+        <xs:element ref="extensions" />
+      </xs:sequence>
+      <xs:attribute name="update-url" type="xs:string" use="optional" />
+    </xs:complexType>
+  </xs:element>
+
+<!--
+	Popup menu by the plugin. The plugin must register itself as a
+	popup-menu listener.
+-->
+  <xs:element name="popup-menu">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="menu" maxOccurs="unbounded" />
+      </xs:sequence>
+      <xs:attribute name="name" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+<!--
+	Section to define popup-menus
+-->
+  <xs:element name="popup-menus">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="popup-menu" maxOccurs="unbounded" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+<!--
+	Properties file with translations used by the tool.
+
+	name	Name of resource bundle file
+-->
+  <xs:element name="resourceBundle">
+    <xs:complexType>
+      <xs:attribute name="name" type="xs:NMTOKEN" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+<!--
+	tool button that remains pressed when it is selected.
+
+	text		Button's text.
+	name			Button name (to retrive it)
+	action-command	Text to identify the different action-tools inside a plugin.
+
+	group		Group where the selectable-tool belongs. It will be only one selectable-tool
+				selected inside the group.
+	is-default  If true, the selectable-tool will be selected by default.
+	icon		Icon to use.
+	last		If true, after the tool it will appears a separator.
+	tooltip		Tooltip
+	position	The position inside the toolbar
+-->
+  <xs:element name="selectable-tool">
+    <xs:complexType>
+      <xs:attribute name="text" type="xs:string" use="optional" />
+      <xs:attribute name="name" type="xs:string" use="optional" />
+      <xs:attribute name="action-command" type="xs:string" use="optional" />
+      <xs:attribute name="is-default" type="xs:boolean" use="optional" />
+      <xs:attribute name="last" type="xs:boolean" use="optional" />
+      <xs:attribute name="icon" type="xs:string" use="required" />
+      <xs:attribute name="tooltip" type="xs:string" use="optional" />
+      <xs:attribute name="enable-text" type="xs:string" use="optional" />
+      <xs:attribute name="group" type="xs:string" use="optional" default="unico" />
+      <xs:attribute name="position" type="xs:int" use="optional" />
+    </xs:complexType>
+  </xs:element>
+
+<!--
+	Extension plugin to andami
+
+	class-name		Class which handles the plugin
+	menu			Menus installed by the plugin
+	tool-bar		Toolbar of the plugin. If it doesn't exist, it will be created.
+	combo-button	combo-button to be added to the status bar
+	combo-scale		combo-scale to be added to the status bar
+-->
+  <xs:element name="skin-extension" type="skin-extension-type"/>
+
+  <xs:complexType name="skin-extension-type">
+    <xs:sequence>
+      <xs:element ref="menu" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element ref="tool-bar" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element ref="combo-button" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element ref="combo-scale" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+    <xs:attribute name="class-name" type="xs:NMTOKEN" use="required" />
+  </xs:complexType>
+
+<!--
+	tool-bar => Application's main toolbar
+
+	name	Toolbar name. This way, other plugins can refer to this toolbar
+			and add tools to this toolbar.
+	position	Used to order the toolbars. Toolbars with higher position are
+				placed on the right side, toolbars with lower position are
+				placed on the left. If it's omitted, the default value is 50.
+
+	combo-button	combo-button to be added to the toolbar
+	commbo-scale	combo-scale to be added to the toolbar
+	visible			(Not supported yet). Determines whether the toolbar is
+					visible by default.	In the future it will be possible to
+					hide/show toolbars, and this attribute will set its	initial
+					status.	Note: if the toolBar is defined in several
+					extensions, the	extension with highest priority will decide
+					the toolbar's visibility.
+-->
+  <xs:element name="tool-bar">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="action-tool" minOccurs="0" maxOccurs="unbounded" />
+        <xs:element ref="selectable-tool" minOccurs="0" maxOccurs="unbounded" />
+        <xs:element ref="combo-button" minOccurs="0" maxOccurs="unbounded" />
+        <xs:element ref="combo-scale" minOccurs="0" maxOccurs="unbounded" />
+      </xs:sequence>
+      <xs:attribute name="name" type="xs:string" use="required" />
+      <xs:attribute name="position" type="xs:int" use="optional" default="50" />
+      <xs:attribute name="is-visible" type="xs:boolean" use="optional" default="true" />
+    </xs:complexType>
+  </xs:element>
+
+ <!--
+ 	combo-scale => A combo box with numeric values, and editable.
+
+ 	name		A name to identify the combo-scale.
+
+ 	label		The label to be displayed on the left of the combo
+
+ 	elements    A semicolon separated list of the combo box' elements
+
+ 	value		The initial selected value. If ommited, the first element is selected
+
+	action-command	Text to identify the different action-tools inside a plugin.
+ -->
+  <xs:element name="combo-scale">
+  	<xs:complexType>
+  		<xs:attribute name="name" type="xs:string" use="required" />
+  		<xs:attribute name="label" type="xs:string" use="optional" />
+  		<xs:attribute name="elements" use="required" />
+  		<xs:attribute name="value" use="optional" />
+  		<xs:attribute name="action-command" type="xs:string" use="required" />
+  		<xs:attribute name="position" use="optional" />
+  	</xs:complexType>
+  </xs:element>
+<!--
+	combo-button => A combo button (drop-down list of selectable buttons).
+
+	name		A name to identify the combo-button
+
+-->
+  <xs:element name="combo-button">
+  	<xs:complexType>
+  		<xs:sequence>
+        	<xs:element ref="combo-button-element" minOccurs="0" maxOccurs="unbounded" />
+      	</xs:sequence>
+  		<xs:attribute name="name" type="xs:string" use="required" />
+  		<xs:attribute name="position" use="optional" />
+  	</xs:complexType>
+  </xs:element>
+
+<!--
+	combo-button-element => An entry (icon) on the combo-button list
+
+	action-command	Text to identify the different action-tools inside a plugin.
+
+	icon		Icon to use.
+-->
+	<xs:element name="combo-button-element">
+		<xs:complexType>
+			<xs:attribute name="icon" type="xs:string" use="required"/>
+			<xs:attribute name="action-command"  type="xs:string"  use="required"/>
+		</xs:complexType>
+	</xs:element>
+
+</xs:schema>

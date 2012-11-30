@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin-config>
+	<libraries library-dir="." />
+	<resourceBundle name="text" />
+	<extensions>
+		<extension class-name="org.gvsig.TestExtension" active="true">
+			<menu text="Test/test" action-command="" position="-100" />
+		</extension>
+
+		<!-- FILE MENU -->
+		<extension class-name="com.iver.cit.gvsig.ProjectExtension"
+			description="Extensión encargada de gestionar los proyectos." active="true"
+			priority="1000">
+			<menu text="Archivo/nuevo_proyecto" action-command="NUEVO" icon="project-new"
+				position="-100" />
+			<menu text="Archivo/abrir_proyecto" action-command="ABRIR"
+				icon="project-open" position="10" />
+			<menu text="Archivo/guardar_proyecto" key="s" action-command="GUARDAR"
+				icon="project-save" position="20" />
+			<menu text="Archivo/guardar_como" action-command="GUARDAR_COMO"
+				icon="project-save-as" position="30" last="true" />
+			<menu text="Archivo" position="35" is_separator="true" />
+			<menu text="Archivo/abrir_plantilla" action-command="OPENTEMPLATE"
+				icon="layout-template-open" position="40" last="true" />
+			<menu text="Archivo" position="45" is_separator="true" />
+			<menu text="Archivo/salir" action-command="SALIR" icon="application-exit"
+				position="9999" />
+			<tool-bar name="gvSIG_archivos" position="-1">
+				<action-tool icon="project-new" tooltip="nuevo_tooltip"
+					action-command="NUEVO" position="1" />
+				<action-tool icon="project-open" tooltip="abrir_tooltip"
+					action-command="ABRIR" position="2" />
+				<action-tool icon="project-save" tooltip="guardar_tooltip"
+					action-command="GUARDAR" position="3" />
+			</tool-bar>
+		</extension>
+	</extensions>
+</plugin-config>

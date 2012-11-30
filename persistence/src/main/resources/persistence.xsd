@@ -1,0 +1,118 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://gvsigce.org/ExternalCommm"
+	targetNamespace="http://gvsigce.org/ExternalCommm" elementFormDefault="qualified">
+
+	<!-- The root element of event documents. JAXB requires its type to be defined 
+		anonymously in order to generate the necessary @XMLRootElement annotation -->
+	<xs:element name="project">
+		<!-- Project type -->
+		<xs:complexType>
+			<xs:sequence>
+
+				<xs:element name="extents" type="LabeledExtentType"
+					maxOccurs="unbounded" />
+
+				<xs:element name="data-sources" type="DataSourceType"
+					maxOccurs="unbounded" />
+
+				<xs:element name="documents" type="DocumentType"
+					maxOccurs="unbounded" />
+
+			</xs:sequence>
+			<xs:attribute name="version" type="xs:string" />
+			<xs:attribute name="name" type="xs:string" />
+			<xs:attribute name="owner" type="xs:string" />
+			<xs:attribute name="comments" type="xs:string" />
+			<xs:attribute name="creationDate" type="xs:string" />
+			<xs:attribute name="modificationDate" type="xs:string" />
+			<xs:attribute name="absolute-path" type="xs:boolean" />
+			<xs:attribute name="selection-color" type="xs:string" />
+			<xs:attribute name="default-crs" type="xs:string" />
+		</xs:complexType>
+	</xs:element>
+
+	<xs:complexType name="LabeledExtentType">
+		<xs:complexContent>
+			<xs:extension base="ExtentType">
+				<xs:attribute name="comment" type="xs:string" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ExtentType">
+		<xs:attribute name="minx" type="xs:double" />
+		<xs:attribute name="miny" type="xs:double" />
+		<xs:attribute name="maxx" type="xs:double" />
+		<xs:attribute name="maxy" type="xs:double" />
+	</xs:complexType>
+
+	<xs:complexType name="DataSourceType">
+		<xs:sequence>
+			<xs:element name="properties" type="StringPropertyType"
+				maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PropertyType" abstract="true">
+		<xs:attribute name="property-name" type="xs:string" />
+	</xs:complexType>
+	<xs:complexType name="StringPropertyType">
+		<xs:complexContent>
+			<xs:extension base="PropertyType">
+				<xs:attribute name="property-value" type="xs:string" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="DocumentType" abstract="true">
+		<xs:attribute name="name" type="xs:string" />
+		<xs:attribute name="comment" type="xs:string" />
+		<xs:attribute name="creation-date" type="xs:string" />
+		<xs:attribute name="owner" type="xs:string" />
+		<xs:attribute name="class-name" type="xs:string" />
+	</xs:complexType>
+	<xs:complexType name="ViewDocumentType">
+		<xs:complexContent>
+			<xs:extension base="DocumentType">
+				<xs:sequence>
+					<xs:element name="main-map" type="MapType" />
+					<xs:element name="overview-map" type="MapType"
+						minOccurs="0" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="MapType">
+		<xs:sequence>
+			<xs:element name="rootLayer" type="LayerType"
+				maxOccurs="1" minOccurs="1" />
+		</xs:sequence>
+		<xs:attribute name="mapUnits" type="xs:int" />
+		<xs:attribute name="areaUnits" type="xs:int" />
+		<xs:attribute name="distanceUnits" type="xs:int" />
+		<xs:attribute name="color" type="xs:int" />
+		<xs:attribute name="crs" type="xs:string" />
+	</xs:complexType>
+
+	<xs:complexType name="LayerType" abstract="true">
+	</xs:complexType>
+	<xs:complexType name="CompositeLayerType">
+		<xs:complexContent>
+			<xs:extension base="LayerType">
+				<xs:sequence>
+					<xs:element name="layers" type="LayerType" maxOccurs="unbounded"
+						minOccurs="0" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="DataLayerType">
+		<xs:complexContent>
+			<xs:extension base="LayerType">
+				<xs:sequence>
+					<xs:element name="source" type="DataSourceType"
+						maxOccurs="1" minOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+</xs:schema>
