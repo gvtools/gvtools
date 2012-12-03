@@ -33,11 +33,6 @@
 			<version>3.0</version>
 		</dependency>
 		<dependency>
-			<groupId>org.gvtools</groupId>
-			<artifactId>persistence</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>geomatico</groupId>
 			<artifactId>utils</artifactId>
 			<version>1.1-SNAPSHOT</version>
@@ -86,6 +81,25 @@
 				<configuration>
 					<argLine>-XX:-UseSplitVerifier</argLine>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.jvnet.jaxb2.maven2</groupId>
+				<artifactId>maven-jaxb2-plugin</artifactId>
+				<version>0.7.5</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<!-- Changes the default schema directory -->
+							<schemaDirectory>src/main/resources</schemaDirectory>
+							<generateDirectory>src/main/jaxb</generateDirectory>
+							<generatePackage>org.gvsig.persistence.generated</generatePackage>
+							<addCompileSourceRoot>true</addCompileSourceRoot>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
