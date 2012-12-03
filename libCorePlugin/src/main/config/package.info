@@ -1,0 +1,16 @@
+
+state=devel
+name=com.iver.core
+official=true
+code=com.iver.core
+operating-system=all
+architecture=all
+java-version=j1_5
+gvSIG-version=1.0.0
+version=1.0.0
+type=plugin
+description=gvSIG basic extensions
+build=1305
+buildNumber=1305
+model-version=1.0.0
+		

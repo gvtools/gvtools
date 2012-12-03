@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<plugin-config>
+	<libraries library-dir="."/>
+	<resourceBundle name="text"/>
+	<extensions>
+		<extension class-name="com.iver.core.menus.ToolbarMenus"
+			description="Active toolbar menues"
+			active="true"
+			priority="99999">
+		</extension>
+		<extension class-name="com.iver.core.Consola"
+			description="Extensión encargada de abrir la ventana de la consola."
+			active="true" priority="1">
+			<menu text="Ver/Consola" action-command="unico"
+				icon="images/console.png"
+				position="1050"/>
+			<menu text="Ver/Consola" is_separator="true" position="1051"/>
+			<!--
+			<tool-bar name="core" position="1000">
+				<action-tool icon="application-console"
+					action-command="consola" tooltip="titulo_consola"
+					enable-text="debe_estar_activada" last="true" position="1"/>
+			</tool-bar>
+			-->
+		</extension>
+		<extension class-name="com.iver.core.PreferencesExtension"
+			description="Extensión encargada de abrir la ventana de preferencias de ANDAMI."
+			active="true" priority="3">
+			<menu text="Archivo/Preferencias" action-command="preferences"
+				icon="application-preferences"
+				position="5010"/>
+			<menu text="Archivo"
+				position="5011"
+				is_separator="true"/>
+			<!--
+			<tool-bar name="core" position="1000">
+				<action-tool icon="application-preferences"
+					action-command="preferences" tooltip="preferencias"
+					enable-text="debe_estar_activada" position="2"/>
+			</tool-bar>
+			-->
+		</extension>
+		<extension class-name="com.iver.core.StatusBar"
+			description="Recoge los mensajes del NotificationManager y los muestra por la StatusBar"
+			active="true">
+		</extension>
+		<skin-extension class-name="com.iver.core.mdiManager.NewSkin">
+			<menu text="Ventana/Cascada" action-command="cascada"
+				position="5005"/>
+			<menu text="Ventana/Tile" action-command="mosaico"
+				position="5006"/>
+			<menu text="Ventana/Tile" is_separator="true"
+				position="5007"/>
+		</skin-extension>
+	</extensions>
+</plugin-config>
+
+<!--
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE plugin SYSTEM "../../plugin.dtd">
+<plugin>
+	<libraries>
+		<library file="com.iver.core.jar"/>
+		<library file="prulib.jar"/>
+	</libraries>
+	<resourceBundle name="text"/>
+	<labelSet class="com.iver.core.ConsolaFrame">
+		<label text="label1"/>
+		<label text="label2"/>
+	</labelSet>
+	<extension>
+		<class name="com.iver.core.Consola"/>
+		<menu text="Ver/Consola" key="s"/>
+		<toolBar name="Ver">
+			<tool icon="application-console"
+				actionCommand="CONSOLA"/>
+		</toolBar>
+	</extension>
+	<extension>
+		<class name="com.iver.core.Cascade"/>
+		<menu text="Window/Tile" key="t"
+			tooltip="tile_tooltip"
+			enableText="cascada_enable"
+			actionCommand="TILE"/>
+		<menu text="Window/Cascada" key="c"
+			tooltip="cascada_tooltip"
+			enableText="cascada_enable"
+			actionCommand="CASCADA"/>
+		<toolBar name="Window">
+			<tool icon="images/cascada.gif"
+				tooltip="cascada_tooltip"
+				enableText="cascada_enable"
+				actionCommand="CASCADA"/>
+			<tool icon="images/tile.gif"
+				tooltip="tile_tooltip"
+				enableText="cascada_enable"
+				actionCommand="TILE"/>
+		</toolBar>
+		<popupMenu name="cascada">
+			<entry text="Cascada"
+				tooltip="cascada_tooltip"
+				enableText="cascada_enable" actionCommand="CASCADA"/>
+			<entry text="Tile"
+				tooltip="tile_tooltip"
+				enableText="cascada_enable" actionCommand="CASCADA"/>
+		</popupMenu>
+	</extension>
+	<extension>
+		<class name="com.iver.core.StatusBar"/>
+	</extension>
+</plugin>
+-->

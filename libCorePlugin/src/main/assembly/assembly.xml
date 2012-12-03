@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly>
+	<id>extension</id>
+	<formats>
+		<format>zip</format>
+		<format>dir</format>
+	</formats>
+	<baseDirectory>com.iver.core</baseDirectory>
+
+	<fileSets>
+		<fileSet>
+			<directory>${basedir}/src/main/config</directory>
+			<outputDirectory>/</outputDirectory>
+		</fileSet>		
+		<fileSet>
+			<directory>${basedir}/src/main/images</directory>
+			<outputDirectory>/images</outputDirectory>
+		</fileSet>
+	</fileSets>
+
+	<dependencySets>
+		<dependencySet>
+			<unpack>false</unpack>
+			<scope>runtime</scope>
+			<outputDirectory>/</outputDirectory>
+			<outputFileNameMapping>${artifact.artifactId}-${artifact.baseVersion}.${artifact.extension}
+			</outputFileNameMapping>
+		</dependencySet>
+	</dependencySets>
+</assembly>
