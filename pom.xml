@@ -13,10 +13,8 @@
 		<module>main</module>
 		<module>persistence</module>
 		<module>core</module>
-		<module>gvtools-app</module>
 	</modules>
 	<properties>
-		<gvjars>${repo-root}/jars</gvjars>
 		<project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
 		<geotools.version>8.0</geotools.version>
 	</properties>

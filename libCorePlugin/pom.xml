@@ -10,6 +10,17 @@
 	<groupId>org.gvtools.extension</groupId>
 	<artifactId>libCorePlugin</artifactId>
 	<name>libCorePlugin</name>
+	<profiles>
+		<profile>
+			<id>build</id>
+			<properties>
+				<build.directory>../build/gvtools-${project.version}/extensions</build.directory>
+			</properties>
+		</profile>
+	</profiles>
+	<properties>
+		<build.directory>${project.build.directory}</build.directory>
+	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -42,6 +53,10 @@
 					<descriptors>
 						<descriptor>src/main/assembly/assembly.xml</descriptor>
 					</descriptors>
+					<attach>false</attach>
+					<finalName>com.iver.core</finalName>
+					<appendAssemblyId>false</appendAssemblyId>
+					<outputDirectory>${build.directory}</outputDirectory>
 				</configuration>
 			</plugin>
 		</plugins>

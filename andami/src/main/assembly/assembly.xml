@@ -23,20 +23,7 @@
 
 	<dependencySets>
 		<dependencySet>
-			<outputDirectory>extensions</outputDirectory>
-			<includes>
-				<include>*gvtools*:*:*:extension:*</include>
-				<include>*:libCorePlugin:*:*</include>
-			</includes>
-			<unpack>true</unpack>
-		</dependencySet>
-		<dependencySet>
 			<outputDirectory>lib</outputDirectory>
-			<excludes>
-				<exclude>*gvtools*:*:*:extension:*</exclude>
-				<exclude>*:libCorePlugin:*:*</exclude>
-			</excludes>
-			<useTransitiveFiltering>true</useTransitiveFiltering>
 		</dependencySet>
 	</dependencySets>
 </assembly>

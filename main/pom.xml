@@ -20,8 +20,17 @@
 		</repository>
 	</repositories>
 	<properties>
+		<build.directory>${project.build.directory}</build.directory>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
+	<profiles>
+		<profile>
+			<id>build</id>
+			<properties>
+				<build.directory>../build/gvtools-${project.version}/extensions</build.directory>
+			</properties>
+		</profile>
+	</profiles>
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -64,6 +73,10 @@
 					<descriptors>
 						<descriptor>src/main/assembly/assembly.xml</descriptor>
 					</descriptors>
+					<attach>false</attach>
+					<finalName>org.gvtools.main</finalName>
+					<appendAssemblyId>false</appendAssemblyId>
+					<outputDirectory>${build.directory}</outputDirectory>
 				</configuration>
 			</plugin>
 		</plugins>

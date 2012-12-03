@@ -82,14 +82,19 @@ Package the application::
 
 	$ mvn package
 
+This will package the artifacts separately in their *target* folders. 
+To create a ready to run build, use the *build* profile::
+
+	$ mvn package -Pbuild
+
 If there are test failures and you really want to package the application, 
 use the skipTests property::
 
-	$ mvn package -DskipTests
+	$ mvn package -Pbuild -DskipTests
 
 And run the application::
 
-	$ cd gvtools-app/target/gvtools-<version>
+	$ cd build/gvtools-<version>
 	$ ./gvSIG.sh
 
 Sorry, the Windows version is not available yet.

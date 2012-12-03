@@ -2,9 +2,9 @@
 <assembly>
 	<id>extension</id>
 	<formats>
-		<format>zip</format>
+		<format>dir</format>
 	</formats>
-	<baseDirectory>org.gvtools.main</baseDirectory>
+	<baseDirectory>.</baseDirectory>
 
 	<fileSets>
 		<fileSet>
