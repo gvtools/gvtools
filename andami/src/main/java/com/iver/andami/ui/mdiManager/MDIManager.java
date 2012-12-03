@@ -62,7 +62,7 @@ import com.iver.andami.ui.mdiFrame.MDIFrame;
  * real window.
  * </p>
  * <p>
- * This class is implemented by the Andami Skin (currently libCorePlugin), which
+ * This class is implemented by the Andami Skin (currently base-plugin), which
  * will decide the final implementation of frames. A different frame
  * implementation could be used by switching the Skin.
  * </p>

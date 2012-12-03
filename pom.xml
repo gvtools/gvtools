@@ -9,7 +9,7 @@
 	<name>gvtools root</name>
 	<modules>
 		<module>andami</module>
-		<module>libCorePlugin</module>
+		<module>base-plugin</module>
 		<module>main</module>
 		<module>core</module>
 	</modules>

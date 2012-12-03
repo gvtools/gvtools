@@ -46,14 +46,12 @@ Project structure
 The gvtools project consists of the following projects:
 
 - andami: The plug-in system
-- libCorePlugin: A core andami plug-in that manages other plug-in windows. Crap. Do not touch.
+- base-plugin: A core andami plug-in that manages other plug-in windows. Crap. Do not touch.
 - main: The only plug-in (appart of core-plugin) of gvtools. Instead of having a lot of different
   plugin projects we only have one for now. There is no need to split the project
   so far.
 - core: The library that contains all the code that can be implemented with
   Geotools
-- persistence: Just defines an schema for the project persistence and generates
-  JAXB classes to perform the marshalling and unmarshalling process
 
 Workspace configuration
 .........................
