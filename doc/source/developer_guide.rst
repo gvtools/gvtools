@@ -97,6 +97,25 @@ And run the application::
 
 Sorry, the Windows version is not available yet.
 
+In order to run/debug the application using Eclipse, a new Run (or Debug)
+configuration must be created. Use the *Run -> Run configurations...* (or
+*Debug -> Debug configurations...*) menu, and double-click on 
+*Java Application*.
+
+On the *Main* tab set the *Project* to *andami* and the *Main class* to 
+*com.iver.core.Launcher*:
+
+.. image:: images/run_main.png
+   :align: center
+
+Then switch to the *Arguments* tab and set the *Program arguments* to
+*gvtools extensions* and the *Working directory* to the build directory
+(*build/gvtools-<version>*):
+
+.. image:: images/run_args.png
+   :align: center
+Run.
+
 Contributing
 -------------
 
