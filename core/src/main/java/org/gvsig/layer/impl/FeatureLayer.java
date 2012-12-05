@@ -43,6 +43,11 @@ public class FeatureLayer implements Layer {
 	}
 
 	@Override
+	public Layer[] getChildren() {
+		return new Layer[0];
+	}
+
+	@Override
 	public Layer[] getAllLayersInTree() {
 		return new Layer[] { this };
 	}

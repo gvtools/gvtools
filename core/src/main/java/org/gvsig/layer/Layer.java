@@ -33,6 +33,14 @@ public interface Layer {
 	Layer[] getAllLayersInTree();
 
 	/**
+	 * Returns the children of this layer. Empty array if this layer is not a
+	 * collection and has no children
+	 * 
+	 * @return
+	 */
+	Layer[] getChildren();
+
+	/**
 	 * Obtains an array of all layers that all match the filter condition. This
 	 * layer and all the descendant are tested
 	 * 

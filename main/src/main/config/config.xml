@@ -34,5 +34,15 @@
 					action-command="GUARDAR" position="3" />
 			</tool-bar>
 		</extension>
+
+		<extension class-name="com.iver.cit.gvsig.ZoomPrev"
+			description="Extensión encargada de gestionar los zooms previos al actual."
+			active="true"
+			priority="12">
+			<menu text="Vista/navegacion/Zoom_Previo" key="b" icon="view-zoom-back"/>
+			<tool-bar name="View_Tools" position ="3">
+				<action-tool icon="view-zoom-back" action-command="ZOOM_PREV" enable-text="Zoom_Previo" tooltip="Zoom_Previo" position="9"/>
+			</tool-bar>
+		</extension>
 	</extensions>
 </plugin-config>

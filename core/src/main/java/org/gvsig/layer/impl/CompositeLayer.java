@@ -42,6 +42,11 @@ public class CompositeLayer implements Layer {
 	}
 
 	@Override
+	public Layer[] getChildren() {
+		return this.layers.toArray(new Layer[this.layers.size()]);
+	}
+
+	@Override
 	public Layer[] getAllLayersInTree() {
 		ArrayList<Layer> ret = new ArrayList<Layer>();
 		ret.add(this);
