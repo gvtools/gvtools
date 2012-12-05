@@ -2,17 +2,36 @@ package org.gvsig.layer;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import geomatico.events.EventBus;
 
 import org.gvsig.GVSIGTestCase;
+import org.gvsig.events.LayerAddedEvent;
 import org.gvsig.layer.filter.LayerFilter;
 import org.gvsig.persistence.generated.LayerType;
 
+import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
+import com.google.inject.Module;
 
 public class LayerTest extends GVSIGTestCase {
 	@Inject
 	private LayerFactory layerFactory;
+
+	@Inject
+	private EventBus eventBus;
+
+	@Override
+	protected Module getOverridingModule() {
+		return new AbstractModule() {
+			@Override
+			protected void configure() {
+				bind(EventBus.class).toInstance(mock(EventBus.class));
+			}
+		};
+	}
 
 	public void testContains() throws Exception {
 		// Feature
@@ -167,10 +186,13 @@ public class LayerTest extends GVSIGTestCase {
 		Layer leaf = layerFactory.createLayer(mock(Source.class));
 		folder.addLayer(leaf);
 		root.addLayer(folder);
+
 		LayerType xml = root.getXML();
 		Layer copy = layerFactory.createLayer(xml);
 
 		assertTrue(copy.getAllLayersInTree().length == 3);
+		// For invocations, two at creation at two at copy
+		verify(eventBus, times(4)).fireEvent(any(LayerAddedEvent.class));
 	}
 
 	public void testRemoveLayer() throws Exception {

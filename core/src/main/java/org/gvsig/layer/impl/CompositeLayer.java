@@ -148,7 +148,7 @@ public class CompositeLayer implements Layer {
 		CompositeLayerType compositeLayerType = (CompositeLayerType) type;
 		List<LayerType> xmlLayers = compositeLayerType.getLayers();
 		for (LayerType layer : xmlLayers) {
-			layers.add(layerFactory.createLayer(layer));
+			addLayer(layerFactory.createLayer(layer));
 		}
 	}
 }
