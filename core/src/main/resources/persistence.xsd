@@ -83,8 +83,8 @@
 
 	<xs:complexType name="MapType">
 		<xs:sequence>
-			<xs:element name="rootLayer" type="LayerType"
-				maxOccurs="1" minOccurs="1" />
+			<xs:element name="rootLayer" type="LayerType" />
+			<xs:element name="last-extent" type="ExtentType" />
 		</xs:sequence>
 		<xs:attribute name="mapUnits" type="xs:int" />
 		<xs:attribute name="areaUnits" type="xs:int" />

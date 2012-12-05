@@ -20,8 +20,10 @@ import org.gvsig.layer.Layer;
 import org.gvsig.layer.LayerFactory;
 import org.gvsig.map.MapContext;
 import org.gvsig.persistence.PersistenceException;
+import org.gvsig.persistence.generated.ExtentType;
 import org.gvsig.persistence.generated.MapType;
 import org.gvsig.units.Unit;
+import org.gvsig.util.EnvelopeUtils;
 import org.gvsig.util.ProcessContext;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.FactoryException;
@@ -36,6 +38,7 @@ public class MapContextImpl implements MapContext, RenderListener {
 	private CoordinateReferenceSystem crs;
 	private EventBus eventBus;
 	private LayerFactory layerFactory;
+	private Rectangle2D lastDrawnArea = null;
 
 	MapContextImpl(EventBus eventBus, LayerFactory layerFactory) {
 		this.eventBus = eventBus;
@@ -82,6 +85,9 @@ public class MapContextImpl implements MapContext, RenderListener {
 		type.setColor(backgroundColor.getRGB());
 		type.setCrs(CRS.toSRS(crs));
 		type.setRootLayer(rootLayer.getXML());
+		if (lastDrawnArea != null) {
+			type.setLastExtent(EnvelopeUtils.toXML(lastDrawnArea));
+		}
 		return type;
 	}
 
@@ -102,6 +108,10 @@ public class MapContextImpl implements MapContext, RenderListener {
 		}
 
 		rootLayer = layerFactory.createLayer(mainMap.getRootLayer());
+		ExtentType lastExtentXML = mainMap.getLastExtent();
+		if (lastExtentXML != null) {
+			lastDrawnArea = EnvelopeUtils.fromXML(lastExtentXML);
+		}
 	}
 
 	@Override
@@ -144,9 +154,16 @@ public class MapContextImpl implements MapContext, RenderListener {
 	}
 
 	@Override
+	public Rectangle2D getLastDrawnArea() {
+		return lastDrawnArea;
+	}
+
+	@Override
 	public void draw(BufferedImage image, Graphics2D g, Rectangle2D extent,
 			ProcessContext processContext) throws IOException {
 		assert false : "processContext.isCancelled should be taken into account";
+
+		lastDrawnArea = extent;
 
 		GTRenderer renderer = new StreamingRenderer();
 

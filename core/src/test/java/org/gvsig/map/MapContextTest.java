@@ -3,6 +3,9 @@ package org.gvsig.map;
 import static org.mockito.Mockito.mock;
 
 import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 
 import org.geotools.referencing.CRS;
 import org.gvsig.GVSIGTestCase;
@@ -13,6 +16,7 @@ import org.gvsig.persistence.PersistenceException;
 import org.gvsig.persistence.generated.CompositeLayerType;
 import org.gvsig.persistence.generated.MapType;
 import org.gvsig.units.Unit;
+import org.gvsig.util.ProcessContext;
 
 import com.google.inject.Inject;
 
@@ -134,6 +138,8 @@ public class MapContextTest extends GVSIGTestCase {
 		mapContext.setCRS(CRS.decode("EPSG:23030"));
 		mapContext.getRootLayer().addLayer(
 				layerFactory.createLayer(mock(Source.class)));
+		mapContext.draw(mock(BufferedImage.class), mock(Graphics2D.class),
+				new Rectangle(0, 0, 10, 10), mock(ProcessContext.class));
 
 		MapType xml = mapContext.getXML();
 		MapContext copy = factory.createMapContext(xml);
@@ -145,6 +151,15 @@ public class MapContextTest extends GVSIGTestCase {
 				copy.getBackgroundColor()));
 		assertTrue(mapContext.getRootLayer().getAllLayersInTree().length == copy
 				.getRootLayer().getAllLayersInTree().length);
+		assertTrue(mapContext.getLastDrawnArea()
+				.equals(copy.getLastDrawnArea()));
+	}
+
+	public void testPersistenceWithNullDrawnArea() throws Exception {
+		MapType xml = mapContext.getXML();
+		MapContext copy = factory.createMapContext(xml);
+
+		assertTrue(copy.getLastDrawnArea() == null);
 	}
 
 	public void testSetXMLInvalidCRS() throws Exception {
@@ -161,5 +176,13 @@ public class MapContextTest extends GVSIGTestCase {
 			fail();
 		} catch (PersistenceException e) {
 		}
+	}
+
+	public void testLastDrawnArea() throws Exception {
+		Rectangle rectangle = new Rectangle(0, 0, 10, 10);
+		mapContext.draw(mock(BufferedImage.class), mock(Graphics2D.class),
+				rectangle, mock(ProcessContext.class));
+
+		assertTrue(mapContext.getLastDrawnArea().equals(rectangle));
 	}
 }

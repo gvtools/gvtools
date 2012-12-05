@@ -56,6 +56,14 @@ public interface MapContext {
 	Unit getAreaUnits();
 
 	/**
+	 * Returns the <code>extent</code> passed as a parameter in the last call to
+	 * {@link #draw(BufferedImage, Graphics2D, Rectangle2D, ProcessContext)}
+	 * 
+	 * @return
+	 */
+	Rectangle2D getLastDrawnArea();
+
+	/**
 	 * @param image
 	 * @param g
 	 * @param extent
