@@ -1,13 +1,10 @@
 Introduction
 ============
 
-The gvtools project aims to provide a Desktop GIS application that offers the gvSIG user interface backed by
-well known libraries, mainly Geotools.
-
 This project is started by us, the gvSIG CE team, with the aim to obtain a more stable version of gvSIG that is
-backed by well known libraries, mainly Geotools. This will allow us to reduce the efforts to
-maintain the software and, at the same time, to learn from a well established community on technical
-and organizational aspects.
+backed by well known libraries, mainly Geotools. The result will be a Desktop GIS application that
+will offer the gvSIG user interface but allowing us to reduce the effort to maintain the software and, at the same
+time, to learn from a well established community on technical and organizational aspects.
 
 On the other side, we look forward to have an opportunity to contribute back to Geotools or any other library
 in use.
@@ -27,4 +24,4 @@ This project is:
 
 - code: https://github.com/gvtools/gvtools
 
-- a mailing list: TODO link to english mailing list
+- a mailing list: http://www.freelists.org/list/gvtools

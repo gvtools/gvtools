@@ -105,14 +105,14 @@ configuration must be created. Use the *Run -> Run configurations...* (or
 On the *Main* tab set the *Project* to *andami* and the *Main class* to 
 *com.iver.core.Launcher*:
 
-.. image:: images/run_main.png
+.. image:: images/run-main.png
    :align: center
 
 Then switch to the *Arguments* tab and set the *Program arguments* to
 *gvtools extensions* and the *Working directory* to the build directory
 (*build/gvtools-<version>*):
 
-.. image:: images/run_args.png
+.. image:: images/run-args.png
    :align: center
 Run.
 
