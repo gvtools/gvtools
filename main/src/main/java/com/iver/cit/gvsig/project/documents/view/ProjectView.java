@@ -85,6 +85,7 @@ public class ProjectView extends ProjectViewBase {
 
 		ViewDocumentType xml = new ViewDocumentType();
 		super.fill(xml);
+		xml.setClassName("com.iver.cit.gvsig.project.documents.view.ProjectView");
 		// xml.putProperty("nameClass", this.getClass().getName());
 		// remove old hyperlink persistence
 		// xml.putProperty("m_selectedField", m_selectedField);
