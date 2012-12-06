@@ -57,6 +57,16 @@
 			<artifactId>gt-epsg-hsql</artifactId>
 			<version>${geotools.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-process</artifactId>
+			<version>${geotools.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-process-feature</artifactId>
+			<version>${geotools.version}</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
