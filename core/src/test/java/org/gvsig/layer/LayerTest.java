@@ -7,10 +7,14 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import geomatico.events.EventBus;
 
+import java.util.Collection;
+import java.util.Set;
+
 import org.gvsig.GVSIGTestCase;
 import org.gvsig.events.LayerAddedEvent;
 import org.gvsig.layer.filter.LayerFilter;
 import org.gvsig.persistence.generated.LayerType;
+import org.opengis.filter.identity.FeatureId;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
@@ -232,5 +236,47 @@ public class LayerTest extends GVSIGTestCase {
 
 		root.setVisible(true);
 		verify(leaf).setVisible(true);
+	}
+
+	public void testSelectionNotSupported() throws Exception {
+		Layer root = layerFactory.createLayer();
+		@SuppressWarnings("unchecked")
+		Set<FeatureId> sel = mock(Set.class);
+		try {
+			root.setSelection(sel);
+			fail();
+		} catch (UnsupportedOperationException e) {
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public void testCannotModifySelectionSet() throws Exception {
+		Layer layer = layerFactory.createLayer(mock(Source.class));
+		Set<FeatureId> selection = layer.getSelection();
+		try {
+			selection.add(mock(FeatureId.class));
+			fail();
+		} catch (UnsupportedOperationException e) {
+		}
+		try {
+			selection.addAll(mock(Collection.class));
+			fail();
+		} catch (UnsupportedOperationException e) {
+		}
+		try {
+			selection.clear();
+			fail();
+		} catch (UnsupportedOperationException e) {
+		}
+		try {
+			selection.remove(mock(FeatureId.class));
+			fail();
+		} catch (UnsupportedOperationException e) {
+		}
+		try {
+			selection.removeAll(mock(Collection.class));
+			fail();
+		} catch (UnsupportedOperationException e) {
+		}
 	}
 }

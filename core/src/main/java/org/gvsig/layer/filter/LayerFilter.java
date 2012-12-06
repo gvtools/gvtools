@@ -10,5 +10,7 @@ public interface LayerFilter {
 
 	LayerFilter ACTIVE = new ActiveFilter();
 
+	LayerFilter SELECTED = new SelectedFilter();
+
 	boolean accepts(Layer layer);
 }

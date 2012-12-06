@@ -2,12 +2,15 @@ package org.gvsig.layer;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Set;
 
+import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.styling.Style;
 import org.gvsig.layer.filter.LayerFilter;
 import org.gvsig.map.MapContext;
 import org.gvsig.persistence.generated.LayerType;
+import org.opengis.filter.identity.FeatureId;
 
 public interface Layer {
 
@@ -94,6 +97,13 @@ public interface Layer {
 	void setSelected(boolean selected);
 
 	/**
+	 * Gets the <code>selected</code> property.
+	 * 
+	 * @return
+	 */
+	boolean isSelected();
+
+	/**
 	 * Adds a layer as a child of this one.
 	 * 
 	 * @param testLayer
@@ -143,4 +153,36 @@ public interface Layer {
 	ReferencedEnvelope getBounds() throws IOException;
 
 	LayerType getXML();
+
+	/**
+	 * Gets the ids of the selected features.
+	 * 
+	 * @return
+	 * @throws UnsupportedOperationException
+	 *             If this is not a feature layer
+	 */
+	Set<FeatureId> getSelection() throws UnsupportedOperationException;
+
+	/**
+	 * Sets the ids of the selected features
+	 * 
+	 * @param newSelection
+	 * @throws UnsupportedOperationException
+	 *             If this is not a feature layer
+	 */
+	void setSelection(Set<FeatureId> newSelection)
+			throws UnsupportedOperationException;
+
+	/**
+	 * Gets this layer's data
+	 * 
+	 * @return
+	 * @throws UnsupportedOperationException
+	 *             If this is not a feature layer
+	 * @throws IOException
+	 *             If data access errors occur
+	 */
+	SimpleFeatureSource getFeatureSource()
+			throws UnsupportedOperationException, IOException;
+
 }

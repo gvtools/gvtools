@@ -73,10 +73,14 @@ import com.iver.cit.gvsig.fmap.tools.Behavior.Behavior;
 import com.iver.cit.gvsig.fmap.tools.Behavior.MouseMovementBehavior;
 import com.iver.cit.gvsig.fmap.tools.Behavior.MoveBehavior;
 import com.iver.cit.gvsig.fmap.tools.Behavior.PointBehavior;
+import com.iver.cit.gvsig.fmap.tools.Behavior.PolygonBehavior;
 import com.iver.cit.gvsig.fmap.tools.Behavior.RectangleBehavior;
 import com.iver.cit.gvsig.project.documents.view.ProjectView;
 import com.iver.cit.gvsig.project.documents.view.ProjectViewBase;
 import com.iver.cit.gvsig.project.documents.view.toolListeners.PanListener;
+import com.iver.cit.gvsig.project.documents.view.toolListeners.PointSelectListener;
+import com.iver.cit.gvsig.project.documents.view.toolListeners.PolygonSelectListener;
+import com.iver.cit.gvsig.project.documents.view.toolListeners.RectangleSelectListener;
 import com.iver.cit.gvsig.project.documents.view.toolListeners.StatusBarListener;
 import com.iver.cit.gvsig.project.documents.view.toolListeners.ZoomInListener;
 import com.iver.cit.gvsig.project.documents.view.toolListeners.ZoomOutListener;
@@ -434,6 +438,23 @@ public class View extends BaseView {
 		PanListener pl = new PanListener(m_MapControl);
 		m_MapControl.addMapTool("pan", new Behavior[] { new MoveBehavior(pl),
 				new MouseMovementBehavior(sbl) });
+
+		// Seleccion por punto
+		PointSelectListener psl = new PointSelectListener(m_MapControl);
+		m_MapControl.addMapTool("pointSelection", new Behavior[] {
+				new PointBehavior(psl), new MouseMovementBehavior(sbl) });
+
+		// Selecci�n por rect�ngulo
+		RectangleSelectListener rsl = new RectangleSelectListener(m_MapControl);
+		m_MapControl.addMapTool("rectSelection", new Behavior[] {
+				new RectangleBehavior(rsl), new MouseMovementBehavior(sbl) });
+
+		// Selecci�n por pol�gono
+		PolygonSelectListener poligSel = new PolygonSelectListener(m_MapControl);
+		m_MapControl
+				.addMapTool("polSelection", new Behavior[] {
+						new PolygonBehavior(poligSel),
+						new MouseMovementBehavior(sbl) });
 
 		// Zoom por rect�ngulo
 		ZoomOutRightButtonListener zoil = new ZoomOutRightButtonListener(

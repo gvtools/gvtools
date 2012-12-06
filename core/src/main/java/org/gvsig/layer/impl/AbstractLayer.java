@@ -17,4 +17,8 @@ public abstract class AbstractLayer implements Layer {
 		this.selected = selected;
 	}
 
+	@Override
+	public boolean isSelected() {
+		return this.selected;
+	}
 }

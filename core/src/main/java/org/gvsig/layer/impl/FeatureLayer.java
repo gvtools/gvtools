@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -16,11 +17,13 @@ import org.gvsig.layer.SymbolFactoryFacade;
 import org.gvsig.layer.filter.LayerFilter;
 import org.gvsig.persistence.generated.DataLayerType;
 import org.gvsig.persistence.generated.LayerType;
+import org.opengis.filter.identity.FeatureId;
 
 public class FeatureLayer extends AbstractLayer implements Layer {
 	private boolean editing, active;
 	private Source source;
 	private Style style;
+	private Set<FeatureId> selection;
 
 	private SourceFactory sourceFactory;
 	private FeatureSourceCache featureSourceCache;
@@ -62,6 +65,17 @@ public class FeatureLayer extends AbstractLayer implements Layer {
 	}
 
 	@Override
+	public void setSelection(Set<FeatureId> newSelection)
+			throws UnsupportedOperationException {
+		this.selection = Collections.unmodifiableSet(newSelection);
+	}
+
+	@Override
+	public Set<FeatureId> getSelection() throws UnsupportedOperationException {
+		return selection;
+	}
+
+	@Override
 	public boolean isEditing() {
 		return editing;
 	}
@@ -97,10 +111,8 @@ public class FeatureLayer extends AbstractLayer implements Layer {
 	}
 
 	private org.geotools.map.Layer getGTLayer() throws IOException {
-		SimpleFeatureSource featureSource = featureSourceCache
-				.getFeatureSource(source);
 		org.geotools.map.Layer layer = new org.geotools.map.FeatureLayer(
-				featureSource, getStyle());
+				getFeatureSource(), getStyle());
 		return layer;
 	}
 
@@ -131,6 +143,12 @@ public class FeatureLayer extends AbstractLayer implements Layer {
 
 		DataLayerType dataLayerType = (DataLayerType) layer;
 		source = sourceFactory.createSource(dataLayerType.getSource());
+	}
+
+	@Override
+	public SimpleFeatureSource getFeatureSource()
+			throws UnsupportedOperationException, IOException {
+		return featureSourceCache.getFeatureSource(source);
 	}
 
 }

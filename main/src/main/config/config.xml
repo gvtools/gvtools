@@ -95,5 +95,27 @@
 					enable-text="Zoom_Previo" tooltip="Zoom_Previo" position="9" />
 			</tool-bar>
 		</extension>
+		
+		<extension class-name="com.iver.cit.gvsig.ViewSelectionControls"
+			description="Extensión encargada de gestionar la vista."
+			active="true"
+			priority="15">
+			<menu text="Vista/seleccion/seleccionar_por_punto" position="16" action-command="SELPOINT" icon="view-select-geometry"/>
+			<menu text="Vista/seleccion/seleccionar_por_rectangulo" position="17" action-command="SELRECT" icon="view-select-by-rectangle"/>
+			<menu text="Vista/seleccion/seleccionar_por_poligono" position="18" action-command="SELPOL" icon="view-select-by-polygon"/>
+			<menu text="Vista/seleccion/Seleccion_por_capa" action-command="separator" is_separator="true"/>			
+			<menu text="Vista/seleccion/Seleccion_por_capa" action-command="SELECTIONBYSHAPE" icon="images/select-by-spatial.png"/>
+			<menu text="Vista/seleccion/separator" action-command="separator" is_separator="true"/>
+			<menu text="Vista/seleccion/invert_selection" action-command="INVERT_SELECTION" icon="view-select-invert"/>
+			<tool-bar name="Tools_Select" position="7">
+				<selectable-tool icon="view-select-geometry" action-command="SELPOINT"  tooltip="seleccionar_por_punto" position="1"/>
+				<selectable-tool icon="view-select-by-rectangle" action-command="SELRECT"  tooltip="seleccionar_por_rectangulo" position="2"/>
+				<selectable-tool icon="view-select-by-polygon" action-command="SELPOL"  tooltip="seleccionar_por_poligono" position="3"/>
+				<action-tool icon="view-select-invert" action-command="INVERT_SELECTION"  tooltip="invert_selection" position="5"/>
+			</tool-bar>
+			<tool-bar name="Tools_Select_Advanced" position="8">
+				<action-tool icon="images/select-by-spatial.png" action-command="SELECTIONBYSHAPE" tooltip="Seleccion_por_capa" position="4"/>
+			</tool-bar>
+		</extension>
 	</extensions>
 </plugin-config>
