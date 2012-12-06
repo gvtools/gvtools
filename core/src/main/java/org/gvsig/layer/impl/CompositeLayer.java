@@ -17,7 +17,7 @@ import org.gvsig.layer.filter.LayerFilter;
 import org.gvsig.persistence.generated.CompositeLayerType;
 import org.gvsig.persistence.generated.LayerType;
 
-public class CompositeLayer implements Layer {
+public class CompositeLayer extends AbstractLayer implements Layer {
 	private List<Layer> layers = new ArrayList<Layer>();
 	private EventBus eventBus;
 	private LayerFactory layerFactory;
@@ -154,6 +154,22 @@ public class CompositeLayer implements Layer {
 		List<LayerType> xmlLayers = compositeLayerType.getLayers();
 		for (LayerType layer : xmlLayers) {
 			addLayer(layerFactory.createLayer(layer));
+		}
+	}
+
+	@Override
+	public void setVisible(boolean visible) {
+		super.setVisible(visible);
+		for (Layer layer : this.layers) {
+			layer.setVisible(visible);
+		}
+	}
+
+	@Override
+	public void setSelected(boolean selected) {
+		super.setSelected(selected);
+		for (Layer layer : this.layers) {
+			layer.setSelected(selected);
 		}
 	}
 }

@@ -6,6 +6,7 @@ import java.util.Collection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.styling.Style;
 import org.gvsig.layer.filter.LayerFilter;
+import org.gvsig.map.MapContext;
 import org.gvsig.persistence.generated.LayerType;
 
 public interface Layer {
@@ -74,6 +75,23 @@ public interface Layer {
 	 *         otherwise.
 	 */
 	boolean isActive();
+
+	/**
+	 * Sets the visibility property on the layer. If the layer visibility is set
+	 * to false,
+	 * {@link MapContext#draw(java.awt.image.BufferedImage, java.awt.Graphics2D, java.awt.geom.Rectangle2D, org.gvsig.util.ProcessContext)}
+	 * will ignore the layer
+	 * 
+	 * @param visible
+	 */
+	void setVisible(boolean visible);
+
+	/**
+	 * Sets the <code>selected</code> property. For general use by clients.
+	 * 
+	 * @param selected
+	 */
+	void setSelected(boolean selected);
 
 	/**
 	 * Adds a layer as a child of this one.

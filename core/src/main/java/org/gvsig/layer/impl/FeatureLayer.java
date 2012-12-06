@@ -17,7 +17,7 @@ import org.gvsig.layer.filter.LayerFilter;
 import org.gvsig.persistence.generated.DataLayerType;
 import org.gvsig.persistence.generated.LayerType;
 
-public class FeatureLayer implements Layer {
+public class FeatureLayer extends AbstractLayer implements Layer {
 	private boolean editing, active;
 	private Source source;
 	private Style style;

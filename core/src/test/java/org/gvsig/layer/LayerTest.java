@@ -219,4 +219,18 @@ public class LayerTest extends GVSIGTestCase {
 	public void testGetBounds() throws Exception {
 		fail();
 	}
+
+	public void testSetVisibleSetsChildren() throws Exception {
+		Layer root = layerFactory.createLayer();
+		Layer folder = layerFactory.createLayer();
+		Layer leaf = mock(Layer.class);
+		folder.addLayer(leaf);
+		root.addLayer(folder);
+
+		root.setVisible(false);
+		verify(leaf).setVisible(false);
+
+		root.setVisible(true);
+		verify(leaf).setVisible(true);
+	}
 }
