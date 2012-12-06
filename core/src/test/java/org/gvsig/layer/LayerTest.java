@@ -8,9 +8,11 @@ import static org.mockito.Mockito.when;
 import geomatico.events.EventBus;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.gvsig.GVSIGTestCase;
+import org.gvsig.events.FeatureSelectionChangeEvent;
 import org.gvsig.events.LayerAddedEvent;
 import org.gvsig.layer.filter.LayerFilter;
 import org.gvsig.persistence.generated.LayerType;
@@ -278,5 +280,19 @@ public class LayerTest extends GVSIGTestCase {
 			fail();
 		} catch (UnsupportedOperationException e) {
 		}
+	}
+
+	public void testSelectionInitialization() throws Exception {
+		Layer layer = layerFactory.createLayer(mock(Source.class));
+
+		assertTrue(layer.getSelection().isEmpty());
+	}
+
+	public void testSelectionEvent() throws Exception {
+		Layer layer = layerFactory.createLayer(mock(Source.class));
+
+		layer.setSelection(new HashSet<FeatureId>());
+
+		verify(eventBus).fireEvent(any(FeatureSelectionChangeEvent.class));
 	}
 }

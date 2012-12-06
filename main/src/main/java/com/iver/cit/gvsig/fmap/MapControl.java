@@ -70,6 +70,8 @@ import org.gvsig.events.BackgroundColorChangeEvent;
 import org.gvsig.events.BackgroundColorChangeHandler;
 import org.gvsig.events.EditionChangeEvent;
 import org.gvsig.events.EditionChangeHandler;
+import org.gvsig.events.FeatureSelectionChangeEvent;
+import org.gvsig.events.FeatureSelectionChangeHandler;
 import org.gvsig.events.LayerActivationChangeEvent;
 import org.gvsig.events.LayerActivationChangeHandler;
 import org.gvsig.events.LayerAddedEvent;
@@ -78,8 +80,6 @@ import org.gvsig.events.LayerLegendChangeEvent;
 import org.gvsig.events.LayerLegendChangeHandler;
 import org.gvsig.events.LayerRemovedEvent;
 import org.gvsig.events.LayerRemovedHandler;
-import org.gvsig.events.LayerSelectionChangeEvent;
-import org.gvsig.events.LayerSelectionChangeHandler;
 import org.gvsig.events.LayerVisibilityChangeEvent;
 import org.gvsig.events.LayerVisibilityChangeHandler;
 import org.gvsig.layer.Layer;
@@ -596,7 +596,8 @@ public class MapControl extends JComponent implements ComponentListener {
 		eventBus.addHandler(LayerVisibilityChangeEvent.class,
 				mapContextListener);
 		eventBus.addHandler(LayerLegendChangeEvent.class, mapContextListener);
-		eventBus.addHandler(LayerSelectionChangeEvent.class, mapContextListener);
+		eventBus.addHandler(FeatureSelectionChangeEvent.class,
+				mapContextListener);
 		eventBus.addHandler(ExtentChangeEvent.class, mapContextListener);
 	}
 
@@ -1958,7 +1959,7 @@ public class MapControl extends JComponent implements ComponentListener {
 	public class MapContextListener implements EditionChangeHandler,
 			BackgroundColorChangeHandler, LayerActivationChangeHandler,
 			LayerAddedHandler, LayerRemovedHandler, LayerLegendChangeHandler,
-			LayerSelectionChangeHandler, LayerVisibilityChangeHandler,
+			FeatureSelectionChangeHandler, LayerVisibilityChangeHandler,
 			ExtentChangeHandler {
 
 		@Override
@@ -1988,6 +1989,13 @@ public class MapControl extends JComponent implements ComponentListener {
 		@Override
 		public void extentChanged(MapContext source) {
 			if (source == mapContext) {
+				MapControl.this.drawMap(false);
+			}
+		}
+
+		@Override
+		public void featureSelectionChange(Layer source) {
+			if (mapContext.getRootLayer().contains(source)) {
 				MapControl.this.drawMap(false);
 			}
 		}

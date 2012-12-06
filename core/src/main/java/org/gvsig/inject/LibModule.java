@@ -2,18 +2,19 @@ package org.gvsig.inject;
 
 import geomatico.events.EventBus;
 
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.styling.StyleFactory;
 import org.gvsig.layer.DataStoreFinder;
 import org.gvsig.layer.FeatureSourceCache;
 import org.gvsig.layer.LayerFactory;
 import org.gvsig.layer.SourceFactory;
-import org.gvsig.layer.SymbolFactoryFacade;
 import org.gvsig.layer.impl.DataStoreFinderImpl;
 import org.gvsig.layer.impl.FeatureSourceCacheImpl;
 import org.gvsig.layer.impl.LayerFactoryImpl;
 import org.gvsig.layer.impl.SourceFactoryImpl;
-import org.gvsig.layer.impl.SymbolFactoryFacadeImpl;
 import org.gvsig.map.MapContextFactory;
 import org.gvsig.map.impl.MapContextFactoryImpl;
+import org.opengis.filter.FilterFactory2;
 
 import com.google.inject.AbstractModule;
 
@@ -29,7 +30,10 @@ public class LibModule extends AbstractModule {
 		bind(FeatureSourceCache.class).to(FeatureSourceCacheImpl.class);
 		bind(LayerFactory.class).to(LayerFactoryImpl.class);
 		bind(MapContextFactory.class).to(MapContextFactoryImpl.class);
-		bind(SymbolFactoryFacade.class).to(SymbolFactoryFacadeImpl.class);
 		bind(EventBus.class).toInstance(EventBus.getInstance());
+		bind(StyleFactory.class).toInstance(
+				CommonFactoryFinder.getStyleFactory());
+		bind(FilterFactory2.class).toInstance(
+				CommonFactoryFinder.getFilterFactory2());
 	}
 }

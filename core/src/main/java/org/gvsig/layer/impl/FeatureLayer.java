@@ -1,39 +1,54 @@
 package org.gvsig.layer.impl;
 
+import geomatico.events.EventBus;
+
 import java.awt.Color;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.styling.FeatureTypeStyle;
+import org.geotools.styling.LineSymbolizer;
+import org.geotools.styling.Rule;
+import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
+import org.geotools.styling.StyleFactory;
+import org.gvsig.events.FeatureSelectionChangeEvent;
 import org.gvsig.layer.FeatureSourceCache;
 import org.gvsig.layer.Layer;
 import org.gvsig.layer.Source;
 import org.gvsig.layer.SourceFactory;
-import org.gvsig.layer.SymbolFactoryFacade;
 import org.gvsig.layer.filter.LayerFilter;
 import org.gvsig.persistence.generated.DataLayerType;
 import org.gvsig.persistence.generated.LayerType;
+import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.identity.FeatureId;
 
 public class FeatureLayer extends AbstractLayer implements Layer {
 	private boolean editing, active;
 	private Source source;
 	private Style style;
-	private Set<FeatureId> selection;
+	private Set<FeatureId> selection = new HashSet<FeatureId>();
 
+	private EventBus eventBus;
 	private SourceFactory sourceFactory;
 	private FeatureSourceCache featureSourceCache;
-	private SymbolFactoryFacade symbolFactoryFacade;
+	private StyleFactory styleFactory;
+	private FilterFactory2 filterFactory;
+	private Rule selectionRule;
 
-	FeatureLayer(FeatureSourceCache featureSourceCache,
-			SymbolFactoryFacade symbolFactoryFacade, SourceFactory sourceFactory) {
+	FeatureLayer(EventBus eventBus, FeatureSourceCache featureSourceCache,
+			SourceFactory sourceFactory, StyleFactory styleFactory,
+			FilterFactory2 filterFactory) {
+		this.eventBus = eventBus;
 		this.featureSourceCache = featureSourceCache;
-		this.symbolFactoryFacade = symbolFactoryFacade;
 		this.sourceFactory = sourceFactory;
+		this.styleFactory = styleFactory;
+		this.filterFactory = filterFactory;
 	}
 
 	void setSource(Source source) {
@@ -68,6 +83,12 @@ public class FeatureLayer extends AbstractLayer implements Layer {
 	public void setSelection(Set<FeatureId> newSelection)
 			throws UnsupportedOperationException {
 		this.selection = Collections.unmodifiableSet(newSelection);
+
+		/*
+		 * We need to update the rule to style selected features
+		 */
+		getSelectionRule().setFilter(filterFactory.id(this.selection));
+		eventBus.fireEvent(new FeatureSelectionChangeEvent(this));
 	}
 
 	@Override
@@ -95,13 +116,51 @@ public class FeatureLayer extends AbstractLayer implements Layer {
 		this.style = style;
 	}
 
+	public Rule getSelectionRule() {
+		if (selectionRule == null) {
+			getStyle();
+		}
+
+		return selectionRule;
+	}
+
 	@Override
 	public Style getStyle() {
 		if (style == null) {
-			style = symbolFactoryFacade.newLineStyle(Color.BLUE, 1);
+			int width = 1;
+			Rule defaultRule = createRule(Color.BLUE, width);
+			defaultRule.setElseFilter(true);
+
+			selectionRule = createRule(Color.YELLOW, width);
+			selectionRule.setFilter(filterFactory.id(getSelection()));
+
+			FeatureTypeStyle fts = styleFactory
+					.createFeatureTypeStyle(new Rule[] { defaultRule,
+							selectionRule });
+			Style style = styleFactory.createStyle();
+			style.featureTypeStyles().add(fts);
+			this.style = style;
 		}
 
 		return style;
+	}
+
+	private Rule createRule(Color color, int width) {
+		/*
+		 * gtintegration Look here to complete
+		 * 
+		 * http://docs.geotools.org/latest/userguide/tutorial/map/style.html#
+		 * creating-a-style-based-on-the-selection
+		 */
+
+		Stroke stroke = styleFactory.createStroke(filterFactory.literal(color),
+				filterFactory.literal(width));
+
+		LineSymbolizer sym = styleFactory.createLineSymbolizer(stroke, null);
+
+		Rule rule = styleFactory.createRule();
+		rule.symbolizers().add(sym);
+		return rule;
 	}
 
 	@Override
