@@ -47,11 +47,9 @@ import java.awt.GridLayout;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
@@ -291,8 +289,7 @@ public class ViewProperties extends JPanel implements SingletonWindow {
 				cmbMapUnits.setSelectedItem(Unit.DEGREES); // degree
 				cmbMapUnits.setEnabled(false);
 			} else {
-				cmbMapUnits
-						.setSelectedItem(view.getMapContext().getMapUnits().name);
+				cmbMapUnits.setSelectedItem(view.getMapContext().getMapUnits());
 				cmbMapUnits.setEnabled(true);
 			}
 		}
@@ -750,7 +747,7 @@ public class ViewProperties extends JPanel implements SingletonWindow {
 			cmbDistanceArea.setPreferredSize(new java.awt.Dimension(200, 20));
 			cmbDistanceArea.setEditable(false);
 			cmbDistanceArea
-					.setSelectedItem(view.getMapContext().getAreaUnits().name);
+					.setSelectedItem(view.getMapContext().getAreaUnits());
 		}
 
 		return cmbDistanceArea;
@@ -760,30 +757,6 @@ public class ViewProperties extends JPanel implements SingletonWindow {
 	public Object getWindowProfile() {
 		// TODO Auto-generated method stub
 		return WindowInfo.PROPERTIES_PROFILE;
-	}
-
-	private class UnitRenderer extends DefaultListCellRenderer {
-		private static final long serialVersionUID = 1L;
-		private boolean square;
-
-		public UnitRenderer(boolean square) {
-			this.square = square;
-		}
-
-		@Override
-		public Component getListCellRendererComponent(JList<?> list,
-				Object value, int index, boolean isSelected,
-				boolean cellHasFocus) {
-			Unit unit = (Unit) value;
-			String text = PluginServices.getText(this, unit.name);
-			if (square) {
-				text += unit.getSquareSuffix();
-			}
-
-			return super.getListCellRendererComponent(list, text, index,
-					isSelected, cellHasFocus);
-		}
-
 	}
 
 } // @jve:decl-index=0:visual-constraint="10,10"

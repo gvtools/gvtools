@@ -35,13 +35,64 @@
 			</tool-bar>
 		</extension>
 
+		<extension class-name="com.iver.cit.gvsig.ViewControls"
+			description="Extensión encargada de gestionar la vista." active="true"
+			priority="10">
+			<combo-scale name="scale" label="1:"
+				elements="1000;2000;5000;10000;25000;50000;100000;200000;500000;1000000;2000000;5000000"
+				value="10000" action-command="CHANGE_SCALE" />
+			<menu text="Vista/poner_capas_a/visibles" action-command="CAPAS_VISIBLES"
+				position="5" />
+			<menu text="Vista/poner_capas_a/no_visibles" action-command="CAPAS_NOVISIBLES" />
+			<menu text="Vista/poner_capas_a/activos" action-command="CAPAS_ACTIVAS" />
+			<menu text="Vista/poner_capas_a/no_activos" action-command="CAPAS_NOACTIVAS" />
+			<menu text="Vista/navegacion" position="9" is_separator="true" />
+			<menu text="Vista/navegacion/Desplazamiento" key="y"
+				action-command="PAN" icon="view-pan" position="10" />
+			<menu text="Vista/navegacion/Desplazamiento" action-command="PAN"
+				icon="view-pan" is_separator="true" />
+			<menu text="Vista/navegacion/Zoom_Mas" key="+" action-command="ZOOM_IN"
+				icon="view-zoom-in" />
+			<menu text="Vista/navegacion/Zoom_Menos" key="-" action-command="ZOOM_OUT"
+				icon="view-zoom-out" />
+			<menu text="Vista/navegacion/Zoom_Acercar" action-command="ACTION_ZOOM_IN"
+				icon="view-zoom-center-in" />
+			<menu text="Vista/navegacion/Zoom_Alejar" action-command="ACTION_ZOOM_OUT"
+				icon="view-zoom-center-out" />
+			<menu text="Vista/navegacion/Zoom_Alejar" is_separator="true" />
+			<menu text="Vista/navegacion/Encuadre" action-command="ENCUADRE"
+				icon="view-zoom-manager" />
+			<menu text="Vista/navegacion/Encuadre" is_separator="true" />
+			<menu text="Vista/navegacion/Zoom_Completo" key="w"
+				action-command="FULL" icon="view-zoom-map-contents" />
+			<menu text="Vista/configurar_localizador" action-command="CONFIG_LOCATOR" />
+			<tool-bar name="View_Tools" position="3">
+				<selectable-tool icon="view-pan" action-command="PAN"
+					tooltip="Desplazamiento" position="1" />
+				<action-tool icon="view-zoom-manager" action-command="ENCUADRE"
+					tooltip="gestion_encuadre" position="6" />
+			</tool-bar>
+			<tool-bar name="View_Tools" position="3">
+				<selectable-tool is-default="true" icon="view-zoom-in"
+					action-command="ZOOM_IN" tooltip="Zoom_Mas" position="2" />
+				<selectable-tool icon="view-zoom-out"
+					action-command="ZOOM_OUT" tooltip="Zoom_Menos" position="3" />
+				<action-tool icon="view-zoom-center-in" action-command="ACTION_ZOOM_IN"
+					tooltip="Zoom_Acercar" position="4" />
+				<action-tool icon="view-zoom-center-out" action-command="ACTION_ZOOM_OUT"
+					tooltip="Zoom_Alejar" position="5" />
+				<action-tool icon="view-zoom-map-contents"
+					action-command="FULL" tooltip="Zoom_Completo" position="7" />
+			</tool-bar>
+		</extension>
+
 		<extension class-name="com.iver.cit.gvsig.ZoomPrev"
 			description="Extensión encargada de gestionar los zooms previos al actual."
-			active="true"
-			priority="12">
-			<menu text="Vista/navegacion/Zoom_Previo" key="b" icon="view-zoom-back"/>
-			<tool-bar name="View_Tools" position ="3">
-				<action-tool icon="view-zoom-back" action-command="ZOOM_PREV" enable-text="Zoom_Previo" tooltip="Zoom_Previo" position="9"/>
+			active="true" priority="12">
+			<menu text="Vista/navegacion/Zoom_Previo" key="b" icon="view-zoom-back" />
+			<tool-bar name="View_Tools" position="3">
+				<action-tool icon="view-zoom-back" action-command="ZOOM_PREV"
+					enable-text="Zoom_Previo" tooltip="Zoom_Previo" position="9" />
 			</tool-bar>
 		</extension>
 	</extensions>

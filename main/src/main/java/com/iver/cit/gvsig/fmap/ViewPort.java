@@ -1308,4 +1308,19 @@ public class ViewPort {
 	public void setZoomFactor(double z) {
 		this.zoomFactor = z;
 	}
+
+	public void setScale(long scale) {
+		double dpi = getScreenDPI();
+		if (getImageSize() == null)
+			return;
+		CoordinateReferenceSystem crs = mapContext.getCRS();
+		if (getAdjustedExtent() == null) {
+			return;
+		}
+		assert false : "Uncomment following line";
+		// setExtent(ProjectionUtils.getExtent(crs, getAdjustedExtent(), //
+		// extent
+		// scale, getImageWidth(), getImageHeight(), 100 * getMapUnits()
+		// .toMeter(), getDistanceUnits().toMeter(), dpi));
+	}
 }

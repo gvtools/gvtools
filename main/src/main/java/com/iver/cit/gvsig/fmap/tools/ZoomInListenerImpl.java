@@ -54,6 +54,7 @@ import com.iver.cit.gvsig.fmap.MapControl;
 import com.iver.cit.gvsig.fmap.ViewPort;
 import com.iver.cit.gvsig.fmap.tools.Events.RectangleEvent;
 import com.iver.cit.gvsig.fmap.tools.Listeners.RectangleListener;
+import com.iver.cit.gvsig.gui.preferencespage.ViewPage;
 
 /**
  * <p>
@@ -94,17 +95,6 @@ import com.iver.cit.gvsig.fmap.tools.Listeners.RectangleListener;
  * @author Vicente Caballero Navarro
  */
 public class ZoomInListenerImpl implements RectangleListener {
-	/**
-	 * <p>
-	 * Default <i>zoom in</i> factor.
-	 * </p>
-	 * <p>
-	 * Doing a <i>zoom in</i> operation, decreases the focal distance and
-	 * increases the eyesight angle to the surface. This allows view an smaller
-	 * area but with the items bigger.
-	 * </p>
-	 */
-	public static double ZOOMINFACTOR = 2;
 
 	/**
 	 * The image to display when the cursor is active.
@@ -153,7 +143,7 @@ public class ZoomInListenerImpl implements RectangleListener {
 
 		if ((pixelRect.getWidth() < 3) && (pixelRect.getHeight() < 3)) {
 			if (vp.getExtent() != null) {
-				double factor = 1 / ZOOMINFACTOR;
+				double factor = 1 / ViewPage.ZOOMINFACTOR;
 				double nuevoX = rect.getMaxX()
 						- ((vp.getExtent().getWidth() * factor) / 2.0);
 				double nuevoY = rect.getMaxY()

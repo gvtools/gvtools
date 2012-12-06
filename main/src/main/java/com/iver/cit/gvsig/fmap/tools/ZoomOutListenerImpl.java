@@ -55,6 +55,7 @@ import com.iver.cit.gvsig.fmap.MapControl;
 import com.iver.cit.gvsig.fmap.ViewPort;
 import com.iver.cit.gvsig.fmap.tools.Events.PointEvent;
 import com.iver.cit.gvsig.fmap.tools.Listeners.PointListener;
+import com.iver.cit.gvsig.gui.preferencespage.ViewPage;
 
 /**
  * <p>
@@ -93,18 +94,6 @@ import com.iver.cit.gvsig.fmap.tools.Listeners.PointListener;
  * @author Vicente Caballero Navarro
  */
 public class ZoomOutListenerImpl implements PointListener {
-	/**
-	 * <p>
-	 * Default <i>zoom out</i> factor.
-	 * </p>
-	 * <p>
-	 * Doing a <i>zoom out</i> operation, increases the focal distance and
-	 * decreases the eyesight angle to the surface. This allows view a bigger
-	 * area but with the items smaller.
-	 * </p>
-	 */
-	public static double ZOOMOUTFACTOR = 0.5;
-
 	/**
 	 * The image to display when the cursor is active.
 	 */
@@ -149,7 +138,7 @@ public class ZoomOutListenerImpl implements PointListener {
 
 		double nuevoX;
 		double nuevoY;
-		double factor = 1 / ZOOMOUTFACTOR;
+		double factor = 1 / ViewPage.ZOOMOUTFACTOR;
 		Rectangle2D.Double r = new Rectangle2D.Double();
 
 		nuevoX = p2.getX() - ((vp.getExtent().getWidth() * factor) / 2.0);
