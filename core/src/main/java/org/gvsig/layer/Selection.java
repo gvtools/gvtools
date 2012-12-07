@@ -1,34 +1,39 @@
 package org.gvsig.layer;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
 import org.opengis.filter.identity.FeatureId;
 
+/**
+ * Represents a set of {@link FeatureId} and includes methods to operate on
+ * selection sets, like {@link #xor(Selection)}. Instances of this object are
+ * mutable, but no event is triggered on doing that. In order to raise events,
+ * the instance must be the object containing this instance, for example
+ * {@link Layer#setSelection(Selection)}
+ * 
+ * @author Fernando González Cortés
+ * @author Víctor González Cortés
+ */
 public class Selection implements Set<FeatureId> {
 
 	private Set<FeatureId> fids;
 
-	public Selection(Set<FeatureId> selection) {
-		this.fids = Collections.unmodifiableSet(selection);
-	}
-
 	public Selection() {
-		this(new HashSet<FeatureId>());
+		this.fids = new HashSet<FeatureId>();
 	}
 
 	public Selection xor(Selection that) {
-		HashSet<FeatureId> ret = new HashSet<FeatureId>();
+		Selection ret = new Selection();
 		addNotContained(that, this.iterator(), ret);
 		addNotContained(this, that.iterator(), ret);
-		return new Selection(ret);
+		return ret;
 	}
 
 	private void addNotContained(Selection that,
-			Iterator<FeatureId> thisIterator, HashSet<FeatureId> ret) {
+			Iterator<FeatureId> thisIterator, Selection ret) {
 		while (thisIterator.hasNext()) {
 			FeatureId featureId = thisIterator.next();
 			if (!that.contains(featureId)) {
