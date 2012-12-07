@@ -1995,9 +1995,18 @@ public class MapControl extends JComponent implements ComponentListener {
 
 		@Override
 		public void featureSelectionChange(Layer source) {
+			refresh(source);
+		}
+
+		private void refresh(Layer source) {
 			if (mapContext.getRootLayer().contains(source)) {
 				MapControl.this.drawMap(false);
 			}
+		}
+
+		@Override
+		public void visibilityChanged(Layer source) {
+			refresh(source);
 		}
 	}
 
