@@ -44,12 +44,17 @@ import java.awt.Cursor;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
+import java.awt.geom.Rectangle2D;
 
 import javax.swing.ImageIcon;
+
+import org.gvsig.util.EnvelopeUtils;
 
 import com.iver.cit.gvsig.fmap.MapControl;
 import com.iver.cit.gvsig.fmap.tools.Events.RectangleEvent;
 import com.iver.cit.gvsig.fmap.tools.Listeners.RectangleListener;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
 
 /**
  * <p>
@@ -101,27 +106,11 @@ public class RectangleSelectionListener implements RectangleListener {
 	 * .iver.cit.gvsig.fmap.tools.Events.RectangleEvent)
 	 */
 	public void rectangle(RectangleEvent event) throws BehaviorException {
-		// try {
-		// // mapCtrl.getMapContext().selectByRect(event.getWorldCoordRect());
-		// Rectangle2D rect = event.getWorldCoordRect();
-		// FLayer[] actives = mapCtrl.getMapContext().getLayers().getActives();
-		// for (int i = 0; i < actives.length; i++) {
-		// if (actives[i] instanceof FLyrVect) {
-		// FLyrVect lyrVect = (FLyrVect) actives[i];
-		// FBitSet oldBitSet = lyrVect.getSource().getRecordset()
-		// .getSelection();
-		// FBitSet newBitSet = lyrVect.queryByRect(rect);
-		// if (event.getEvent().isControlDown())
-		// newBitSet.xor(oldBitSet);
-		// lyrVect.getRecordset().setSelection(newBitSet);
-		// }
-		// }
-		//
-		// } catch (ReadDriverException e) {
-		// throw new BehaviorException("No se pudo hacer la selecci�n");
-		// } catch (VisitorException e) {
-		// throw new BehaviorException("No se pudo hacer la selecci�n");
-		// }
+		Rectangle2D rect = event.getWorldCoordRect();
+		GeometryFactory gf = new GeometryFactory();
+		Geometry geom = gf.toGeometry(EnvelopeUtils.toEnvelope(rect));
+		PointSelectionListener.selectByGeometry(event.getEvent()
+				.isControlDown(), geom, mapCtrl);
 	}
 
 	/*

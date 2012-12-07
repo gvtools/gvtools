@@ -55,8 +55,7 @@ import com.iver.cit.gvsig.fmap.tools.Listeners.PolylineListener;
 import com.iver.cit.gvsig.fmap.tools.Listeners.ToolListener;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.LineString;
 
 /**
  * <p>
@@ -209,9 +208,8 @@ public class PolylineBehavior extends Behavior {
 	 */
 	protected void drawPolyLine(Graphics2D g2) {
 		GeometryFactory gf = new GeometryFactory();
-		LinearRing ring = gf.createLinearRing(coordinates
+		LineString geom = gf.createLineString(coordinates
 				.toArray(new Coordinate[this.coordinates.size()]));
-		Polygon geom = gf.createPolygon(ring, null);
 
 		g2.draw(new LiteShape(geom, getMapControl().getViewPort()
 				.getAffineTransform(), false));

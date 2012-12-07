@@ -50,6 +50,9 @@ import javax.swing.ImageIcon;
 import com.iver.cit.gvsig.fmap.MapControl;
 import com.iver.cit.gvsig.fmap.tools.Events.MeasureEvent;
 import com.iver.cit.gvsig.fmap.tools.Listeners.PolylineListener;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * <p>
@@ -150,29 +153,10 @@ public class PolygonSelectionListener implements PolylineListener {
 	 * (com.iver.cit.gvsig.fmap.tools.Events.MeasureEvent)
 	 */
 	public void polylineFinished(MeasureEvent event) throws BehaviorException {
-		// try {
-		// ViewPort vp = mapCtrl.getMapContext().getViewPort();
-		//
-		// GeneralPathX gp = event.getGP();
-		// IGeometry geom = ShapeFactory.createPolygon2D(gp);
-		// FLayer[] actives = mapCtrl.getMapContext().getLayers().getActives();
-		// for (int i = 0; i < actives.length; i++) {
-		// if (actives[i] instanceof FLyrVect) {
-		// FLyrVect lyrVect = (FLyrVect) actives[i];
-		// FBitSet oldBitSet = lyrVect.getSource().getRecordset()
-		// .getSelection();
-		// FBitSet newBitSet = lyrVect.queryByShape(geom,
-		// DefaultStrategy.INTERSECTS);
-		// if (event.getEvent().isControlDown())
-		// newBitSet.xor(oldBitSet);
-		// lyrVect.getRecordset().setSelection(newBitSet);
-		// }
-		// }
-		//
-		// } catch (ReadDriverException e) {
-		// throw new BehaviorException("No se pudo hacer la selecci�n");
-		// } catch (VisitorException e) {
-		// throw new BehaviorException("No se pudo hacer la selecci�n");
-		// }
+		Coordinate[] coordinates = event.getCoordinates();
+		GeometryFactory gf = new GeometryFactory();
+		Polygon geom = gf.createPolygon(gf.createLinearRing(coordinates), null);
+		PointSelectionListener.selectByGeometry(event.getEvent()
+				.isControlDown(), geom, mapCtrl);
 	}
 }

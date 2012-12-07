@@ -130,7 +130,6 @@ public class PointSelectionListener implements PointListener {
 		Rectangle2D.Double recPoint = new Rectangle2D.Double(p.getX()
 				- (tolerance / 2), p.getY() - (tolerance / 2), tolerance,
 				tolerance);
-
 		Geometry geometry = new GeometryFactory().toGeometry(EnvelopeUtils
 				.toEnvelope(recPoint));
 		try {
@@ -140,6 +139,11 @@ public class PointSelectionListener implements PointListener {
 			throw new BehaviorException("Cannot prepare the query", e);
 		}
 
+		selectByGeometry(event.getEvent().isControlDown(), geometry, mapCtrl);
+	}
+
+	static void selectByGeometry(boolean controlDown, Geometry geometry,
+			MapControl mapCtrl) throws BehaviorException {
 		Layer[] actives = mapCtrl
 				.getMapContext()
 				.getRootLayer()
@@ -167,7 +171,7 @@ public class PointSelectionListener implements PointListener {
 				}
 				iterator.close();
 
-				if (event.getEvent().isControlDown()) {
+				if (controlDown) {
 					newSelection = newSelection.xor(oldSelection);
 				}
 				actives[i].setSelection(newSelection);

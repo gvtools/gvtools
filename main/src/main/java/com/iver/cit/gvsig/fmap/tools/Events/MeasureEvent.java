@@ -100,4 +100,8 @@ public class MeasureEvent {
 	public MouseEvent getEvent() {
 		return event;
 	}
+
+	public Coordinate[] getCoordinates() {
+		return coordinates;
+	}
 }
