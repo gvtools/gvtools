@@ -16,7 +16,7 @@ public class LayerFactoryTest extends GVSIGTestCase {
 
 	public void testCreateFromNullSource() throws Exception {
 		try {
-			factory.createLayer((Source) null);
+			factory.createLayer("l", (Source) null);
 			fail();
 		} catch (IOException e) {
 		}
@@ -27,7 +27,7 @@ public class LayerFactoryTest extends GVSIGTestCase {
 		properties.put("url", "invalid_url");
 		Source source = sourceFactory.createSource(properties);
 		try {
-			factory.createLayer(source);
+			factory.createLayer("l", source);
 			fail();
 		} catch (IOException e) {
 		}

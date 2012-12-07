@@ -20,11 +20,11 @@ import org.gvsig.persistence.generated.LayerType;
 
 public class CompositeLayer extends AbstractLayer implements Layer {
 	private List<Layer> layers = new ArrayList<Layer>();
-	private EventBus eventBus;
 	private LayerFactory layerFactory;
 
-	public CompositeLayer(EventBus eventBus, LayerFactory layerFactory) {
-		this.eventBus = eventBus;
+	public CompositeLayer(EventBus eventBus, LayerFactory layerFactory,
+			String name) {
+		super(eventBus, name);
 		this.layerFactory = layerFactory;
 	}
 
@@ -90,13 +90,18 @@ public class CompositeLayer extends AbstractLayer implements Layer {
 	public void addLayer(Layer layer) {
 		if (layer == null) {
 			throw new IllegalArgumentException("Layer cannot be null");
+		} else if (layer.getParent() != null) {
+			throw new IllegalArgumentException("The layer already has a parent");
 		}
 		layers.add(layer);
+		((AbstractLayer) layer).setParent(this);
 		eventBus.fireEvent(new LayerAddedEvent(layer));
 	}
 
 	public boolean removeLayer(Layer layer) {
-		return layers.remove(layer);
+		boolean ret = layers.remove(layer);
+		((AbstractLayer) layer).setParent(null);
+		return ret;
 	}
 
 	@Override
@@ -128,6 +133,8 @@ public class CompositeLayer extends AbstractLayer implements Layer {
 	public LayerType getXML() {
 		CompositeLayerType xml = new CompositeLayerType();
 
+		super.fill(xml);
+
 		List<LayerType> xmlLayers = xml.getLayers();
 		xmlLayers.clear();
 		for (Layer layer : layers) {
@@ -138,6 +145,8 @@ public class CompositeLayer extends AbstractLayer implements Layer {
 
 	void setXML(LayerType type) {
 		assert type instanceof CompositeLayerType;
+
+		super.read(type);
 
 		CompositeLayerType compositeLayerType = (CompositeLayerType) type;
 		List<LayerType> xmlLayers = compositeLayerType.getLayers();

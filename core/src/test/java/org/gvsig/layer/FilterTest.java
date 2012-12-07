@@ -16,7 +16,7 @@ public class FilterTest extends GVSIGTestCase {
 
 	public void testActive() throws Exception {
 		// Feature active
-		Layer layer = spy(layerFactory.createLayer(mock(Source.class)));
+		Layer layer = spy(layerFactory.createLayer("l", mock(Source.class)));
 		when(layer.isActive()).thenReturn(true);
 
 		Layer[] layers = layer.filter(LayerFilter.ACTIVE);
@@ -24,7 +24,7 @@ public class FilterTest extends GVSIGTestCase {
 		assertEquals(layer, layers[0]);
 
 		// Feature not active
-		layer = spy(layerFactory.createLayer(mock(Source.class)));
+		layer = spy(layerFactory.createLayer("l", mock(Source.class)));
 		when(layer.isActive()).thenReturn(false);
 		layers = layer.filter(LayerFilter.ACTIVE);
 		assertEquals(0, layers.length);
@@ -34,7 +34,7 @@ public class FilterTest extends GVSIGTestCase {
 		Layer l2 = mock(Layer.class);
 		when(l1.isActive()).thenReturn(false);
 		when(l2.isActive()).thenReturn(true);
-		layer = layerFactory.createLayer(l1, l2);
+		layer = layerFactory.createLayer("l", l1, l2);
 
 		layers = layer.filter(LayerFilter.ACTIVE);
 		assertEquals(1, layers.length);
@@ -59,7 +59,7 @@ public class FilterTest extends GVSIGTestCase {
 		when(l3.hasFeatures()).thenReturn(true);
 		when(l3.isActive()).thenReturn(false);
 
-		Layer layer = layerFactory.createLayer(l1, l2, l3);
+		Layer layer = layerFactory.createLayer("l", l1, l2, l3);
 
 		Layer[] layers = layer.filter(filter);
 		assertEquals(1, layers.length);
@@ -78,19 +78,19 @@ public class FilterTest extends GVSIGTestCase {
 		when(l3.hasFeatures()).thenReturn(true);
 		when(l3.isEditing()).thenReturn(false);
 
-		Layer layer = layerFactory.createLayer(l1, l2, l3);
+		Layer layer = layerFactory.createLayer("l", l1, l2, l3);
 		Layer[] layers = layer.filter(LayerFilter.FEATURE_EDITING);
 		assertEquals(1, layers.length);
 		assertEquals(l1, layers[0]);
 
 		// Feature layer
-		layer = spy(layerFactory.createLayer(mock(Source.class)));
+		layer = spy(layerFactory.createLayer("l", mock(Source.class)));
 		when(layer.isEditing()).thenReturn(true);
 		layers = layer.filter(LayerFilter.FEATURE_EDITING);
 		assertEquals(1, layers.length);
 		assertEquals(layer, layers[0]);
 
-		layer = spy(layerFactory.createLayer(mock(Source.class)));
+		layer = spy(layerFactory.createLayer("l", mock(Source.class)));
 		when(layer.isEditing()).thenReturn(false);
 		layers = layer.filter(LayerFilter.FEATURE_EDITING);
 		assertEquals(0, layers.length);
@@ -98,7 +98,7 @@ public class FilterTest extends GVSIGTestCase {
 
 	public void testFeature() throws Exception {
 		// Feature layer
-		Layer layer = layerFactory.createLayer(mock(Source.class));
+		Layer layer = layerFactory.createLayer("l", mock(Source.class));
 		Layer[] layers = layer.filter(LayerFilter.FEATURE);
 		assertEquals(1, layers.length);
 		assertEquals(layer, layers[0]);
@@ -108,7 +108,7 @@ public class FilterTest extends GVSIGTestCase {
 		Layer l2 = mock(Layer.class);
 		when(l1.hasFeatures()).thenReturn(false);
 		when(l2.hasFeatures()).thenReturn(true);
-		layer = layerFactory.createLayer(l1, l2);
+		layer = layerFactory.createLayer("l", l1, l2);
 
 		layers = layer.filter(LayerFilter.FEATURE);
 		assertEquals(1, layers.length);

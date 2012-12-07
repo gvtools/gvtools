@@ -87,6 +87,13 @@ public interface Layer {
 	void setVisible(boolean visible);
 
 	/**
+	 * Gets the visibility property
+	 * 
+	 * @return
+	 */
+	boolean isVisible();
+
+	/**
 	 * Sets the <code>selected</code> property. For general use by clients.
 	 * 
 	 * @param selected
@@ -103,11 +110,15 @@ public interface Layer {
 	/**
 	 * Adds a layer as a child of this one.
 	 * 
-	 * @param testLayer
+	 * @param layer
 	 * @throws UnsupportedOperationException
 	 *             If this layer is not a collection
+	 * @throws IllegalArgumentException
+	 *             If <code>layer</code> is null or is already added to another
+	 *             parent ( {@link #getParent()} is not null)
 	 */
-	void addLayer(Layer testLayer) throws UnsupportedOperationException;
+	void addLayer(Layer layer) throws UnsupportedOperationException,
+			IllegalArgumentException;
 
 	boolean removeLayer(Layer layer);
 
@@ -161,5 +172,11 @@ public interface Layer {
 	 */
 	SimpleFeatureSource getFeatureSource()
 			throws UnsupportedOperationException, IOException;
+
+	String getName();
+
+	void setName(String name);
+
+	Layer getParent();
 
 }

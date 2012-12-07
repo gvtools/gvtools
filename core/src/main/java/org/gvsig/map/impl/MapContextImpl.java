@@ -44,7 +44,7 @@ public class MapContextImpl implements MapContext, RenderListener {
 		this.eventBus = eventBus;
 		this.layerFactory = layerFactory;
 		this.backgroundColor = Color.white;
-		this.rootLayer = layerFactory.createLayer();
+		this.rootLayer = layerFactory.createLayer("root");
 	}
 
 	@Override

@@ -137,7 +137,7 @@ public class MapContextTest extends GVSIGTestCase {
 		mapContext.setBackgroundColor(Color.red);
 		mapContext.setCRS(CRS.decode("EPSG:23030"));
 		mapContext.getRootLayer().addLayer(
-				layerFactory.createLayer(mock(Source.class)));
+				layerFactory.createLayer("l", mock(Source.class)));
 		mapContext.draw(mock(BufferedImage.class), mock(Graphics2D.class),
 				new Rectangle(0, 0, 10, 10), mock(ProcessContext.class));
 

@@ -94,6 +94,7 @@
 	</xs:complexType>
 
 	<xs:complexType name="LayerType" abstract="true">
+		<xs:attribute name="name" type="xs:string" />
 	</xs:complexType>
 	<xs:complexType name="CompositeLayerType">
 		<xs:complexContent>

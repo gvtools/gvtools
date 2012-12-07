@@ -36,11 +36,8 @@ public class LayerFactoryImpl implements LayerFactory {
 	private Provider<EventBus> eventBusProvider;
 
 	@Override
-	public Layer createLayer(Source source) throws IOException {
-		if (source == null) {
-			throw new IOException("Source cannot be null");
-		}
-		FeatureLayer ret = newFeatureLayer();
+	public Layer createLayer(String name, Source source) throws IOException {
+		FeatureLayer ret = newFeatureLayer(name);
 		ret.setSource(source);
 
 		// Just to check the feature source is valid
@@ -49,34 +46,34 @@ public class LayerFactoryImpl implements LayerFactory {
 		return ret;
 	}
 
-	private FeatureLayer newFeatureLayer() {
+	private FeatureLayer newFeatureLayer(String name) {
 		return new FeatureLayer(eventBusProvider.get(),
 				featureSourceCache.get(), sourceFactoryProvider.get(),
-				styleFactoryProvider.get(), filterFactoryProvider.get());
+				styleFactoryProvider.get(), filterFactoryProvider.get(), name);
 	}
 
 	@Override
-	public Layer createLayer(Layer... layers) {
-		CompositeLayer composite = newCompositeLayer();
+	public Layer createLayer(String name, Layer... layers) {
+		CompositeLayer composite = newCompositeLayer(name);
 		for (Layer layer : layers) {
 			composite.addLayer(layer);
 		}
 		return composite;
 	}
 
-	private CompositeLayer newCompositeLayer() {
-		return new CompositeLayer(eventBusProvider.get(), this);
+	private CompositeLayer newCompositeLayer(String name) {
+		return new CompositeLayer(eventBusProvider.get(), this, name);
 	}
 
 	@Override
 	public Layer createLayer(LayerType xml) {
 		if (xml instanceof CompositeLayerType) {
-			CompositeLayer composite = newCompositeLayer();
+			CompositeLayer composite = newCompositeLayer(xml.getName());
 			composite.setXML(xml);
 
 			return composite;
 		} else if (xml instanceof DataLayerType) {
-			FeatureLayer layer = newFeatureLayer();
+			FeatureLayer layer = newFeatureLayer(xml.getName());
 			layer.setXML(xml);
 
 			return layer;

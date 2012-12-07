@@ -36,7 +36,7 @@ public class TestExtension extends Extension {
 		// properties.put("url", "file:///home/victorzinho/workspace/"
 		// + "cursos/gvsig_2012/datos/vias.shp");
 		Source source = sourceFactory.createSource(properties);
-		Layer testLayer = layerFactory.createLayer(source);
+		Layer testLayer = layerFactory.createLayer("vias", source);
 		InjectorSingleton.getInjector().injectMembers(testLayer);
 
 		com.iver.andami.ui.mdiManager.IWindow frame = PluginServices

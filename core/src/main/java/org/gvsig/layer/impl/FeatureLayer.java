@@ -32,7 +32,6 @@ public class FeatureLayer extends AbstractLayer implements Layer {
 	private Style style;
 	private Selection selection = new Selection();
 
-	private EventBus eventBus;
 	private SourceFactory sourceFactory;
 	private FeatureSourceCache featureSourceCache;
 	private StyleFactory styleFactory;
@@ -41,8 +40,8 @@ public class FeatureLayer extends AbstractLayer implements Layer {
 
 	FeatureLayer(EventBus eventBus, FeatureSourceCache featureSourceCache,
 			SourceFactory sourceFactory, StyleFactory styleFactory,
-			FilterFactory2 filterFactory) {
-		this.eventBus = eventBus;
+			FilterFactory2 filterFactory, String name) {
+		super(eventBus, name);
 		this.featureSourceCache = featureSourceCache;
 		this.sourceFactory = sourceFactory;
 		this.styleFactory = styleFactory;
@@ -161,7 +160,11 @@ public class FeatureLayer extends AbstractLayer implements Layer {
 	@Override
 	public Collection<org.geotools.map.Layer> getDrawingLayers()
 			throws IOException {
-		return Collections.singletonList(getGTLayer());
+		if (isVisible()) {
+			return Collections.singletonList(getGTLayer());
+		} else {
+			return Collections.emptyList();
+		}
 	}
 
 	private org.geotools.map.Layer getGTLayer() throws IOException {
@@ -188,12 +191,17 @@ public class FeatureLayer extends AbstractLayer implements Layer {
 	@Override
 	public LayerType getXML() {
 		DataLayerType xml = new DataLayerType();
+
+		super.fill(xml);
+
 		xml.setSource(source.getXML());
 		return xml;
 	}
 
 	void setXML(LayerType layer) {
 		assert layer instanceof DataLayerType;
+
+		super.read(layer);
 
 		DataLayerType dataLayerType = (DataLayerType) layer;
 		source = sourceFactory.createSource(dataLayerType.getSource());
