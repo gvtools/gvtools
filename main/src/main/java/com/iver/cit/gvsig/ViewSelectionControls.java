@@ -99,14 +99,13 @@ import geomatico.events.EventBus;
 import geomatico.events.ExceptionEvent;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.gvsig.inject.InjectorSingleton;
 import org.gvsig.layer.Layer;
+import org.gvsig.layer.Selection;
 import org.gvsig.layer.filter.AndLayerFilter;
 import org.gvsig.layer.filter.LayerFilter;
 import org.gvsig.map.MapContext;
@@ -195,8 +194,8 @@ public class ViewSelectionControls extends Extension {
 					SimpleFeatureCollection collection = layer
 							.getFeatureSource().getFeatures();
 					SimpleFeatureIterator iterator = collection.features();
-					Set<FeatureId> currentSelection = layer.getSelection();
-					Set<FeatureId> newSelection = new HashSet<FeatureId>();
+					Selection currentSelection = layer.getSelection();
+					Selection newSelection = new Selection();
 					while (iterator.hasNext()) {
 						SimpleFeature feature = iterator.next();
 						FeatureId featureId = feature.getIdentifier();

@@ -6,8 +6,6 @@ import java.awt.Color;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -20,19 +18,19 @@ import org.geotools.styling.StyleFactory;
 import org.gvsig.events.FeatureSelectionChangeEvent;
 import org.gvsig.layer.FeatureSourceCache;
 import org.gvsig.layer.Layer;
+import org.gvsig.layer.Selection;
 import org.gvsig.layer.Source;
 import org.gvsig.layer.SourceFactory;
 import org.gvsig.layer.filter.LayerFilter;
 import org.gvsig.persistence.generated.DataLayerType;
 import org.gvsig.persistence.generated.LayerType;
 import org.opengis.filter.FilterFactory2;
-import org.opengis.filter.identity.FeatureId;
 
 public class FeatureLayer extends AbstractLayer implements Layer {
 	private boolean editing, active;
 	private Source source;
 	private Style style;
-	private Set<FeatureId> selection = new HashSet<FeatureId>();
+	private Selection selection = new Selection();
 
 	private EventBus eventBus;
 	private SourceFactory sourceFactory;
@@ -80,9 +78,9 @@ public class FeatureLayer extends AbstractLayer implements Layer {
 	}
 
 	@Override
-	public void setSelection(Set<FeatureId> newSelection)
+	public void setSelection(Selection newSelection)
 			throws UnsupportedOperationException {
-		this.selection = Collections.unmodifiableSet(newSelection);
+		this.selection = newSelection;
 
 		/*
 		 * We need to update the rule to style selected features
@@ -92,7 +90,7 @@ public class FeatureLayer extends AbstractLayer implements Layer {
 	}
 
 	@Override
-	public Set<FeatureId> getSelection() throws UnsupportedOperationException {
+	public Selection getSelection() throws UnsupportedOperationException {
 		return selection;
 	}
 

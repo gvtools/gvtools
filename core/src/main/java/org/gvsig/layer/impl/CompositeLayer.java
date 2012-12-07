@@ -7,17 +7,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.gvsig.events.LayerAddedEvent;
 import org.gvsig.layer.Layer;
 import org.gvsig.layer.LayerFactory;
+import org.gvsig.layer.Selection;
 import org.gvsig.layer.filter.LayerFilter;
 import org.gvsig.persistence.generated.CompositeLayerType;
 import org.gvsig.persistence.generated.LayerType;
-import org.opengis.filter.identity.FeatureId;
 
 public class CompositeLayer extends AbstractLayer implements Layer {
 	private List<Layer> layers = new ArrayList<Layer>();
@@ -164,12 +163,12 @@ public class CompositeLayer extends AbstractLayer implements Layer {
 	}
 
 	@Override
-	public Set<FeatureId> getSelection() throws UnsupportedOperationException {
+	public Selection getSelection() throws UnsupportedOperationException {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public void setSelection(Set<FeatureId> newSelection)
+	public void setSelection(Selection newSelection)
 			throws UnsupportedOperationException {
 		throw new UnsupportedOperationException();
 	}

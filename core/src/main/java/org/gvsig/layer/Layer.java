@@ -2,14 +2,12 @@ package org.gvsig.layer;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Set;
 
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.gvsig.layer.filter.LayerFilter;
 import org.gvsig.map.MapContext;
 import org.gvsig.persistence.generated.LayerType;
-import org.opengis.filter.identity.FeatureId;
 
 public interface Layer {
 
@@ -140,7 +138,7 @@ public interface Layer {
 	 * @throws UnsupportedOperationException
 	 *             If this is not a feature layer
 	 */
-	Set<FeatureId> getSelection() throws UnsupportedOperationException;
+	Selection getSelection() throws UnsupportedOperationException;
 
 	/**
 	 * Sets the ids of the selected features
@@ -149,7 +147,7 @@ public interface Layer {
 	 * @throws UnsupportedOperationException
 	 *             If this is not a feature layer
 	 */
-	void setSelection(Set<FeatureId> newSelection)
+	void setSelection(Selection newSelection)
 			throws UnsupportedOperationException;
 
 	/**

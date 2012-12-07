@@ -48,8 +48,6 @@ import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.swing.ImageIcon;
 
@@ -61,6 +59,7 @@ import org.geotools.factory.GeoTools;
 import org.geotools.process.ProcessException;
 import org.geotools.process.feature.gs.QueryProcess;
 import org.gvsig.layer.Layer;
+import org.gvsig.layer.Selection;
 import org.gvsig.layer.filter.AndLayerFilter;
 import org.gvsig.layer.filter.LayerFilter;
 import org.gvsig.util.AffineTransformCoordinateSequenceFilter;
@@ -68,7 +67,6 @@ import org.gvsig.util.EnvelopeUtils;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
-import org.opengis.filter.identity.FeatureId;
 
 import com.iver.cit.gvsig.fmap.MapControl;
 import com.iver.cit.gvsig.fmap.tools.Events.PointEvent;
@@ -149,7 +147,7 @@ public class PointSelectionListener implements PointListener {
 						LayerFilter.SELECTED));
 		for (int i = 0; i < actives.length; i++) {
 			try {
-				Set<FeatureId> oldSelection = actives[i].getSelection();
+				Selection oldSelection = actives[i].getSelection();
 				QueryProcess qp = new QueryProcess();
 				FilterFactory2 ff = CommonFactoryFinder
 						.getFilterFactory2(GeoTools.getDefaultHints());
@@ -162,7 +160,7 @@ public class PointSelectionListener implements PointListener {
 				SimpleFeatureCollection result = qp.execute(
 						featureSource.getFeatures(), null, filter);
 				SimpleFeatureIterator iterator = result.features();
-				Set<FeatureId> newSelection = new HashSet<FeatureId>();
+				Selection newSelection = new Selection();
 				while (iterator.hasNext()) {
 					SimpleFeature feature = iterator.next();
 					newSelection.add(feature.getIdentifier());

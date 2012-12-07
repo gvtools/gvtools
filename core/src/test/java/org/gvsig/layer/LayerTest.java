@@ -8,7 +8,6 @@ import static org.mockito.Mockito.when;
 import geomatico.events.EventBus;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.gvsig.GVSIGTestCase;
@@ -242,8 +241,7 @@ public class LayerTest extends GVSIGTestCase {
 
 	public void testSelectionNotSupported() throws Exception {
 		Layer root = layerFactory.createLayer();
-		@SuppressWarnings("unchecked")
-		Set<FeatureId> sel = mock(Set.class);
+		Selection sel = mock(Selection.class);
 		try {
 			root.setSelection(sel);
 			fail();
@@ -291,7 +289,7 @@ public class LayerTest extends GVSIGTestCase {
 	public void testSelectionEvent() throws Exception {
 		Layer layer = layerFactory.createLayer(mock(Source.class));
 
-		layer.setSelection(new HashSet<FeatureId>());
+		layer.setSelection(new Selection());
 
 		verify(eventBus).fireEvent(any(FeatureSelectionChangeEvent.class));
 	}
