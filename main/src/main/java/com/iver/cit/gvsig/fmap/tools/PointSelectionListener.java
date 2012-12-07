@@ -167,9 +167,9 @@ public class PointSelectionListener implements PointListener {
 				}
 				iterator.close();
 
-				// if (event.getEvent().isControlDown()) {
-				// newSelection.xor(oldSelection);
-				// }
+				if (event.getEvent().isControlDown()) {
+					newSelection = newSelection.xor(oldSelection);
+				}
 				actives[i].setSelection(newSelection);
 			} catch (ProcessException e) {
 				throw new BehaviorException("Cannot filter layer", e);

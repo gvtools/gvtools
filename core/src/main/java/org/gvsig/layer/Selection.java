@@ -10,8 +10,32 @@ import org.opengis.filter.identity.FeatureId;
 
 public class Selection implements Set<FeatureId> {
 
-	private Set<FeatureId> fids = Collections
-			.unmodifiableSet(new HashSet<FeatureId>());
+	private Set<FeatureId> fids;
+
+	public Selection(Set<FeatureId> selection) {
+		this.fids = Collections.unmodifiableSet(selection);
+	}
+
+	public Selection() {
+		this(new HashSet<FeatureId>());
+	}
+
+	public Selection xor(Selection that) {
+		HashSet<FeatureId> ret = new HashSet<FeatureId>();
+		addNotContained(that, this.iterator(), ret);
+		addNotContained(this, that.iterator(), ret);
+		return new Selection(ret);
+	}
+
+	private void addNotContained(Selection that,
+			Iterator<FeatureId> thisIterator, HashSet<FeatureId> ret) {
+		while (thisIterator.hasNext()) {
+			FeatureId featureId = thisIterator.next();
+			if (!that.contains(featureId)) {
+				ret.add(featureId);
+			}
+		}
+	}
 
 	public boolean add(FeatureId arg0) {
 		return fids.add(arg0);
