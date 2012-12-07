@@ -58,12 +58,14 @@ import org.gvsig.events.CRSChangeEvent;
 import org.gvsig.events.CRSChangeHandler;
 import org.gvsig.inject.InjectorSingleton;
 import org.gvsig.layer.Layer;
+import org.gvsig.layer.LayerFactory;
 import org.gvsig.layer.filter.LayerFilter;
 import org.gvsig.main.events.ExtentChangeEvent;
 import org.gvsig.main.events.ExtentChangeHandler;
 import org.gvsig.map.MapContext;
 import org.gvsig.map.MapContextFactory;
 
+import com.google.inject.Injector;
 import com.iver.andami.PluginServices;
 import com.iver.andami.ui.mdiFrame.NewStatusBar;
 import com.iver.andami.ui.mdiManager.WindowInfo;
@@ -377,14 +379,15 @@ public class View extends BaseView {
 	 * DOCUMENT ME!
 	 */
 	protected void initComponents() { // GEN-BEGIN:initComponents
-		MapContextFactory factory = InjectorSingleton.getInjector()
+		Injector injector = InjectorSingleton.getInjector();
+		MapContextFactory factory = injector
 				.getInstance(MapContextFactory.class);
 		m_MapControl = new MapControl(eventBus, factory,
 				ProjectView.DEFAULT_MAP_UNITS, ProjectView.DEFAULT_AREA_UNITS,
 				ProjectView.DEFAULT_DISTANCE_UNITS, ProjectView.DEFAULT_CRS);
 
 		m_MapControl.addExceptionListener(mapControlExceptionListener);
-		m_TOC = new TOC();
+		m_TOC = new TOC(eventBus, injector.getInstance(LayerFactory.class));
 
 		// Ponemos el localizador
 		m_MapLoc = new MapOverview(m_MapControl);
