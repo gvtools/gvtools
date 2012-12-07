@@ -6,7 +6,6 @@ import java.util.Set;
 
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.styling.Style;
 import org.gvsig.layer.filter.LayerFilter;
 import org.gvsig.map.MapContext;
 import org.gvsig.persistence.generated.LayerType;
@@ -113,26 +112,6 @@ public interface Layer {
 	void addLayer(Layer testLayer) throws UnsupportedOperationException;
 
 	boolean removeLayer(Layer layer);
-
-	/**
-	 * Getter for the layer style
-	 * 
-	 * @return
-	 * @throws UnsupportedOperationException
-	 *             If the layer does not support the style property, e.g.: layer
-	 *             groups
-	 */
-	Style getStyle() throws UnsupportedOperationException;
-
-	/**
-	 * Setter for the layer style
-	 * 
-	 * @param style
-	 * @throws UnsupportedOperationException
-	 *             If the layer does not support the style property, e.g.: layer
-	 *             groups
-	 */
-	void setStyle(Style style) throws UnsupportedOperationException;
 
 	/**
 	 * Returns a collection of GeoTools layers that will be used to draw.

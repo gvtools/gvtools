@@ -111,38 +111,35 @@ public class FeatureLayer extends AbstractLayer implements Layer {
 		return active;
 	}
 
-	@Override
-	public void setStyle(Style style) {
-		this.style = style;
-	}
-
 	public Rule getSelectionRule() {
 		if (selectionRule == null) {
-			getStyle();
+			buildStyle();
 		}
 
 		return selectionRule;
 	}
 
-	@Override
-	public Style getStyle() {
+	private Style getStyle() {
 		if (style == null) {
-			int width = 1;
-			Rule defaultRule = createRule(Color.BLUE, width);
-			defaultRule.setElseFilter(true);
-
-			selectionRule = createRule(Color.YELLOW, width);
-			selectionRule.setFilter(filterFactory.id(getSelection()));
-
-			FeatureTypeStyle fts = styleFactory
-					.createFeatureTypeStyle(new Rule[] { defaultRule,
-							selectionRule });
-			Style style = styleFactory.createStyle();
-			style.featureTypeStyles().add(fts);
-			this.style = style;
+			buildStyle();
 		}
 
 		return style;
+	}
+
+	private void buildStyle() {
+		int width = 1;
+		Rule defaultRule = createRule(Color.BLUE, width);
+		defaultRule.setElseFilter(true);
+
+		selectionRule = createRule(Color.YELLOW, width);
+		selectionRule.setFilter(filterFactory.id(getSelection()));
+
+		FeatureTypeStyle fts = styleFactory.createFeatureTypeStyle(new Rule[] {
+				defaultRule, selectionRule });
+		Style style = styleFactory.createStyle();
+		style.featureTypeStyles().add(fts);
+		this.style = style;
 	}
 
 	private Rule createRule(Color color, int width) {

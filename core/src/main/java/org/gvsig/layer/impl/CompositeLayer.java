@@ -11,7 +11,6 @@ import java.util.Set;
 
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.styling.Style;
 import org.gvsig.events.LayerAddedEvent;
 import org.gvsig.layer.Layer;
 import org.gvsig.layer.LayerFactory;
@@ -99,18 +98,6 @@ public class CompositeLayer extends AbstractLayer implements Layer {
 
 	public boolean removeLayer(Layer layer) {
 		return layers.remove(layer);
-	}
-
-	@Override
-	public Style getStyle() {
-		throw new UnsupportedOperationException(
-				"Layer groups do not have style property");
-	}
-
-	@Override
-	public void setStyle(Style style) {
-		throw new UnsupportedOperationException(
-				"Layer groups do not have style property");
 	}
 
 	@Override
