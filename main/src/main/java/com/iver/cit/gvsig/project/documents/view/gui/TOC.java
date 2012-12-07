@@ -8,12 +8,18 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.JTree;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 
+import org.gvsig.events.LayerSelectionChangeEvent;
+import org.gvsig.events.LayerSelectionChangeHandler;
+import org.gvsig.layer.Layer;
 import org.gvsig.layer.LayerFactory;
 import org.gvsig.map.MapContext;
 
-public class TOC extends JTree {
+public class TOC extends JTree implements LayerSelectionChangeHandler {
 
 	private static final long serialVersionUID = 1L;
 	private EventBus eventBus;
@@ -50,10 +56,32 @@ public class TOC extends JTree {
 			}
 
 		});
+
+		this.getSelectionModel().setSelectionMode(
+				TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
+		this.getSelectionModel().addTreeSelectionListener(
+				new TreeSelectionListener() {
+
+					@Override
+					public void valueChanged(TreeSelectionEvent e) {
+						TreePath[] paths = e.getPaths();
+						for (TreePath path : paths) {
+							Layer layer = (Layer) path.getLastPathComponent();
+							layer.setSelected(getSelectionModel()
+									.isPathSelected(path));
+						}
+					}
+				});
+		eventBus.addHandler(LayerSelectionChangeEvent.class, this);
 	}
 
 	public void setMapContext(MapContext fmap) {
 		this.setModel(new LayerTreeModel(eventBus, fmap.getRootLayer()));
+	}
+
+	@Override
+	public void layerSelectionChanged(Layer source) {
+		this.repaint();
 	}
 
 }

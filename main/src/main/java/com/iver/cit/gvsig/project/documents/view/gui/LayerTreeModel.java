@@ -81,10 +81,6 @@ public class LayerTreeModel implements TreeModel, LayerAddedHandler,
 
 	@Override
 	public void layerAdded(Layer layer) {
-		fireChange(layer);
-	}
-
-	private void fireChange(Layer layer) {
 		if (root.contains(layer)) {
 			for (TreeModelListener treeModelListener : listeners) {
 				treeModelListener.treeStructureChanged(new TreeModelEvent(this,
@@ -95,7 +91,12 @@ public class LayerTreeModel implements TreeModel, LayerAddedHandler,
 
 	@Override
 	public void visibilityChanged(Layer source) {
-		fireChange(source);
+		if (root.contains(source)) {
+			for (TreeModelListener treeModelListener : listeners) {
+				treeModelListener.treeNodesChanged(new TreeModelEvent(this,
+						buildPath(source).getParentPath()));
+			}
+		}
 	}
 
 	private TreePath buildPath(Layer layer) {
