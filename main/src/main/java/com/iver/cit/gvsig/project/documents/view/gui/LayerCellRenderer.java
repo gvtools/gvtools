@@ -5,11 +5,11 @@ import java.awt.Component;
 import java.awt.Point;
 import java.awt.Rectangle;
 
-import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTree;
+import javax.swing.UIManager;
 import javax.swing.tree.TreeCellRenderer;
 
 import org.gvsig.layer.Layer;
@@ -18,14 +18,20 @@ public class LayerCellRenderer extends JPanel implements TreeCellRenderer {
 	private static final long serialVersionUID = 1L;
 	private JCheckBox check;
 	private JLabel label;
+	private Color selectionForeground;
+	private Color selectionBackground;
+	private Color textForeground;
+	private Color textBackground;
 
 	public LayerCellRenderer() {
 		check = new JCheckBox();
 		label = new JLabel();
 		this.add(check);
 		this.add(label);
-		this.setOpaque(false);
-		check.setOpaque(false);
+		selectionForeground = UIManager.getColor("Tree.selectionForeground");
+		selectionBackground = UIManager.getColor("Tree.selectionBackground");
+		textForeground = UIManager.getColor("Tree.textForeground");
+		textBackground = UIManager.getColor("Tree.textBackground");
 	}
 
 	@Override
@@ -36,10 +42,16 @@ public class LayerCellRenderer extends JPanel implements TreeCellRenderer {
 		label.setText(layer.getName());
 		check.setSelected(layer.isVisible());
 
-		if (layer.isSelected()) {
-			this.setBorder(BorderFactory.createEtchedBorder());
+		if (selected) {
+			label.setForeground(selectionForeground);
+			label.setBackground(selectionBackground);
+			check.setBackground(selectionBackground);
+			this.setBackground(selectionBackground);
 		} else {
-			this.setBorder(null);
+			label.setForeground(textForeground);
+			label.setBackground(textBackground);
+			check.setBackground(textBackground);
+			this.setBackground(textBackground);
 		}
 
 		if (layer.isEditing()) {
