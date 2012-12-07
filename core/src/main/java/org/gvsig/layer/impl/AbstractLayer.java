@@ -2,6 +2,7 @@ package org.gvsig.layer.impl;
 
 import geomatico.events.EventBus;
 
+import org.gvsig.events.LayerSelectionChangeEvent;
 import org.gvsig.events.LayerVisibilityChangeEvent;
 import org.gvsig.layer.Layer;
 import org.gvsig.persistence.generated.LayerType;
@@ -51,7 +52,10 @@ public abstract class AbstractLayer implements Layer {
 
 	@Override
 	public void setSelected(boolean selected) {
-		this.selected = selected;
+		if (selected != this.selected) {
+			this.selected = selected;
+			eventBus.fireEvent(new LayerSelectionChangeEvent(this));
+		}
 	}
 
 	@Override

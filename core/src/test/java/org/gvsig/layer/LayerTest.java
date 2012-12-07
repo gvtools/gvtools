@@ -2,6 +2,7 @@ package org.gvsig.layer;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -11,6 +12,7 @@ import org.geotools.filter.identity.FeatureIdImpl;
 import org.gvsig.GVSIGTestCase;
 import org.gvsig.events.FeatureSelectionChangeEvent;
 import org.gvsig.events.LayerAddedEvent;
+import org.gvsig.events.LayerSelectionChangeEvent;
 import org.gvsig.events.LayerVisibilityChangeEvent;
 import org.gvsig.layer.filter.LayerFilter;
 import org.gvsig.persistence.generated.LayerType;
@@ -228,6 +230,21 @@ public class LayerTest extends GVSIGTestCase {
 		layer.setVisible(false);
 
 		verify(eventBus).fireEvent(any(LayerVisibilityChangeEvent.class));
+	}
+
+	public void testSelectionChangedEvent() throws Exception {
+		Layer layer = layerFactory.createLayer("leaf", mock(Source.class));
+		layer.setSelected(true);
+
+		verify(eventBus).fireEvent(any(LayerSelectionChangeEvent.class));
+	}
+
+	public void testSelectionCallWithSameValueRaisesNoEvent() throws Exception {
+		Layer layer = layerFactory.createLayer("leaf", mock(Source.class));
+		layer.setSelected(layer.isSelected());
+
+		verify(eventBus, never()).fireEvent(
+				any(LayerSelectionChangeEvent.class));
 	}
 
 	public void testDataLayerXML() throws Exception {
