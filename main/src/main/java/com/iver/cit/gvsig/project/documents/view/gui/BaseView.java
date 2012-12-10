@@ -58,6 +58,7 @@ import com.iver.cit.gvsig.fmap.MapControl;
 import com.iver.cit.gvsig.project.documents.gui.IDocumentWindow;
 import com.iver.cit.gvsig.project.documents.gui.WindowData;
 import com.iver.cit.gvsig.project.documents.view.IProjectView;
+import com.iver.cit.gvsig.project.documents.view.toc.gui.TOC;
 import com.iver.utiles.exceptionHandling.ExceptionListener;
 
 //import javax.swing.JSplitPane;

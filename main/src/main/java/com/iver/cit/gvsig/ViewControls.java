@@ -71,7 +71,6 @@ import com.iver.cit.gvsig.project.documents.view.gui.ExtentListSelectorModel;
 import com.iver.cit.gvsig.project.documents.view.gui.FPanelExtentSelector;
 import com.iver.cit.gvsig.project.documents.view.gui.FPanelLocConfig;
 import com.iver.cit.gvsig.project.documents.view.gui.View;
-import com.iver.cit.gvsig.project.documents.view.toc.gui.FPopupMenu;
 import com.iver.utiles.extensionPoints.ExtensionPoint;
 import com.iver.utiles.extensionPoints.ExtensionPoints;
 import com.iver.utiles.extensionPoints.ExtensionPointsSingleton;
@@ -213,8 +212,6 @@ public class ViewControls extends Extension implements IPreferenceExtension {
 									+ "(register instances of "
 									+ "com.iver.cit.gvsig.gui.toc.AbstractTocContextMenuAction)"));
 		}
-
-		FPopupMenu.registerExtensionPoint();
 
 		registerIcons();
 	}

@@ -79,6 +79,7 @@ import com.iver.cit.gvsig.fmap.tools.Behavior.PolygonBehavior;
 import com.iver.cit.gvsig.fmap.tools.Behavior.RectangleBehavior;
 import com.iver.cit.gvsig.project.documents.view.ProjectView;
 import com.iver.cit.gvsig.project.documents.view.ProjectViewBase;
+import com.iver.cit.gvsig.project.documents.view.toc.gui.TOC;
 import com.iver.cit.gvsig.project.documents.view.toolListeners.PanListener;
 import com.iver.cit.gvsig.project.documents.view.toolListeners.PointSelectListener;
 import com.iver.cit.gvsig.project.documents.view.toolListeners.PolygonSelectListener;

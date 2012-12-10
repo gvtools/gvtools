@@ -43,12 +43,128 @@
  */
 package com.iver.cit.gvsig.project.documents.view.toc.gui;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.TreeSet;
+
+import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+
+import org.gvsig.map.MapContext;
+
+import com.iver.cit.gvsig.project.documents.view.toc.actions.ChangeNameTocMenuEntry;
 
 public class FPopupMenu extends JPopupMenu {
 	private static final long serialVersionUID = 1L;
 
-	public static void registerExtensionPoint() {
+	private ArrayList<ILayerAction> layerActions = new ArrayList<ILayerAction>();
+
+	public FPopupMenu() {
+		layerActions.add(new ChangeNameTocMenuEntry());
+		// extensionPoints.add("View_TocActions", "FSymbolChangeColor",
+		// new ChangeSymbolTocMenuEntry());
+		// extensionPoints.add("View_TocActions", "FLyrVectEditProperties",
+		// new FLyrVectEditPropertiesTocMenuEntry());
+		// extensionPoints.add("View_TocActions", "ZoomAlTema",
+		// new ZoomAlTemaTocMenuEntry());
+		// extensionPoints.add("View_TocActions", "AttTable",
+		// new AttTableTocMenuEntry());
+		// extensionPoints.add("View_TocActions", "AttFilter",
+		// new AttFilterTocMenuEntry());
+		// extensionPoints.add("View_TocActions", "AttJoin",
+		// new AttJoinTocMenuEntry());
+		// // extensionPoints.add("View_TocActions","ZoomPixelCursor",new
+		// // ZoomPixelCursorTocMenuEntry());
+		// extensionPoints.add("View_TocActions", "EliminarCapa",
+		// new EliminarCapaTocMenuEntry());
+		// extensionPoints.add("View_TocActions", "VerErroresCapa",
+		// new ShowLayerErrorsTocMenuEntry());
+		// extensionPoints.add("View_TocActions", "ReloadLayer",
+		// new ReloadLayerTocMenuEntry());
+		// extensionPoints.add("View_TocActions", "LayersGroup",
+		// new LayersGroupTocMenuEntry());
+		// extensionPoints.add("View_TocActions", "LayersUngroup",
+		// new LayersUngroupTocMenuEntry());
+		// extensionPoints.add("View_TocActions", "FirstLayer",
+		// new FirstLayerTocMenuEntry());
+		//
+		// extensionPoints.add("View_TocActions", "Copy",
+		// new CopyLayersTocMenuEntry());
+		// extensionPoints.add("View_TocActions", "Cut",
+		// new CutLayersTocMenuEntry());
+		// extensionPoints.add("View_TocActions", "Paste",
+		// new PasteLayersTocMenuEntry());
+		// // extensionPoints.add("View_TocActions","RasterProperties",new
+		// // FLyrRasterAdjustPropertiesTocMenuEntry());
+		// // extensionPoints.add("View_TocActions","RasterProperties",new
+		// // RasterPropertiesTocMenuEntry());
+	}
+
+	public void update(MapContext mapContext) {
+		// filter and sort the items
+		TreeSet<ILayerAction> ret = new TreeSet<ILayerAction>(
+				new LayerActionComparator());
+		for (ILayerAction layerAction : this.layerActions) {
+			if (layerAction.isVisible(mapContext)) {
+				ret.add(layerAction);
+			}
+		}
+		ILayerAction[] actions = ret.toArray(new ILayerAction[ret.size()]);
+
+		// Add the items
+		this.removeAll();
+		String group = null;
+		for (int i = 0; i < actions.length; i++) {
+			ILayerAction action = actions[i];
+			LayerActionMenuItem item = new LayerActionMenuItem(mapContext,
+					action.getText(), action);
+			item.setEnabled(action.isEnabled(mapContext));
+			if (!action.getGroup().equals(group)) {
+				if (group != null)
+					this.addSeparator();
+				group = action.getGroup();
+			}
+			this.add(item);
+		}
+	}
+
+	public class LayerActionComparator implements Comparator<ILayerAction> {
+		@Override
+		public int compare(ILayerAction o1, ILayerAction o2) {
+			NumberFormat formater = NumberFormat.getInstance();
+			formater.setMinimumIntegerDigits(3);
+			String key1 = "" + formater.format(o1.getGroupOrder())
+					+ o1.getGroup() + formater.format(o1.getOrder());
+			String key2 = "" + formater.format(o2.getGroupOrder())
+					+ o2.getGroup() + formater.format(o2.getOrder());
+			return key1.compareTo(key2);
+		}
+	}
+
+	public class LayerActionMenuItem extends JMenuItem implements
+			ActionListener {
+		private static final long serialVersionUID = 1L;
+		private ILayerAction action;
+		private MapContext mapContext;
+
+		public LayerActionMenuItem(MapContext mapContext, String text,
+				ILayerAction documentAction) {
+			super(text);
+			this.mapContext = mapContext;
+			this.action = documentAction;
+			String tip = this.action.getDescription();
+			if (tip != null && tip.length() > 0) {
+				this.setToolTipText(tip);
+			}
+			this.addActionListener(this);
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			this.action.execute(mapContext);
+		}
 	}
 
 }

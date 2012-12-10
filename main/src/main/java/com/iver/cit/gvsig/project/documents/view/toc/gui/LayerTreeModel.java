@@ -1,4 +1,4 @@
-package com.iver.cit.gvsig.project.documents.view.gui;
+package com.iver.cit.gvsig.project.documents.view.toc.gui;
 
 import geomatico.events.EventBus;
 
@@ -11,12 +11,14 @@ import javax.swing.tree.TreePath;
 
 import org.gvsig.events.LayerAddedEvent;
 import org.gvsig.events.LayerAddedHandler;
+import org.gvsig.events.LayerNameChangeEvent;
+import org.gvsig.events.LayerNameChangeHandler;
 import org.gvsig.events.LayerVisibilityChangeEvent;
 import org.gvsig.events.LayerVisibilityChangeHandler;
 import org.gvsig.layer.Layer;
 
 public class LayerTreeModel implements TreeModel, LayerAddedHandler,
-		LayerVisibilityChangeHandler {
+		LayerVisibilityChangeHandler, LayerNameChangeHandler {
 
 	private ArrayList<TreeModelListener> listeners = new ArrayList<TreeModelListener>();
 	private Layer root;
@@ -24,6 +26,7 @@ public class LayerTreeModel implements TreeModel, LayerAddedHandler,
 	public LayerTreeModel(EventBus eventBus, Layer rootLayer) {
 		eventBus.addHandler(LayerAddedEvent.class, this);
 		eventBus.addHandler(LayerVisibilityChangeEvent.class, this);
+		eventBus.addHandler(LayerNameChangeEvent.class, this);
 		this.root = rootLayer;
 	}
 
@@ -91,12 +94,21 @@ public class LayerTreeModel implements TreeModel, LayerAddedHandler,
 
 	@Override
 	public void visibilityChanged(Layer source) {
+		layerChanged(source);
+	}
+
+	private void layerChanged(Layer source) {
 		if (root.contains(source)) {
 			for (TreeModelListener treeModelListener : listeners) {
 				treeModelListener.treeNodesChanged(new TreeModelEvent(this,
-						buildPath(source).getParentPath()));
+						buildPath(source)));
 			}
 		}
+	}
+
+	@Override
+	public void layerNameChanged(Layer source) {
+		layerChanged(source);
 	}
 
 	private TreePath buildPath(Layer layer) {

@@ -2,6 +2,7 @@ package org.gvsig.layer.impl;
 
 import geomatico.events.EventBus;
 
+import org.gvsig.events.LayerNameChangeEvent;
 import org.gvsig.events.LayerSelectionChangeEvent;
 import org.gvsig.events.LayerVisibilityChangeEvent;
 import org.gvsig.layer.Layer;
@@ -23,6 +24,7 @@ public abstract class AbstractLayer implements Layer {
 	@Override
 	public void setName(String name) {
 		this.name = name;
+		eventBus.fireEvent(new LayerNameChangeEvent(this));
 	}
 
 	@Override

@@ -1,4 +1,4 @@
-package com.iver.cit.gvsig.project.documents.view.gui;
+package com.iver.cit.gvsig.project.documents.view.toc.gui;
 
 import java.awt.Color;
 import java.awt.Component;

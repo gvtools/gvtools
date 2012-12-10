@@ -12,6 +12,7 @@ import org.geotools.filter.identity.FeatureIdImpl;
 import org.gvsig.GVSIGTestCase;
 import org.gvsig.events.FeatureSelectionChangeEvent;
 import org.gvsig.events.LayerAddedEvent;
+import org.gvsig.events.LayerNameChangeEvent;
 import org.gvsig.events.LayerSelectionChangeEvent;
 import org.gvsig.events.LayerVisibilityChangeEvent;
 import org.gvsig.layer.filter.LayerFilter;
@@ -245,6 +246,13 @@ public class LayerTest extends GVSIGTestCase {
 
 		verify(eventBus, never()).fireEvent(
 				any(LayerSelectionChangeEvent.class));
+	}
+
+	public void testLayerNameChangedEvent() throws Exception {
+		Layer layer = layerFactory.createLayer("leaf", mock(Source.class));
+		layer.setName("other");
+
+		verify(eventBus).fireEvent(any(LayerNameChangeEvent.class));
 	}
 
 	public void testDataLayerXML() throws Exception {
