@@ -1,14 +1,20 @@
 package com.iver.cit.gvsig.project.documents.view.toc.actions;
 
+import geomatico.events.EventBus;
+import geomatico.events.ExceptionEvent;
+
+import java.io.IOException;
+
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.gvsig.inject.InjectorSingleton;
 import org.gvsig.layer.Layer;
 import org.gvsig.map.MapContext;
+import org.gvsig.util.EnvelopeUtils;
 
 import com.iver.andami.PluginServices;
-import com.iver.cit.gvsig.ProjectExtension;
 import com.iver.cit.gvsig.fmap.MapControl;
-import com.iver.cit.gvsig.project.Project;
-import com.iver.cit.gvsig.project.documents.view.toc.gui.ChangeName;
 import com.iver.cit.gvsig.project.documents.view.toc.gui.ILayerAction;
+import com.vividsolutions.jts.geom.Envelope;
 
 /* gvSIG. Sistema de Informaci�n Geogr�fica de la Generalitat Valenciana
  *
@@ -52,10 +58,22 @@ import com.iver.cit.gvsig.project.documents.view.toc.gui.ILayerAction;
  */
 /* CVS MESSAGES:
  *
- * $Id: ChangeNameTocMenuEntry.java 9532 2007-01-04 07:24:32Z caballero $
+ * $Id: ZoomAlTemaTocMenuEntry.java 13869 2007-09-19 16:00:32Z jaume $
  * $Log$
- * Revision 1.2  2007-01-04 07:24:31  caballero
+ * Revision 1.6  2007-09-19 15:52:16  jaume
+ * ReadExpansionFileException removed from this context
+ *
+ * Revision 1.5  2007/03/06 16:37:08  caballero
+ * Exceptions
+ *
+ * Revision 1.4  2007/01/04 07:24:31  caballero
  * isModified
+ *
+ * Revision 1.3  2006/10/18 16:01:13  sbayarri
+ * Added zoomToExtent method to MapContext.
+ *
+ * Revision 1.2  2006/10/02 13:52:34  jaume
+ * organize impots
  *
  * Revision 1.1  2006/09/15 10:41:30  caballero
  * extensibilidad de documentos
@@ -65,19 +83,14 @@ import com.iver.cit.gvsig.project.documents.view.toc.gui.ILayerAction;
  *
  *
  */
-/**
- * Realiza un cambio de nombre en la capa seleccionada
- * 
- * @author Vicente Caballero Navarro
- */
-public class ChangeNameTocMenuEntry extends AbstractLayerAction implements
+public class ZoomAlTemaTocMenuEntry extends AbstractLayerAction implements
 		ILayerAction {
 	public String getGroup() {
-		return "group1"; // FIXME
+		return "group2"; // FIXME
 	}
 
 	public int getGroupOrder() {
-		return 10;
+		return 20;
 	}
 
 	public int getOrder() {
@@ -85,29 +98,45 @@ public class ChangeNameTocMenuEntry extends AbstractLayerAction implements
 	}
 
 	public String getText() {
-		return PluginServices.getText(this, "cambio_nombre");
+		return PluginServices.getText(this, "Zoom_a_la_capa");
 	}
 
 	public boolean isEnabled(MapContext mapContext) {
-		return getSelected(mapContext).length == 1;
-	}
-
-	public boolean isVisible(MapContext mapContext) {
 		return true;
 	}
 
+	public boolean isVisible(MapContext mapContext) {
+		return getSelected(mapContext).length > 0;
+	}
+
 	public void execute(MapContext mapContext, MapControl mapControl) {
-		Layer lyr = getSelected(mapContext)[0];
-		ChangeName chn = new ChangeName(lyr.getName());
-		PluginServices.getMDIManager().addWindow(chn);
-		lyr.setName(chn.getName());
-		Project project = ((ProjectExtension) PluginServices
-				.getExtension(ProjectExtension.class)).getProject();
-		project.setModified(true);
+
+		// 050209, jmorell: Para que haga un zoom a un grupo de capas
+		// seleccionadas.
+
+		Layer[] selected = getSelected(mapContext);
+		Envelope selectedEnvelope = null;
+		for (Layer layer : selected) {
+			try {
+				ReferencedEnvelope envelope = layer.getBounds();
+				if (selectedEnvelope == null) {
+					selectedEnvelope = new Envelope(envelope);
+				} else {
+					selectedEnvelope.expandToInclude(envelope);
+				}
+			} catch (IOException e) {
+				EventBus eventBus = InjectorSingleton.getInjector()
+						.getInstance(EventBus.class);
+				eventBus.fireEvent(new ExceptionEvent(
+						"Cannot get the bounds of layer: " + layer.getName(), e));
+			}
+		}
+		mapControl.getViewPort().setExtent(
+				EnvelopeUtils.toRectangle2D(selectedEnvelope));
 	}
 
 	@Override
 	public String getDescription() {
-		return PluginServices.getText(this, "name_change_tooltip");
+		return PluginServices.getText(this, "zoom_to_layer_tooltip");
 	}
 }

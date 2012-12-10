@@ -179,6 +179,16 @@ public class FeatureLayer extends AbstractLayer implements Layer {
 	}
 
 	@Override
+	public void addLayer(int position, Layer testLayer) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public int indexOf(Layer layer) {
+		return -1;
+	}
+
+	@Override
 	public ReferencedEnvelope getBounds() throws IOException {
 		return getGTLayer().getBounds();
 	}

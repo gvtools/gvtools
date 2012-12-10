@@ -37,7 +37,8 @@ public abstract class AbstractLayer implements Layer {
 		return parent;
 	}
 
-	void setParent(Layer parent) {
+	@Override
+	public void setParent(Layer parent) {
 		this.parent = parent;
 	}
 

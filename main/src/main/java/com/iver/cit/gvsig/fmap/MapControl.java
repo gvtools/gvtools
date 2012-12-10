@@ -2008,6 +2008,11 @@ public class MapControl extends JComponent implements ComponentListener {
 		public void visibilityChanged(Layer source) {
 			refresh(source);
 		}
+
+		@Override
+		public void layerRemoved(Layer parent, Layer removed) {
+			refresh(parent);
+		}
 	}
 
 	/**

@@ -19,6 +19,8 @@ import org.gvsig.layer.Layer;
 import org.gvsig.layer.LayerFactory;
 import org.gvsig.map.MapContext;
 
+import com.iver.cit.gvsig.fmap.MapControl;
+
 public class TOC extends JTree implements LayerSelectionChangeHandler {
 
 	private static final long serialVersionUID = 1L;
@@ -27,7 +29,8 @@ public class TOC extends JTree implements LayerSelectionChangeHandler {
 	private FPopupMenu popmenu;
 	private MapContext mapContext;
 
-	public TOC(EventBus eventBus, LayerFactory layerFactory) {
+	public TOC(EventBus eventBus, LayerFactory layerFactory,
+			final MapControl mapControl) {
 		assert false : "Uncomment following line";
 		/*
 		 * gtintegration This line was removed from View. I mean: don't forget
@@ -39,6 +42,7 @@ public class TOC extends JTree implements LayerSelectionChangeHandler {
 		popmenu = new FPopupMenu();
 
 		this.setRootVisible(false);
+		this.setShowsRootHandles(true);
 		this.setModel(new LayerTreeModel(eventBus, layerFactory
 				.createLayer("root")));
 		renderer = new LayerCellRenderer();
@@ -58,7 +62,7 @@ public class TOC extends JTree implements LayerSelectionChangeHandler {
 				}
 
 				if (e.getButton() == MouseEvent.BUTTON3) {
-					popmenu.update(mapContext);
+					popmenu.update(mapContext, mapControl);
 					popmenu.show(e.getComponent(), e.getX(), e.getY());
 				}
 			}

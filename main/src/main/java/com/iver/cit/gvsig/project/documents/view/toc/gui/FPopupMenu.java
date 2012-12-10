@@ -55,7 +55,12 @@ import javax.swing.JPopupMenu;
 
 import org.gvsig.map.MapContext;
 
+import com.iver.cit.gvsig.fmap.MapControl;
 import com.iver.cit.gvsig.project.documents.view.toc.actions.ChangeNameTocMenuEntry;
+import com.iver.cit.gvsig.project.documents.view.toc.actions.EliminarCapaTocMenuEntry;
+import com.iver.cit.gvsig.project.documents.view.toc.actions.LayersGroupTocMenuEntry;
+import com.iver.cit.gvsig.project.documents.view.toc.actions.LayersUngroupTocMenuEntry;
+import com.iver.cit.gvsig.project.documents.view.toc.actions.ZoomAlTemaTocMenuEntry;
 
 public class FPopupMenu extends JPopupMenu {
 	private static final long serialVersionUID = 1L;
@@ -68,8 +73,7 @@ public class FPopupMenu extends JPopupMenu {
 		// new ChangeSymbolTocMenuEntry());
 		// extensionPoints.add("View_TocActions", "FLyrVectEditProperties",
 		// new FLyrVectEditPropertiesTocMenuEntry());
-		// extensionPoints.add("View_TocActions", "ZoomAlTema",
-		// new ZoomAlTemaTocMenuEntry());
+		layerActions.add(new ZoomAlTemaTocMenuEntry());
 		// extensionPoints.add("View_TocActions", "AttTable",
 		// new AttTableTocMenuEntry());
 		// extensionPoints.add("View_TocActions", "AttFilter",
@@ -78,16 +82,13 @@ public class FPopupMenu extends JPopupMenu {
 		// new AttJoinTocMenuEntry());
 		// // extensionPoints.add("View_TocActions","ZoomPixelCursor",new
 		// // ZoomPixelCursorTocMenuEntry());
-		// extensionPoints.add("View_TocActions", "EliminarCapa",
-		// new EliminarCapaTocMenuEntry());
+		layerActions.add(new EliminarCapaTocMenuEntry());
 		// extensionPoints.add("View_TocActions", "VerErroresCapa",
 		// new ShowLayerErrorsTocMenuEntry());
 		// extensionPoints.add("View_TocActions", "ReloadLayer",
 		// new ReloadLayerTocMenuEntry());
-		// extensionPoints.add("View_TocActions", "LayersGroup",
-		// new LayersGroupTocMenuEntry());
-		// extensionPoints.add("View_TocActions", "LayersUngroup",
-		// new LayersUngroupTocMenuEntry());
+		layerActions.add(new LayersGroupTocMenuEntry());
+		layerActions.add(new LayersUngroupTocMenuEntry());
 		// extensionPoints.add("View_TocActions", "FirstLayer",
 		// new FirstLayerTocMenuEntry());
 		//
@@ -103,7 +104,7 @@ public class FPopupMenu extends JPopupMenu {
 		// // RasterPropertiesTocMenuEntry());
 	}
 
-	public void update(MapContext mapContext) {
+	public void update(MapContext mapContext, MapControl mapControl) {
 		// filter and sort the items
 		TreeSet<ILayerAction> ret = new TreeSet<ILayerAction>(
 				new LayerActionComparator());
@@ -120,7 +121,7 @@ public class FPopupMenu extends JPopupMenu {
 		for (int i = 0; i < actions.length; i++) {
 			ILayerAction action = actions[i];
 			LayerActionMenuItem item = new LayerActionMenuItem(mapContext,
-					action.getText(), action);
+					mapControl, action.getText(), action);
 			item.setEnabled(action.isEnabled(mapContext));
 			if (!action.getGroup().equals(group)) {
 				if (group != null)
@@ -149,10 +150,12 @@ public class FPopupMenu extends JPopupMenu {
 		private static final long serialVersionUID = 1L;
 		private ILayerAction action;
 		private MapContext mapContext;
+		private MapControl mapControl;
 
-		public LayerActionMenuItem(MapContext mapContext, String text,
-				ILayerAction documentAction) {
+		public LayerActionMenuItem(MapContext mapContext,
+				MapControl mapControl, String text, ILayerAction documentAction) {
 			super(text);
+			this.mapControl = mapControl;
 			this.mapContext = mapContext;
 			this.action = documentAction;
 			String tip = this.action.getDescription();
@@ -163,7 +166,7 @@ public class FPopupMenu extends JPopupMenu {
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			this.action.execute(mapContext);
+			this.action.execute(mapContext, mapControl);
 		}
 	}
 

@@ -11,6 +11,7 @@ import java.util.List;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.gvsig.events.LayerAddedEvent;
+import org.gvsig.events.LayerRemovedEvent;
 import org.gvsig.layer.Layer;
 import org.gvsig.layer.LayerFactory;
 import org.gvsig.layer.Selection;
@@ -65,8 +66,9 @@ public class CompositeLayer extends AbstractLayer implements Layer {
 		}
 
 		for (Layer layer : layers) {
-			if (filter.accepts(layer)) {
-				ret.add(layer);
+			Layer[] childResults = layer.filter(filter);
+			for (Layer childResult : childResults) {
+				ret.add(childResult);
 			}
 		}
 		return ret.toArray(new Layer[ret.size()]);
@@ -88,19 +90,38 @@ public class CompositeLayer extends AbstractLayer implements Layer {
 	}
 
 	public void addLayer(Layer layer) {
+		addLayer(layers.size(), layer);
+	}
+
+	@Override
+	public void addLayer(int position, Layer layer)
+			throws UnsupportedOperationException, IllegalArgumentException {
 		if (layer == null) {
 			throw new IllegalArgumentException("Layer cannot be null");
 		} else if (layer.getParent() != null) {
 			throw new IllegalArgumentException("The layer already has a parent");
 		}
-		layers.add(layer);
-		((AbstractLayer) layer).setParent(this);
+		layers.add(position, layer);
+		layer.setParent(this);
 		eventBus.fireEvent(new LayerAddedEvent(layer));
+	}
+
+	@Override
+	public int indexOf(Layer layer) {
+		for (int i = 0; i < layers.size(); i++) {
+			Layer testLayer = layers.get(i);
+			if (testLayer == layer) {
+				return i;
+			}
+		}
+
+		return -1;
 	}
 
 	public boolean removeLayer(Layer layer) {
 		boolean ret = layers.remove(layer);
-		((AbstractLayer) layer).setParent(null);
+		layer.setParent(null);
+		eventBus.fireEvent(new LayerRemovedEvent(this, layer));
 		return ret;
 	}
 
@@ -160,14 +181,6 @@ public class CompositeLayer extends AbstractLayer implements Layer {
 		super.setVisible(visible);
 		for (Layer layer : this.layers) {
 			layer.setVisible(visible);
-		}
-	}
-
-	@Override
-	public void setSelected(boolean selected) {
-		super.setSelected(selected);
-		for (Layer layer : this.layers) {
-			layer.setSelected(selected);
 		}
 	}
 

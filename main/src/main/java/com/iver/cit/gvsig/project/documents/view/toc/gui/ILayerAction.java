@@ -2,6 +2,8 @@ package com.iver.cit.gvsig.project.documents.view.toc.gui;
 
 import org.gvsig.map.MapContext;
 
+import com.iver.cit.gvsig.fmap.MapControl;
+
 public interface ILayerAction {
 
 	String getText();
@@ -12,7 +14,7 @@ public interface ILayerAction {
 
 	boolean isEnabled(MapContext mapContext);
 
-	void execute(MapContext mapContext);
+	void execute(MapContext mapContext, MapControl mapControl);
 
 	int getGroupOrder();
 

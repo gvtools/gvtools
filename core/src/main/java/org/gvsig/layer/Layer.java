@@ -120,6 +120,32 @@ public interface Layer {
 	void addLayer(Layer layer) throws UnsupportedOperationException,
 			IllegalArgumentException;
 
+	/**
+	 * The same as {@link #addLayer(Layer)} but specifying the position where
+	 * the layer will be added. The current layer at that position and all the
+	 * following ones will be shifted one place.
+	 * 
+	 * @param position
+	 * @param layer
+	 * @throws UnsupportedOperationException
+	 *             if {@link #addLayer(Layer)} raises the exception
+	 * @throws IllegalArgumentException
+	 *             if the position does not exist or {@link #addLayer(Layer)}
+	 *             raises the exception
+	 */
+	void addLayer(int position, Layer layer)
+			throws UnsupportedOperationException, IllegalArgumentException;
+
+	/**
+	 * Convenience method that returns the index of the layer in the array
+	 * returned by {@link #getChildren()} or -1 if the layers is not a children
+	 * of this layer
+	 * 
+	 * @param layer
+	 * @return
+	 */
+	int indexOf(Layer layer);
+
 	boolean removeLayer(Layer layer);
 
 	/**
@@ -179,4 +205,10 @@ public interface Layer {
 
 	Layer getParent();
 
+	/**
+	 * Sets the parent of the layer. Should not be called directly
+	 * 
+	 * @param parent
+	 */
+	void setParent(Layer parent);
 }

@@ -13,18 +13,22 @@ import org.gvsig.events.LayerAddedEvent;
 import org.gvsig.events.LayerAddedHandler;
 import org.gvsig.events.LayerNameChangeEvent;
 import org.gvsig.events.LayerNameChangeHandler;
+import org.gvsig.events.LayerRemovedEvent;
+import org.gvsig.events.LayerRemovedHandler;
 import org.gvsig.events.LayerVisibilityChangeEvent;
 import org.gvsig.events.LayerVisibilityChangeHandler;
 import org.gvsig.layer.Layer;
 
 public class LayerTreeModel implements TreeModel, LayerAddedHandler,
-		LayerVisibilityChangeHandler, LayerNameChangeHandler {
+		LayerRemovedHandler, LayerVisibilityChangeHandler,
+		LayerNameChangeHandler {
 
 	private ArrayList<TreeModelListener> listeners = new ArrayList<TreeModelListener>();
 	private Layer root;
 
 	public LayerTreeModel(EventBus eventBus, Layer rootLayer) {
 		eventBus.addHandler(LayerAddedEvent.class, this);
+		eventBus.addHandler(LayerRemovedEvent.class, this);
 		eventBus.addHandler(LayerVisibilityChangeEvent.class, this);
 		eventBus.addHandler(LayerNameChangeEvent.class, this);
 		this.root = rootLayer;
@@ -84,12 +88,21 @@ public class LayerTreeModel implements TreeModel, LayerAddedHandler,
 
 	@Override
 	public void layerAdded(Layer layer) {
+		structureChanged(layer, buildPath(layer).getParentPath());
+	}
+
+	private void structureChanged(Layer layer, TreePath pathToUpdate) {
 		if (root.contains(layer)) {
 			for (TreeModelListener treeModelListener : listeners) {
 				treeModelListener.treeStructureChanged(new TreeModelEvent(this,
-						buildPath(layer).getParentPath()));
+						pathToUpdate));
 			}
 		}
+	}
+
+	@Override
+	public void layerRemoved(Layer parent, Layer removed) {
+		structureChanged(parent, buildPath(parent));
 	}
 
 	@Override
@@ -119,4 +132,5 @@ public class LayerTreeModel implements TreeModel, LayerAddedHandler,
 			return new TreePath(layer);
 		}
 	}
+
 }

@@ -114,4 +114,14 @@ public class FilterTest extends GVSIGTestCase {
 		assertEquals(1, layers.length);
 		assertEquals(l2, layers[0]);
 	}
+
+	public void testFilterExploresAllTree() throws Exception {
+		Layer root = layerFactory.createLayer("l");
+		Layer folder = layerFactory.createLayer("l");
+		Layer leaf = layerFactory.createLayer("leaf", mock(Source.class));
+		folder.addLayer(leaf);
+		root.addLayer(folder);
+
+		assertTrue(root.filter(LayerFilter.FEATURE).length == 1);
+	}
 }

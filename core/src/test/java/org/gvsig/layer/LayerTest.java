@@ -1,11 +1,13 @@
 package org.gvsig.layer;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import geomatico.events.Event;
 import geomatico.events.EventBus;
 
 import org.geotools.filter.identity.FeatureIdImpl;
@@ -69,6 +71,28 @@ public class LayerTest extends GVSIGTestCase {
 			fail();
 		} catch (IllegalArgumentException e) {
 		}
+	}
+
+	public void testAddLayerToPosition() throws Exception {
+		Layer layer1 = layerFactory.createLayer("leaf1", mock(Source.class));
+		Layer folder = layerFactory.createLayer("folder");
+
+		folder.addLayer(0, layer1);
+
+		assertTrue(folder.getChildren()[0] == layer1);
+
+		Layer layer2 = layerFactory.createLayer("leaf2", mock(Source.class));
+		folder.addLayer(0, layer2);
+
+		assertTrue(folder.indexOf(layer2) == 0);
+		assertTrue(folder.indexOf(layer1) == 1);
+	}
+
+	public void testIndexOfNonChild() throws Exception {
+		Layer layer = layerFactory.createLayer("leaf", mock(Source.class));
+		Layer folder = layerFactory.createLayer("folder");
+
+		assertTrue(folder.indexOf(layer) == -1);
 	}
 
 	public void testContains() throws Exception {
@@ -166,8 +190,8 @@ public class LayerTest extends GVSIGTestCase {
 		assertEquals(layer, layers[0]);
 
 		// Composite
-		Layer l1 = mock(Layer.class);
-		Layer l2 = mock(Layer.class);
+		Layer l1 = layerFactory.createLayer("l", mock(Source.class));
+		Layer l2 = layerFactory.createLayer("l", mock(Source.class));
 		layer = layerFactory.createLayer("l", l1, l2);
 
 		layers = layer.filter(new LayerFilter() {
@@ -311,6 +335,21 @@ public class LayerTest extends GVSIGTestCase {
 		assertEquals(l2, layers[1]);
 	}
 
+	@SuppressWarnings("unchecked")
+	public void testRemoveLayerEvent() throws Exception {
+		Layer leaf = layerFactory.createLayer("l", mock(Source.class));
+		Layer folder = layerFactory.createLayer("l", leaf);
+		/*
+		 * Don't know why mockito does not check the class of the event. Let's
+		 * just count invocations then
+		 */
+		verify(eventBus, times(1)).fireEvent(any(Event.class));
+
+		folder.removeLayer(leaf);
+
+		verify(eventBus, times(2)).fireEvent(any(Event.class));
+	}
+
 	public void testGetBounds() throws Exception {
 		fail();
 	}
@@ -327,6 +366,20 @@ public class LayerTest extends GVSIGTestCase {
 
 		root.setVisible(true);
 		verify(leaf).setVisible(true);
+	}
+
+	public void testSetSelectedDoesNotSetChildren() throws Exception {
+		Layer root = layerFactory.createLayer("l");
+		Layer folder = layerFactory.createLayer("l");
+		Layer leaf = mock(Layer.class);
+		folder.addLayer(leaf);
+		root.addLayer(folder);
+
+		root.setSelected(true);
+		verify(leaf, never()).setVisible(anyBoolean());
+
+		root.setSelected(false);
+		verify(leaf, never()).setVisible(anyBoolean());
 	}
 
 	public void testSelectionNotSupported() throws Exception {

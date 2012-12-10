@@ -388,7 +388,8 @@ public class View extends BaseView {
 				ProjectView.DEFAULT_DISTANCE_UNITS, ProjectView.DEFAULT_CRS);
 
 		m_MapControl.addExceptionListener(mapControlExceptionListener);
-		m_TOC = new TOC(eventBus, injector.getInstance(LayerFactory.class));
+		m_TOC = new TOC(eventBus, injector.getInstance(LayerFactory.class),
+				m_MapControl);
 
 		// Ponemos el localizador
 		m_MapLoc = new MapOverview(m_MapControl);

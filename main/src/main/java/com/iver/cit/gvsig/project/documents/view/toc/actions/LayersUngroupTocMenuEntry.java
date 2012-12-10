@@ -1,15 +1,3 @@
-package com.iver.cit.gvsig.project.documents.view.toc.actions;
-
-import org.gvsig.layer.Layer;
-import org.gvsig.map.MapContext;
-
-import com.iver.andami.PluginServices;
-import com.iver.cit.gvsig.ProjectExtension;
-import com.iver.cit.gvsig.fmap.MapControl;
-import com.iver.cit.gvsig.project.Project;
-import com.iver.cit.gvsig.project.documents.view.toc.gui.ChangeName;
-import com.iver.cit.gvsig.project.documents.view.toc.gui.ILayerAction;
-
 /* gvSIG. Sistema de Informaci�n Geogr�fica de la Generalitat Valenciana
  *
  * Copyright (C) 2004 IVER T.I. and Generalitat Valenciana.
@@ -50,12 +38,33 @@ import com.iver.cit.gvsig.project.documents.view.toc.gui.ILayerAction;
  *   +34 963163400
  *   dac@iver.es
  */
+package com.iver.cit.gvsig.project.documents.view.toc.actions;
+
+import org.gvsig.layer.Layer;
+import org.gvsig.map.MapContext;
+
+import com.iver.andami.PluginServices;
+import com.iver.cit.gvsig.fmap.MapControl;
+import com.iver.cit.gvsig.project.documents.view.toc.gui.ILayerAction;
+
 /* CVS MESSAGES:
  *
- * $Id: ChangeNameTocMenuEntry.java 9532 2007-01-04 07:24:32Z caballero $
+ * $Id: LayersUngroupTocMenuEntry.java 24624 2008-11-03 08:20:00Z vcaballero $
  * $Log$
- * Revision 1.2  2007-01-04 07:24:31  caballero
+ * Revision 1.6  2007-01-04 07:24:31  caballero
  * isModified
+ *
+ * Revision 1.5  2006/10/02 13:52:34  jaume
+ * organize impots
+ *
+ * Revision 1.4  2006/09/25 15:24:26  jmvivo
+ * * Modificada la implementacion.
+ *
+ * Revision 1.3  2006/09/20 12:01:24  jaume
+ * *** empty log message ***
+ *
+ * Revision 1.2  2006/09/20 11:41:20  jaume
+ * *** empty log message ***
  *
  * Revision 1.1  2006/09/15 10:41:30  caballero
  * extensibilidad de documentos
@@ -66,18 +75,19 @@ import com.iver.cit.gvsig.project.documents.view.toc.gui.ILayerAction;
  *
  */
 /**
- * Realiza un cambio de nombre en la capa seleccionada
+ * Realiza una desagrupaci�n de capas, a partir de las capas que se encuentren
+ * activas.
  * 
  * @author Vicente Caballero Navarro
  */
-public class ChangeNameTocMenuEntry extends AbstractLayerAction implements
+public class LayersUngroupTocMenuEntry extends AbstractLayerAction implements
 		ILayerAction {
 	public String getGroup() {
-		return "group1"; // FIXME
+		return "group4"; // FIXME
 	}
 
 	public int getGroupOrder() {
-		return 10;
+		return 40;
 	}
 
 	public int getOrder() {
@@ -85,29 +95,39 @@ public class ChangeNameTocMenuEntry extends AbstractLayerAction implements
 	}
 
 	public String getText() {
-		return PluginServices.getText(this, "cambio_nombre");
+		return PluginServices.getText(this, "desagrupar_capas");
 	}
 
 	public boolean isEnabled(MapContext mapContext) {
-		return getSelected(mapContext).length == 1;
-	}
-
-	public boolean isVisible(MapContext mapContext) {
 		return true;
 	}
 
+	public boolean isVisible(MapContext mapContext) {
+		Layer[] selected = getSelected(mapContext);
+		for (Layer layer : selected) {
+			if (layer.getChildren().length == 0) {
+				return false;
+			}
+		}
+		return selected.length > 0;
+	}
+
 	public void execute(MapContext mapContext, MapControl mapControl) {
-		Layer lyr = getSelected(mapContext)[0];
-		ChangeName chn = new ChangeName(lyr.getName());
-		PluginServices.getMDIManager().addWindow(chn);
-		lyr.setName(chn.getName());
-		Project project = ((ProjectExtension) PluginServices
-				.getExtension(ProjectExtension.class)).getProject();
-		project.setModified(true);
+		Layer[] selected = getSelected(mapContext);
+		for (Layer layer : selected) {
+			Layer[] toAdd = layer.getChildren();
+			Layer parent = layer.getParent();
+			int position = parent.indexOf(layer);
+			parent.removeLayer(layer);
+			for (Layer groupedLayer : toAdd) {
+				layer.removeLayer(groupedLayer);
+				parent.addLayer(position++, groupedLayer);
+			}
+		}
 	}
 
 	@Override
 	public String getDescription() {
-		return PluginServices.getText(this, "name_change_tooltip");
+		return PluginServices.getText(this, "ungroup_layer_tooltip");
 	}
 }
