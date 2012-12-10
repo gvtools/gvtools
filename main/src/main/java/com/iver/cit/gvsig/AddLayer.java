@@ -69,6 +69,8 @@ public class AddLayer extends Extension {
 		return wizard;
 	}
 
+	private LayerCreationErrorHandler handler;
+
 	@Override
 	public boolean isVisible() {
 		IWindow window = PluginServices.getMDIManager().getActiveWindow();
@@ -146,16 +148,20 @@ public class AddLayer extends Extension {
 				this.getClass().getClassLoader()
 						.getResource("images/addlayer.png"));
 
+		handler = new LayerCreationErrorHandler() {
+			@Override
+			public void error(String[] layers) {
+				String message = PluginServices.getText(this, "fallo_capas")
+						+ " :";
+				for (String layer : layers) {
+					message += "\n" + layer;
+				}
+				JOptionPane.showMessageDialog(
+						(Component) PluginServices.getMainFrame(), message);
+			}
+		};
 		EventBus.getInstance().addHandler(LayerCreationErrorEvent.class,
-				new LayerCreationErrorHandler() {
-					@Override
-					public void error(String message, Throwable cause) {
-						JOptionPane.showMessageDialog(
-								(Component) PluginServices.getMainFrame(),
-								PluginServices.getText(this, "fallo_capas")
-										+ " : \n" + message);
-					}
-				});
+				handler);
 
 		// Add wizards
 		addWizard(AddFileLayerWizard.class);

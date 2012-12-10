@@ -71,6 +71,10 @@ public class SourceImpl implements Source {
 	@Override
 	public SimpleFeatureSource createFeatureSource() throws IOException {
 		DataStore dataStore = getDataStore();
+		if (dataStore == null) {
+			throw new IOException("Cannot obtain data store from source");
+		}
+
 		String actualTypeName = typeName;
 		if (actualTypeName == null) {
 			String[] typeNames = dataStore.getTypeNames();

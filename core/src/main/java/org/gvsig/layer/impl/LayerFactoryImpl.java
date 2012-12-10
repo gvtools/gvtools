@@ -2,6 +2,8 @@ package org.gvsig.layer.impl;
 
 import geomatico.events.EventBus;
 
+import java.io.IOException;
+
 import javax.inject.Inject;
 
 import org.geotools.styling.StyleFactory;
@@ -34,9 +36,15 @@ public class LayerFactoryImpl implements LayerFactory {
 	private Provider<EventBus> eventBusProvider;
 
 	@Override
-	public Layer createLayer(Source source) {
+	public Layer createLayer(Source source) throws IOException {
+		if (source == null) {
+			throw new IOException("Source cannot be null");
+		}
 		FeatureLayer ret = newFeatureLayer();
 		ret.setSource(source);
+
+		// Just to check the feature source is valid
+		ret.getFeatureSource();
 
 		return ret;
 	}

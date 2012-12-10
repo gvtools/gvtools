@@ -4,16 +4,14 @@ import geomatico.events.Event;
 
 public class LayerCreationErrorEvent implements
 		Event<LayerCreationErrorHandler> {
-	private String message;
-	private Throwable cause;
+	private String[] layers;
 
-	public LayerCreationErrorEvent(String message, Throwable cause) {
-		this.message = message;
-		this.cause = cause;
+	public LayerCreationErrorEvent(String[] layers) {
+		this.layers = layers;
 	}
 
 	@Override
 	public void dispatch(LayerCreationErrorHandler handler) {
-		handler.error(message, cause);
+		handler.error(layers);
 	}
 }
