@@ -33,6 +33,8 @@ public class TestExtension extends Extension {
 		Map<String, String> properties = new HashMap<String, String>();
 		// properties.put("url", "file:///home/fergonco/carto/ggl/paises.shp");
 		properties.put("url", "file:///home/fergonco/carto/vias.shp");
+		// properties.put("url", "file:///home/victorzinho/workspace/"
+		// + "cursos/gvsig_2012/datos/vias.shp");
 		Source source = sourceFactory.createSource(properties);
 		Layer testLayer = layerFactory.createLayer(source);
 		InjectorSingleton.getInjector().injectMembers(testLayer);
