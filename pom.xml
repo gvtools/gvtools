@@ -15,7 +15,7 @@
 	</modules>
 	<properties>
 		<project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
-		<geotools.version>8.0</geotools.version>
+		<geotools.version>8.3</geotools.version>
 	</properties>
 	<repositories>
 		<repository>
