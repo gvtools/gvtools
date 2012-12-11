@@ -1,5 +1,9 @@
 package org.gvsig;
 
+import geomatico.events.EventBus;
+import geomatico.events.ExceptionEvent;
+
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,16 +40,21 @@ public class TestExtension extends Extension {
 		// properties.put("url", "file:///home/victorzinho/workspace/"
 		// + "cursos/gvsig_2012/datos/vias.shp");
 		Source source = sourceFactory.createSource(properties);
-		Layer testLayer = layerFactory.createLayer("vias", source);
-		InjectorSingleton.getInjector().injectMembers(testLayer);
+		try {
+			Layer testLayer = layerFactory.createLayer("vias", source);
+			InjectorSingleton.getInjector().injectMembers(testLayer);
 
-		com.iver.andami.ui.mdiManager.IWindow frame = PluginServices
-				.getMDIManager().getActiveWindow();
+			com.iver.andami.ui.mdiManager.IWindow frame = PluginServices
+					.getMDIManager().getActiveWindow();
 
-		if (frame instanceof BaseView) {
-			MapContext mapContext = ((BaseView) frame).getModel()
-					.getMapContext();
-			mapContext.getRootLayer().addLayer(testLayer);
+			if (frame instanceof BaseView) {
+				MapContext mapContext = ((BaseView) frame).getModel()
+						.getMapContext();
+				mapContext.getRootLayer().addLayer(testLayer);
+			}
+		} catch (IOException e) {
+			InjectorSingleton.getInjector().getInstance(EventBus.class)
+					.fireEvent(new ExceptionEvent("Cannot add layer", e));
 		}
 	}
 

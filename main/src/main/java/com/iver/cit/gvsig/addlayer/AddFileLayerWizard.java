@@ -166,8 +166,8 @@ public class AddFileLayerWizard extends AddLayerWizard {
 				Map<String, String> properties = new HashMap<String, String>();
 				String url = file.toURI().toURL().toExternalForm();
 				properties.put("url", url);
-				Layer layer = layerFactory.createLayer(sourceFactory
-						.createSource(properties));
+				Layer layer = layerFactory.createLayer(file.getName(),
+						sourceFactory.createSource(properties));
 				model.add(name, layer);
 			} catch (Exception e) {
 				logger.error("Cannot create layer", e);
@@ -181,7 +181,7 @@ public class AddFileLayerWizard extends AddLayerWizard {
 			EventBus.getInstance().fireEvent(
 					new LayerCreationErrorEvent(layerNames));
 		}
-		
+
 		callStateChanged(model.getSize() > 0);
 		updateButtons();
 		list.invalidate();
