@@ -12,5 +12,7 @@ public interface LayerFilter {
 
 	LayerFilter SELECTED = new SelectedFilter();
 
+	LayerFilter FEATURE_SELECTED = new FeatureSelectedFilter();
+
 	boolean accepts(Layer layer);
 }
