@@ -80,6 +80,7 @@ import com.iver.cit.gvsig.fmap.tools.Behavior.RectangleBehavior;
 import com.iver.cit.gvsig.project.documents.view.ProjectView;
 import com.iver.cit.gvsig.project.documents.view.ProjectViewBase;
 import com.iver.cit.gvsig.project.documents.view.toc.gui.TOC;
+import com.iver.cit.gvsig.project.documents.view.toolListeners.InfoListener;
 import com.iver.cit.gvsig.project.documents.view.toolListeners.PanListener;
 import com.iver.cit.gvsig.project.documents.view.toolListeners.PointSelectListener;
 import com.iver.cit.gvsig.project.documents.view.toolListeners.PolygonSelectListener;
@@ -460,6 +461,11 @@ public class View extends BaseView {
 				.addMapTool("polSelection", new Behavior[] {
 						new PolygonBehavior(poligSel),
 						new MouseMovementBehavior(sbl) });
+
+		// Info por punto
+		InfoListener il = new InfoListener(m_MapControl);
+		m_MapControl.addMapTool("info", new Behavior[] { new PointBehavior(il),
+				new MouseMovementBehavior(sbl) });
 
 		// Zoom por rect�ngulo
 		ZoomOutRightButtonListener zoil = new ZoomOutRightButtonListener(

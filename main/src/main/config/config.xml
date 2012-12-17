@@ -142,6 +142,16 @@
 			</tool-bar>
 		</extension>
 
+		<extension class-name="com.iver.cit.gvsig.InfoToolExtension"
+			description="Extensión encargada de gestionar la herramienta de info."
+			active="true"
+			priority="29">
+			<menu text="Vista/consulta/informacion" key="i" action-command="INFO" icon="view-query-information" position="20"/>
+			<tool-bar name="View_Tools_Query" position="5">
+				<selectable-tool icon="view-query-information" action-command="INFO"  tooltip="informacion" position="1"/>
+			</tool-bar>
+		</extension>
+
 		<!-- ADD LAYER -->
 		<extension class-name="com.iver.cit.gvsig.AddLayer"
 			description="Extensión encargada de abrir las diferentes capas."
