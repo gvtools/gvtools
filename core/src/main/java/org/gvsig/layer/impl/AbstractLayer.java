@@ -6,6 +6,8 @@ import org.gvsig.events.LayerNameChangeEvent;
 import org.gvsig.events.LayerSelectionChangeEvent;
 import org.gvsig.events.LayerVisibilityChangeEvent;
 import org.gvsig.layer.Layer;
+import org.gvsig.layer.LayerProcessor;
+import org.gvsig.layer.filter.LayerFilter;
 import org.gvsig.persistence.generated.LayerType;
 
 public abstract class AbstractLayer implements Layer {
@@ -72,5 +74,25 @@ public abstract class AbstractLayer implements Layer {
 
 	void read(LayerType type) {
 		this.name = type.getName();
+	}
+
+	@Override
+	public void process(LayerFilter layerFilter, LayerProcessor processor) {
+		if (layerFilter.accepts(this)) {
+			processor.process(this);
+		}
+		Layer[] children = getChildren();
+		for (Layer layer : children) {
+			layer.process(layerFilter, processor);
+		}
+	}
+
+	@Override
+	public void process(LayerProcessor processor) {
+		processor.process(this);
+		Layer[] children = getChildren();
+		for (Layer layer : children) {
+			layer.process(processor);
+		}
 	}
 }

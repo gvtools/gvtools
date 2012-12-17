@@ -51,6 +51,25 @@ public interface Layer {
 	Layer[] filter(LayerFilter filter);
 
 	/**
+	 * Processes all the layers in this tree using the specified
+	 * <code>processor</code>
+	 * 
+	 * @param processor
+	 * @return
+	 */
+	void process(LayerProcessor processor);
+
+	/**
+	 * Processes all the layers in this tree that are filtered by
+	 * <code>layerFilter</code> using the specified <code>processor</code>
+	 * 
+	 * @param layerFilter
+	 * @param processor
+	 * @return
+	 */
+	void process(LayerFilter layerFilter, LayerProcessor processor);
+
+	/**
 	 * Determines if the layer is being edited. A layer is being edited if there
 	 * are any editing tasks being performed. In any other case (including
 	 * composite layers), this method returns <code>false</code>.
