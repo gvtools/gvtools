@@ -132,6 +132,16 @@
 			</tool-bar>
 		</extension>
 
+		<extension class-name="com.iver.cit.gvsig.ClearSelectionExtension"
+			description="Extensión encargada de limpiar la selección."
+			active="true">
+			<menu text="Vista/seleccion/clear_selection" key="d" action-command="DEL_SELECTION" icon="view-clear-selection"/>
+			<menu text="Tabla/clear_selection" key="d" action-command="DEL_SELECTION" icon="view-clear-selection" position="18"/>
+			<tool-bar name="Tools_Select" position="7">
+				<action-tool icon="view-clear-selection" action-command="DEL_SELECTION" enable-text="clear_selection" tooltip="clear_selection" position="6"/>
+			</tool-bar>
+		</extension>
+
 		<!-- ADD LAYER -->
 		<extension class-name="com.iver.cit.gvsig.AddLayer"
 			description="Extensión encargada de abrir las diferentes capas."
