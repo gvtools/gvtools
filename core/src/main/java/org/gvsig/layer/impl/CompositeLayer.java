@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.styling.Style;
 import org.gvsig.events.LayerAddedEvent;
 import org.gvsig.events.LayerRemovedEvent;
 import org.gvsig.layer.Layer;
@@ -199,5 +200,15 @@ public class CompositeLayer extends AbstractLayer implements Layer {
 	public SimpleFeatureSource getFeatureSource()
 			throws UnsupportedOperationException, IOException {
 		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void setStyle(Style style) {
+		throw new UnsupportedOperationException("Cannot set style on groups");
+	}
+
+	@Override
+	public Style getStyle() {
+		throw new UnsupportedOperationException("Cannot get style on groups");
 	}
 }

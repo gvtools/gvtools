@@ -58,6 +58,7 @@ import org.gvsig.map.MapContext;
 import com.iver.cit.gvsig.fmap.MapControl;
 import com.iver.cit.gvsig.project.documents.view.toc.actions.ChangeNameTocMenuEntry;
 import com.iver.cit.gvsig.project.documents.view.toc.actions.EliminarCapaTocMenuEntry;
+import com.iver.cit.gvsig.project.documents.view.toc.actions.FLyrVectEditPropertiesTocMenuEntry;
 import com.iver.cit.gvsig.project.documents.view.toc.actions.LayersGroupTocMenuEntry;
 import com.iver.cit.gvsig.project.documents.view.toc.actions.LayersUngroupTocMenuEntry;
 import com.iver.cit.gvsig.project.documents.view.toc.actions.ZoomAlTemaTocMenuEntry;
@@ -71,8 +72,7 @@ public class FPopupMenu extends JPopupMenu {
 		layerActions.add(new ChangeNameTocMenuEntry());
 		// extensionPoints.add("View_TocActions", "FSymbolChangeColor",
 		// new ChangeSymbolTocMenuEntry());
-		// extensionPoints.add("View_TocActions", "FLyrVectEditProperties",
-		// new FLyrVectEditPropertiesTocMenuEntry());
+		layerActions.add(new FLyrVectEditPropertiesTocMenuEntry());
 		layerActions.add(new ZoomAlTemaTocMenuEntry());
 		// extensionPoints.add("View_TocActions", "AttTable",
 		// new AttTableTocMenuEntry());

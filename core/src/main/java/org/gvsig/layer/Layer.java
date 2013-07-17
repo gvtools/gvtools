@@ -5,6 +5,7 @@ import java.util.Collection;
 
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.styling.Style;
 import org.gvsig.layer.filter.LayerFilter;
 import org.gvsig.map.MapContext;
 import org.gvsig.persistence.generated.LayerType;
@@ -230,4 +231,8 @@ public interface Layer {
 	 * @param parent
 	 */
 	void setParent(Layer parent);
+
+	void setStyle(Style style);
+
+	Style getStyle();
 }
