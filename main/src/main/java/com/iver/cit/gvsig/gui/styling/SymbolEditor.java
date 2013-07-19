@@ -175,6 +175,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
+import org.geotools.styling.StyleFactoryImpl;
+import org.geotools.styling.Symbolizer;
+import org.geotools.styling.TextSymbolizer;
 import org.gvsig.gui.beans.AcceptCancelPanel;
 
 import com.iver.andami.PluginServices;
@@ -182,6 +185,8 @@ import com.iver.andami.messages.NotificationManager;
 import com.iver.andami.ui.mdiManager.IWindow;
 import com.iver.andami.ui.mdiManager.WindowInfo;
 import com.iver.cit.gvsig.gui.JComboBoxUnits;
+import com.iver.cit.gvsig.project.documents.view.legend.gui.SymbolPreviewer;
+import com.iver.cit.gvsig.project.documents.view.legend.gui.SymbologyUtils;
 import com.iver.utiles.XMLEntity;
 
 /**
@@ -197,20 +202,20 @@ public class SymbolEditor extends JPanel implements IWindow {
 	public static final int POINT = 2;
 	public static final int LINE = 3;
 	public static final int TEXT = 4;
-	private static Hashtable editorsByType;
+	private static Hashtable<Class<? extends Symbolizer>, ArrayList<Class<? extends AbstractTypeSymbolEditor>>> editorsByType;
 	private WindowInfo wi;
 	private JPanel pnlWest = null;
 	private JPanel pnlCenter = null;
 	private JPanel pnlPreview = null;
 	private JPanel pnlLayers = null;
 	private AcceptCancelPanel okCancelPanel;
-	private ISymbol symbol;
+	private Symbolizer style;
 	private SymbolPreviewer symbolPreview = null;
 	private JPanel pnlTypeAndUnits = null;
-	private JComboBox cmbType;
+	private JComboBox<AbstractTypeSymbolEditor> cmbType;
 	private JComboBoxUnits cmbUnits;
 	private JTabbedPane tabbedPane = null;
-	private int shapeType;
+	private Class<? extends Symbolizer> shapeType;
 	private XMLEntity oldSymbolProperties;
 	private ActionListener cmbTypeActionListener;
 
@@ -227,45 +232,46 @@ public class SymbolEditor extends JPanel implements IWindow {
 	 * @param shapeType
 	 *            int
 	 */
-	public SymbolEditor(ISymbol symbol, int shapeType) {
+	public SymbolEditor(Symbolizer symbol, Class<? extends Symbolizer> shapeType) {
 		// //////// /-------------------------------------
-		if (shapeType == FShape.TEXT) {
-			this.symbol = symbol == null ? new SimpleTextSymbol() : symbol;
+		if (TextSymbolizer.class.isAssignableFrom(shapeType)) {
+			this.style = (symbol == null) ? new StyleFactoryImpl()
+					.createTextSymbolizer() : symbol;
 		} else {
-			// //////// /-------------------------------------
+			// gtintegration
+			// if (!(symbol instanceof IMultiLayerSymbol)) {
+			// this is a simple symbol (or null one); it will be
+			// converted to a multilayer one to accept layer addition
+			// IMultiLayerSymbol nSym = SymbologyFactory
+			// .createEmptyMultiLayerSymbol(shapeType);
+			//
+			// if (!(symbol instanceof FSymbol))
+			// nSym.addLayer(symbol);
 
-			if (!(symbol instanceof IMultiLayerSymbol)) {
-				// this is a simple symbol (or null one); it will be
-				// converted to a multilayer one to accept layer addition
-				IMultiLayerSymbol nSym = SymbologyFactory
-						.createEmptyMultiLayerSymbol(shapeType);
+			// if (symbol instanceof CartographicSupport) {
+			// CartographicSupport cs = (CartographicSupport) symbol;
+			// CartographicSupport nCs = (CartographicSupport) nSym;
+			// nCs.setReferenceSystem(cs.getReferenceSystem());
+			// nCs.setUnit(cs.getUnit());
+			// }
 
-				if (!(symbol instanceof FSymbol))
-					nSym.addLayer(symbol);
+			// this.style = nSym;
+			// } else {
+			this.style = symbol;
+			// }
 
-				if (symbol instanceof CartographicSupport) {
-					CartographicSupport cs = (CartographicSupport) symbol;
-					CartographicSupport nCs = (CartographicSupport) nSym;
-					nCs.setReferenceSystem(cs.getReferenceSystem());
-					nCs.setUnit(cs.getUnit());
-				}
-
-				this.symbol = nSym;
-			} else {
-				this.symbol = symbol;
-			}
-
-			// apply units and reference system to comboboxes
-			if (this.symbol instanceof CartographicSupport) {
-				CartographicSupport cs = (CartographicSupport) this.symbol;
-				getCmbUnits().setSelectedUnitIndex(cs.getUnit());
-				getCmbUnitsReferenceSystem().setSelectedIndex(
-						cs.getReferenceSystem());
-
-			}
+			// gtintegration
+			// // apply units and reference system to comboboxes
+			// if (this.style instanceof CartographicSupport) {
+			// CartographicSupport cs = (CartographicSupport) this.style;
+			// getCmbUnits().setSelectedUnitIndex(cs.getUnit());
+			// getCmbUnitsReferenceSystem().setSelectedIndex(
+			// cs.getReferenceSystem());
+			//
+			// }
 
 		}
-		this.oldSymbolProperties = this.symbol.getXMLEntity();
+		this.oldSymbolProperties = SymbologyUtils.getXMLEntity(style);
 		this.shapeType = shapeType;
 		initialize();
 	}
@@ -291,7 +297,7 @@ public class SymbolEditor extends JPanel implements IWindow {
 					// //////// /-------------------------------------
 					if (layerManager != null) {
 						// //////// /-------------------------------------
-						ISymbol l = layerManager.getSelectedLayer();
+						Symbolizer l = layerManager.getSelectedLayer();
 
 						// if the symbol is not null and is it managed by the
 						// "options" class
@@ -299,13 +305,14 @@ public class SymbolEditor extends JPanel implements IWindow {
 						if (l != null
 								&& l.getClass()
 										.equals(options.getSymbolClass())) {
-							if (l instanceof CartographicSupport) {
-								CartographicSupport cs = (CartographicSupport) l;
-								getCmbUnits()
-										.setSelectedUnitIndex(cs.getUnit());
-								getCmbUnitsReferenceSystem().setSelectedIndex(
-										cs.getReferenceSystem());
-							}
+							// gtintegration
+							// if (l instanceof CartographicSupport) {
+							// CartographicSupport cs = (CartographicSupport) l;
+							// getCmbUnits()
+							// .setSelectedUnitIndex(cs.getUnit());
+							// getCmbUnitsReferenceSystem().setSelectedIndex(
+							// cs.getReferenceSystem());
+							// }
 							options.refreshControls(l);
 						}
 
@@ -320,13 +327,10 @@ public class SymbolEditor extends JPanel implements IWindow {
 			}
 		};
 
-		Comparator tabComparator = new Comparator() {
-			public int compare(Object o1, Object o2) {
-				if (!(o1 instanceof AbstractTypeSymbolEditor || o1 instanceof AbstractTypeSymbolEditor))
-					throw new IllegalArgumentException(PluginServices.getText(
-							this, "trying_to_add_a_non_TypeSymbolEditor_panel"));
-				AbstractTypeSymbolEditor pnl1 = (AbstractTypeSymbolEditor) o1, pnl2 = (AbstractTypeSymbolEditor) o2;
-				int result = pnl1.getName().compareTo(pnl2.getName());
+		Comparator<AbstractTypeSymbolEditor> tabComparator = new Comparator<AbstractTypeSymbolEditor>() {
+			public int compare(AbstractTypeSymbolEditor o1,
+					AbstractTypeSymbolEditor o2) {
+				int result = o1.getName().compareTo(o2.getName());
 				if (result == 0)
 					throw new IllegalArgumentException(PluginServices.getText(
 							this, "two_panels_with_the_same_name"));
@@ -334,16 +338,19 @@ public class SymbolEditor extends JPanel implements IWindow {
 			}
 		};
 
-		TreeSet set = new TreeSet(tabComparator);
-		ArrayList editors = (ArrayList) editorsByType
-				.get(new Integer(shapeType));
+		TreeSet<AbstractTypeSymbolEditor> set = new TreeSet<AbstractTypeSymbolEditor>(
+				tabComparator);
+		ArrayList<Class<? extends AbstractTypeSymbolEditor>> editors = editorsByType
+				.get(shapeType);
 		Class[] constrLocator = new Class[] { SymbolEditor.class };
 		Object[] constrInitargs = new Object[] { this };
 		for (int i = 0; i < editors.size(); i++) {
-			Class editorClass = (Class) editors.get(i);
+			Class<? extends AbstractTypeSymbolEditor> editorClass = editors
+					.get(i);
 			try {
 				Constructor c = editorClass.getConstructor(constrLocator);
-				set.add(c.newInstance(constrInitargs));
+				set.add((AbstractTypeSymbolEditor) c
+						.newInstance(constrInitargs));
 			} catch (Exception e) {
 				NotificationManager.addError(
 						PluginServices.getText(this,
@@ -353,8 +360,7 @@ public class SymbolEditor extends JPanel implements IWindow {
 			}
 		}
 		;
-		tabs = (AbstractTypeSymbolEditor[]) set
-				.toArray(new AbstractTypeSymbolEditor[0]);
+		tabs = set.toArray(new AbstractTypeSymbolEditor[0]);
 
 		this.setLayout(new BorderLayout());
 		this.add(getPnlWest(), BorderLayout.WEST);
@@ -374,7 +380,7 @@ public class SymbolEditor extends JPanel implements IWindow {
 	 * @param sym
 	 * @return tabs[] AbstractTypeSymbolEditor[]
 	 */
-	private AbstractTypeSymbolEditor getOptionsForSymbol(ISymbol sym) {
+	private AbstractTypeSymbolEditor getOptionsForSymbol(Symbolizer sym) {
 		if (sym == null)
 			return tabs[0];
 		for (int i = 0; i < tabs.length; i++)
@@ -394,7 +400,7 @@ public class SymbolEditor extends JPanel implements IWindow {
 			ActionListener action = new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					if ("CANCEL".equals(e.getActionCommand())) {
-						symbol = SymbologyFactory.createSymbolFromXML(
+						style = SymbologyUtils.createSymbolFromXML(
 								oldSymbolProperties, null);
 					}
 					PluginServices.getMDIManager().closeWindow(
@@ -416,12 +422,13 @@ public class SymbolEditor extends JPanel implements IWindow {
 		return wi;
 	}
 
-	public ISymbol getSymbol() {
-		if (symbol instanceof CartographicSupport) {
-			CartographicSupport cs = (CartographicSupport) symbol;
-			cs.setUnit(getUnit());
-			cs.setReferenceSystem(getReferenceSystem());
-		}
+	public Symbolizer getSymbol() {
+		// gtintegration
+		// if (style instanceof CartographicSupport) {
+		// CartographicSupport cs = (CartographicSupport) style;
+		// cs.setUnit(getUnit());
+		// cs.setReferenceSystem(getReferenceSystem());
+		// }
 		//
 		// if (symbol instanceof MultiLayerLineSymbol) {
 		// MultiLayerLineSymbol mLineSym = (MultiLayerLineSymbol) symbol;
@@ -434,7 +441,7 @@ public class SymbolEditor extends JPanel implements IWindow {
 		// if (mLineSym.getLineWidth() != lineWidth)
 		// mLineSym.setLineWidth(lineWidth);
 		// }
-		return symbol;
+		return style;
 	}
 
 	/**
@@ -447,15 +454,16 @@ public class SymbolEditor extends JPanel implements IWindow {
 			pnlWest = new JPanel();
 			pnlWest.setLayout(new BorderLayout());
 			pnlWest.add(getPnlPreview(), java.awt.BorderLayout.NORTH);
-			// //////// /-------------------------------------
-			if (symbol instanceof IMultiLayerSymbol) {
-				// //////// /-------------------------------------
-
-				pnlWest.add(getPnlLayers(), java.awt.BorderLayout.SOUTH);
-
-				// //////// /-------------------------------------
-			} // otherwise, no layer manager needed
-			// //////// /-------------------------------------
+			// gtintegration
+			// // //////// /-------------------------------------
+			// if (style instanceof IMultiLayerSymbol) {
+			// // //////// /-------------------------------------
+			//
+			// pnlWest.add(getPnlLayers(), java.awt.BorderLayout.SOUTH);
+			//
+			// // //////// /-------------------------------------
+			// } // otherwise, no layer manager needed
+			// // //////// /-------------------------------------
 		}
 		return pnlWest;
 	}
@@ -606,9 +614,9 @@ public class SymbolEditor extends JPanel implements IWindow {
 	 * 
 	 * @return cmbType JComboBox
 	 */
-	private JComboBox getCmbType() {
+	private JComboBox<AbstractTypeSymbolEditor> getCmbType() {
 		if (cmbType == null) {
-			cmbType = new JComboBox(tabs);
+			cmbType = new JComboBox<AbstractTypeSymbolEditor>(tabs);
 			cmbType.addActionListener(cmbTypeActionListener);
 		}
 		return cmbType;
@@ -620,18 +628,20 @@ public class SymbolEditor extends JPanel implements IWindow {
 	 * 
 	 * @param layer
 	 */
-	protected void setLayerToSymbol(ISymbol layer) {
-		int i = getLayerManager().getSelectedLayerIndex();
-		IMultiLayerSymbol s = (IMultiLayerSymbol) symbol;
-		if (i >= 0 && i < s.getLayerCount()) {
-			s.setLayer(s.getLayerCount() - 1 - i, layer);
-
-		}
+	protected void setLayerToSymbol(Symbolizer layer) {
+		this.style = layer;
+		// gtintegration
+		// int i = getLayerManager().getSelectedLayerIndex();
+		// IMultiLayerSymbol s = (IMultiLayerSymbol) style;
+		// if (i >= 0 && i < s.getLayerCount()) {
+		// s.setLayer(s.getLayerCount() - 1 - i, layer);
+		//
+		// }
 		refresh();
 	}
 
 	public void refresh() {
-		getSymbolPreviewer().setSymbol(symbol);
+		getSymbolPreviewer().setSymbol(style);
 		doLayout();
 		repaint();
 	}
@@ -653,7 +663,7 @@ public class SymbolEditor extends JPanel implements IWindow {
 	 * 
 	 * @return
 	 */
-	public int getShapeType() {
+	public Class<? extends Symbolizer> getShapeType() {
 		return shapeType;
 	}
 
@@ -662,11 +672,9 @@ public class SymbolEditor extends JPanel implements IWindow {
 	 * 
 	 * @return sym ISymbol
 	 */
-	public ISymbol getNewLayer() {
-		ISymbol sym = ((AbstractTypeSymbolEditor) getCmbType()
-				.getSelectedItem()).getLayer();
-
-		return sym;
+	public Symbolizer getNewLayer() {
+		return getCmbType().getItemAt(getCmbType().getSelectedIndex())
+				.getStyle();
 	}
 
 	private void replaceOptions(AbstractTypeSymbolEditor options) {
@@ -686,7 +694,7 @@ public class SymbolEditor extends JPanel implements IWindow {
 		}
 	}
 
-	public void setOptionsPageFor(ISymbol symbol) {
+	public void setOptionsPageFor(Symbolizer symbol) {
 		AbstractTypeSymbolEditor options = getOptionsForSymbol(symbol);
 		if (options == null)
 			return;
@@ -703,19 +711,20 @@ public class SymbolEditor extends JPanel implements IWindow {
 	}
 
 	public static void addSymbolEditorPanel(
-			Class abstractTypeSymbolEditorPanelClass, int shapeType) {
+			Class<? extends AbstractTypeSymbolEditor> abstractTypeSymbolEditorPanelClass,
+			Class<? extends Symbolizer> shapeType) {
 		if (editorsByType == null) {
-			editorsByType = new Hashtable();
+			editorsByType = new Hashtable<Class<? extends Symbolizer>, ArrayList<Class<? extends AbstractTypeSymbolEditor>>>();
 		}
 
-		Integer key = new Integer(shapeType);
-		ArrayList l = (ArrayList) editorsByType.get(key);
+		ArrayList<Class<? extends AbstractTypeSymbolEditor>> l = editorsByType
+				.get(shapeType);
 		if (l == null) {
-			l = new ArrayList();
+			l = new ArrayList<Class<? extends AbstractTypeSymbolEditor>>();
 		}
 		l.add(abstractTypeSymbolEditorPanelClass);
 
-		editorsByType.put(key, l);
+		editorsByType.put(shapeType, l);
 	}
 
 	public Object getWindowProfile() {

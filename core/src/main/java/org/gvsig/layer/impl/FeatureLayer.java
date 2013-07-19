@@ -9,12 +9,16 @@ import java.util.Collections;
 
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.styling.DescriptionImpl;
 import org.geotools.styling.FeatureTypeStyle;
-import org.geotools.styling.LineSymbolizer;
+import org.geotools.styling.Fill;
+import org.geotools.styling.Graphic;
+import org.geotools.styling.Mark;
 import org.geotools.styling.Rule;
 import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
+import org.geotools.styling.Symbolizer;
 import org.gvsig.events.FeatureSelectionChangeEvent;
 import org.gvsig.layer.FeatureSourceCache;
 import org.gvsig.layer.Layer;
@@ -25,6 +29,12 @@ import org.gvsig.layer.filter.LayerFilter;
 import org.gvsig.persistence.generated.DataLayerType;
 import org.gvsig.persistence.generated.LayerType;
 import org.opengis.filter.FilterFactory2;
+
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 public class FeatureLayer extends AbstractLayer implements Layer {
 	private boolean editing, active;
@@ -116,12 +126,18 @@ public class FeatureLayer extends AbstractLayer implements Layer {
 		return selectionRule;
 	}
 
-	private Style getStyle() {
+	@Override
+	public Style getStyle() {
 		if (style == null) {
 			buildStyle();
 		}
 
 		return style;
+	}
+
+	@Override
+	public void setStyle(Style style) {
+		this.style = style;
 	}
 
 	private void buildStyle() {
@@ -147,11 +163,44 @@ public class FeatureLayer extends AbstractLayer implements Layer {
 		 * creating-a-style-based-on-the-selection
 		 */
 
-		Stroke stroke = styleFactory.createStroke(filterFactory.literal(color),
-				filterFactory.literal(width));
+		Symbolizer sym;
 
-		LineSymbolizer sym = styleFactory.createLineSymbolizer(stroke, null);
+		if (Point.class.isAssignableFrom(getShapeType())) {
+			Mark mark = styleFactory.getCircleMark();
+			mark.setStroke(styleFactory.createStroke(
+					filterFactory.literal(color), filterFactory.literal(1)));
+			mark.setFill(styleFactory.createFill(filterFactory.literal(color)));
 
+			Graphic graphic = styleFactory.createDefaultGraphic();
+			graphic.graphicalSymbols().clear();
+			graphic.graphicalSymbols().add(mark);
+			graphic.setSize(filterFactory.literal(width));
+			sym = styleFactory.createPointSymbolizer(graphic, null);
+		} else if (LineString.class.isAssignableFrom(getShapeType())) {
+			Stroke stroke = styleFactory.createStroke(
+					filterFactory.literal(color), filterFactory.literal(width));
+			sym = styleFactory.createLineSymbolizer(stroke, null);
+		} else if (Polygon.class.isAssignableFrom(getShapeType())
+				|| MultiPolygon.class.isAssignableFrom(getShapeType())) {
+			Stroke stroke = styleFactory.createStroke(
+					filterFactory.literal(color), filterFactory.literal(width));
+			Fill fill = styleFactory.createFill(filterFactory.literal(color),
+					filterFactory.literal(0));
+			sym = styleFactory.createPolygonSymbolizer(stroke, fill, null);
+		} else {
+			Mark mark = styleFactory.getCircleMark();
+			mark.setStroke(styleFactory.createStroke(
+					filterFactory.literal(color), filterFactory.literal(1)));
+			mark.setFill(styleFactory.createFill(filterFactory.literal(color)));
+
+			Graphic graphic = styleFactory.createDefaultGraphic();
+			graphic.graphicalSymbols().clear();
+			graphic.graphicalSymbols().add(mark);
+			graphic.setSize(filterFactory.literal(5));
+			sym = styleFactory.createPointSymbolizer(graphic, null);
+		}
+		sym.setDescription(new DescriptionImpl("", ""));
+		
 		Rule rule = styleFactory.createRule();
 		rule.symbolizers().add(sym);
 		return rule;
@@ -223,4 +272,16 @@ public class FeatureLayer extends AbstractLayer implements Layer {
 		return featureSourceCache.getFeatureSource(source);
 	}
 
+	@Override
+	public Class<? extends Geometry> getShapeType() {
+		// TODO Auto-generated method stub
+		try {
+			return (Class<? extends Geometry>) getFeatureSource().getSchema()
+					.getGeometryDescriptor().getType().getBinding();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new RuntimeException();
+		}
+	}
 }

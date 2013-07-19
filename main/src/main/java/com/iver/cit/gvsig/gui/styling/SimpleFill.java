@@ -1,4 +1,4 @@
-/* gvSIG. Sistema de Información Geográfica de la Generalitat Valenciana
+/* gvSIG. Sistema de Informaciï¿½n Geogrï¿½fica de la Generalitat Valenciana
  *
  * Copyright (C) 2005 IVER T.I. and Generalitat Valenciana.
  *
@@ -20,7 +20,7 @@
  *
  *  Generalitat Valenciana
  *   Conselleria d'Infraestructures i Transport
- *   Av. Blasco Ibáñez, 50
+ *   Av. Blasco Ibï¿½ï¿½ez, 50
  *   46010 VALENCIA
  *   SPAIN
  *
@@ -135,16 +135,22 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.geotools.filter.FilterFactoryImpl;
+import org.geotools.styling.Fill;
+import org.geotools.styling.LineSymbolizer;
+import org.geotools.styling.PolygonSymbolizer;
+import org.geotools.styling.SLD;
+import org.geotools.styling.Stroke;
+import org.geotools.styling.Style;
+import org.geotools.styling.StyleFactory;
+import org.geotools.styling.StyleFactoryImpl;
+import org.geotools.styling.Symbolizer;
 import org.gvsig.gui.beans.swing.GridBagLayoutPanel;
 import org.gvsig.gui.beans.swing.JBlank;
 import org.gvsig.gui.beans.swing.JIncrementalNumberField;
+import org.opengis.filter.FilterFactory;
 
 import com.iver.andami.PluginServices;
-import com.iver.andami.messages.NotificationManager;
-import com.iver.cit.gvsig.fmap.core.FShape;
-import com.iver.cit.gvsig.fmap.core.symbols.ILineSymbol;
-import com.iver.cit.gvsig.fmap.core.symbols.ISymbol;
-import com.iver.cit.gvsig.fmap.core.symbols.SimpleFillSymbol;
 import com.iver.cit.gvsig.gui.panels.ColorChooserPanel;
 import com.iver.cit.gvsig.project.documents.view.legend.gui.JSymbolPreviewButton;
 
@@ -172,11 +178,11 @@ public class SimpleFill extends AbstractTypeSymbolEditor implements
 		ActionListener, ChangeListener {
 	private ColorChooserPanel jccFillColor;
 	private JIncrementalNumberField txtOutlineWidth;
-	private ArrayList tabs = new ArrayList();
+	private ArrayList<JPanel> tabs = new ArrayList<JPanel>();
 	private JSymbolPreviewButton btnOutline;
 	private JSlider sldOutlineTransparency;
 	private int outlineAlpha;
-	private ILineSymbol outline;
+	private Stroke outline;
 	private JCheckBox useBorder;
 
 	public SimpleFill(SymbolEditor owner) {
@@ -209,7 +215,7 @@ public class SimpleFill extends AbstractTypeSymbolEditor implements
 				jccFillColor);
 
 		JPanel aux2 = new JPanel();
-		btnOutline = new JSymbolPreviewButton(FShape.LINE);
+		btnOutline = new JSymbolPreviewButton();
 		btnOutline.setPreferredSize(new Dimension(100, 35));
 		aux2.add(btnOutline);
 
@@ -237,93 +243,79 @@ public class SimpleFill extends AbstractTypeSymbolEditor implements
 		tabs.add(myTab);
 	}
 
-	public ISymbol getLayer() {
+	public Symbolizer getStyle() {
+		StyleFactory styleFactory = new StyleFactoryImpl();
+		FilterFactory filterFactory = new FilterFactoryImpl();
 
-		SimpleFillSymbol layer = new SimpleFillSymbol();
-		layer.setHasFill(false);
-		layer.setHasOutline(false);
+		Symbolizer symbolizer = btnOutline.getSymbol();
+		if (symbolizer instanceof LineSymbolizer) {
+			outline = ((LineSymbolizer) symbolizer).getStroke();
+			outline.setWidth(filterFactory.literal(txtOutlineWidth.getDouble()));
+			int opacity = useBorder.isSelected() ? outlineAlpha : 0;
+			outline.setOpacity(filterFactory.literal(opacity));
+		}
 
-		layer.setHasOutline(useBorder.isSelected());
+		Fill fill;
+		Color color = jccFillColor.getColor();
+		if (jccFillColor.getUseColorisSelected()) {
+			fill = styleFactory.createFill(filterFactory.literal(color),
+					filterFactory.literal(color.getAlpha() / 255));
+		} else {
+			fill = styleFactory.createFill(filterFactory.literal(color),
+					filterFactory.literal(0));
+		}
 
-		outline = (ILineSymbol) btnOutline.getSymbol();
+		return styleFactory.createPolygonSymbolizer(outline, fill, null);
+	}
+
+	public void refreshControls(Symbolizer sym) {
+		if (!(sym instanceof PolygonSymbolizer)) {
+			return;
+		}
+
+		PolygonSymbolizer style = (PolygonSymbolizer) sym;
+		// fill
+
+		jccFillColor.setUseColorIsSelected(SLD.opacity(style.getFill()) > 0.0);
+		jccFillColor.setColor(SLD.color(style.getFill()));
+		// outline
+
+		sldOutlineTransparency.removeChangeListener(this);
+
+		boolean hasOutline = SLD.opacity(style.getStroke()) > 0;
+
+		useBorder.setSelected(hasOutline);
+		if (hasOutline) {
+			outline = style.getStroke();
+			btnOutline.setSymbol(new StyleFactoryImpl().createLineSymbolizer(
+					outline, null));
+		}
+
 		if (outline != null) {
-			outline.setLineWidth(txtOutlineWidth.getDouble());
-			outline.setAlpha(outlineAlpha);
+			outlineAlpha = (int) SLD.opacity(outline) * 255;
+			sldOutlineTransparency.setValue(outlineAlpha / 255 * 100);
+			txtOutlineWidth.setDouble(SLD.width(outline));
+		} else {
+			sldOutlineTransparency.setValue(100);
 		}
-		layer.setOutline(outline);
 
-		layer.setHasFill(jccFillColor.getUseColorisSelected());
-		Color c = jccFillColor.getColor();
-		if (c != null)
-			c = new Color(c.getRed(), c.getGreen(), c.getBlue(), c.getAlpha());
-		layer.setFillColor(c);
-
-		return layer;
+		sldOutlineTransparency.addChangeListener(this);
 	}
 
-	public void refreshControls(ISymbol layer) {
-		SimpleFillSymbol sym;
-		try {
-			if (layer == null) {
-				// initialize defaults
-				NotificationManager.addWarning(getClass().getName()
-						+ ":: should be unreachable code", new Exception());
-			} else {
-
-				// fill
-
-				sym = (SimpleFillSymbol) layer;
-				jccFillColor.setUseColorIsSelected(sym.hasFill());
-				jccFillColor.setColor(sym.getFillColor());
-				// outline
-
-				sldOutlineTransparency.removeChangeListener(this);
-
-				useBorder.setSelected(sym.hasOutline());
-
-				if (sym.getOutline() != null) {
-					outline = sym.getOutline();
-					btnOutline.setSymbol(outline);
-				}
-
-				if (outline != null) {
-					outlineAlpha = outline.getAlpha();
-					sldOutlineTransparency
-							.setValue((int) ((outlineAlpha / 255D) * 100));
-					txtOutlineWidth.setDouble(outline.getLineWidth());
-				} else {
-					sldOutlineTransparency.setValue(100);
-				}
-
-				sldOutlineTransparency.addChangeListener(this);
-
-			}
-		} catch (IndexOutOfBoundsException ioEx) {
-			NotificationManager.addWarning("Symbol layer index out of bounds",
-					ioEx);
-		} catch (ClassCastException ccEx) {
-			NotificationManager.addWarning(
-					"Illegal casting from " + layer.getClassName() + " to "
-							+ getSymbolClass().getName() + ".", ccEx);
-
-		}
-	}
-
-	public Class getSymbolClass() {
-		return SimpleFillSymbol.class;
+	public Class<? extends Style> getSymbolClass() {
+		return Style.class;
 	}
 
 	public void actionPerformed(ActionEvent e) {
 		Object s = e.getSource();
 
 		if (s.equals(btnOutline)) {
-			ISymbol sym = btnOutline.getSymbol();
-			if (sym instanceof ILineSymbol) {
-				ILineSymbol outline = (ILineSymbol) sym;
-				if (outline != null)
-					txtOutlineWidth.setDouble(outline.getLineWidth());
+			Symbolizer symbolizer = btnOutline.getSymbol();
+			if (symbolizer instanceof LineSymbolizer) {
+				LineSymbolizer lineSymbolizer = (LineSymbolizer) symbolizer;
+				txtOutlineWidth
+						.setDouble(SLD.width(lineSymbolizer.getStroke()));
 			}
-
 		}
 
 		fireSymbolChangedEvent();
@@ -336,8 +328,9 @@ public class SimpleFill extends AbstractTypeSymbolEditor implements
 			outlineAlpha = (int) (255 * (sldOutlineTransparency.getValue() / 100.0));
 		}
 
-		if (useBorder.isSelected())
-			outline = (ILineSymbol) btnOutline.getSymbol();
+		if (useBorder.isSelected()) {
+			outline = ((LineSymbolizer) btnOutline.getSymbol()).getStroke();
+		}
 		fireSymbolChangedEvent();
 	}
 

@@ -4,9 +4,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
-import com.iver.cit.gvsig.fmap.layers.FLayer;
-import com.iver.cit.gvsig.fmap.layers.FLayers;
-import com.iver.cit.gvsig.fmap.rendering.ILegend;
+import org.geotools.styling.Style;
+import org.gvsig.layer.Layer;
 
 public interface IFMapLegendDriver {
 
@@ -18,9 +17,8 @@ public interface IFMapLegendDriver {
 
 	ArrayList<String> getSupportedVersions();
 
-	void write(FLayers layers, FLayer layer, ILegend legend, File file,
-			String version) throws LegendDriverException;
+	void write(Layer layers, Layer layer, Style legend, File file,
+			String version);
 
-	Hashtable<FLayer, ILegend> read(FLayers layers, FLayer layer, File file)
-			throws LegendDriverException;
+	Hashtable<Layer, Style> read(Layer layers, Layer layer, File file);
 }

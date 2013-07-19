@@ -1,4 +1,4 @@
-/* gvSIG. Sistema de Información Geográfica de la Generalitat Valenciana
+/* gvSIG. Sistema de Informaciï¿½n Geogrï¿½fica de la Generalitat Valenciana
  *
  * Copyright (C) 2005 IVER T.I. and Generalitat Valenciana.
  *
@@ -20,7 +20,7 @@
  *
  *  Generalitat Valenciana
  *   Conselleria d'Infraestructures i Transport
- *   Av. Blasco Ibáñez, 50
+ *   Av. Blasco Ibï¿½ï¿½ez, 50
  *   46010 VALENCIA
  *   SPAIN
  *
@@ -48,14 +48,15 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 
+import org.geotools.styling.Style;
+import org.geotools.styling.StyleFactoryImpl;
+import org.geotools.styling.Symbolizer;
 import org.gvsig.gui.beans.swing.GridBagLayoutPanel;
 import org.gvsig.gui.beans.swing.JComboBoxFontSizes;
 import org.gvsig.gui.beans.swing.JComboBoxFonts;
 import org.gvsig.gui.beans.swing.JIncrementalNumberField;
 
 import com.iver.andami.PluginServices;
-import com.iver.cit.gvsig.fmap.core.symbols.ISymbol;
-import com.iver.cit.gvsig.fmap.core.symbols.SimpleTextSymbol;
 import com.iver.cit.gvsig.gui.panels.ColorChooserPanel;
 
 /**
@@ -85,7 +86,7 @@ import com.iver.cit.gvsig.gui.panels.ColorChooserPanel;
 public class SimpleText extends AbstractTypeSymbolEditor {
 
 	private ArrayList tabs = new ArrayList();
-	// TODO: Comentarizado hasta que mask esté acabado
+	// TODO: Comentarizado hasta que mask estï¿½ acabado
 	// private Mask mask;
 	private JComboBoxFonts cmbFonts;
 	private JToggleButton btnUnderlined;
@@ -93,8 +94,6 @@ public class SimpleText extends AbstractTypeSymbolEditor {
 	private JToggleButton btnBold;
 	private JComboBoxFontSizes cmbFontSize;
 	private ColorChooserPanel jcc;
-	private JIncrementalNumberField txtXOffset;
-	private JIncrementalNumberField txtYOffset;
 
 	public SimpleText(SymbolEditor owner) {
 		super(owner);
@@ -135,9 +134,9 @@ public class SimpleText extends AbstractTypeSymbolEditor {
 		leftColumn.addComponent(new JLabel(" "));
 		// \vertical alignment stuff
 		leftColumn.addComponent(PluginServices.getText(this, "x_offset") + ":",
-				txtXOffset = new JIncrementalNumberField("0", 3));
+				new JIncrementalNumberField("0", 3));
 		leftColumn.addComponent(PluginServices.getText(this, "x_offset") + ":",
-				txtYOffset = new JIncrementalNumberField("0", 3));
+				new JIncrementalNumberField("0", 3));
 
 		GridBagLayoutPanel rightColumn = new GridBagLayoutPanel();
 		aux2 = new JPanel(new FlowLayout(0, 0, FlowLayout.LEFT));
@@ -183,9 +182,8 @@ public class SimpleText extends AbstractTypeSymbolEditor {
 		// tabs.add(mask);
 	}
 
-	public ISymbol getLayer() {
-		SimpleTextSymbol sts = new SimpleTextSymbol();
-		return sts;
+	public Symbolizer getStyle() {
+		return new StyleFactoryImpl().createTextSymbolizer();
 	}
 
 	public String getName() {
@@ -196,14 +194,14 @@ public class SimpleText extends AbstractTypeSymbolEditor {
 		return (JPanel[]) tabs.toArray(new JPanel[tabs.size()]);
 	}
 
-	public void refreshControls(ISymbol layer) {
+	public void refreshControls(Symbolizer style) {
 		// TODO Implement it
 		// throw new Error("Not yet implemented!");
 
 	}
 
 	public Class getSymbolClass() {
-		return SimpleTextSymbol.class;
+		return Style.class;
 	}
 
 	public EditorTool[] getEditorTools() {

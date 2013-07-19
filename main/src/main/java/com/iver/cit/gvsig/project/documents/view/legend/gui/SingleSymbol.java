@@ -58,14 +58,23 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
-import org.exolab.castor.xml.XMLException;
+import org.geotools.styling.Description;
+import org.geotools.styling.LineSymbolizer;
+import org.geotools.styling.PointSymbolizer;
+import org.geotools.styling.PolygonSymbolizer;
 import org.geotools.styling.Style;
+import org.geotools.styling.Symbolizer;
 import org.gvsig.gui.beans.swing.GridBagLayoutPanel;
 import org.gvsig.gui.beans.swing.JButton;
 import org.gvsig.layer.Layer;
 
 import com.iver.andami.PluginServices;
-import com.iver.andami.messages.NotificationManager;
+import com.iver.cit.gvsig.gui.styling.SymbolSelector;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * @author jaume dominguez faus - jaume.dominguez@iver.es
@@ -73,13 +82,13 @@ import com.iver.andami.messages.NotificationManager;
 public class SingleSymbol extends JPanel implements ILegendPanel,
 		ActionListener {
 	private JPanel symbolPanel = null;
-	private int shapeType;
+	private Class<? extends Geometry> shapeType;
 	private GridBagLayoutPanel legendPanel = null;
 	private SymbolPreviewer symbolPreviewComponent;
 	private JButton btnOpenSymbolSelector;
 	private JTextField txtLabel;
 	private JButton btnOpenSymbolLevelsEditor;
-	private Style legend;
+	private Symbolizer style;
 
 	public SingleSymbol() {
 		super();
@@ -98,29 +107,13 @@ public class SingleSymbol extends JPanel implements ILegendPanel,
 
 	}
 
-	public void setData(Layer lyr, Style legend) {
-		try {
-			shapeType = ((FLyrVect) lyr).getShapeType();
-		} catch (ReadDriverException e) {
-			NotificationManager
-					.addError("Could not find out the shape type", e);
-		}
-		if (legend != null && legend instanceof SingleSymbolLegend) {
-			setSymbol(legend.getDefaultSymbol());
-			try {
-				this.legend = (SingleSymbolLegend) legend.cloneLegend();
-			} catch (XMLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-		} else {
-			this.legend = (SingleSymbolLegend) LegendFactory
-					.createSingleSymbolLegend(shapeType);
-		}
-		getSymbolPreviewPanel().setSymbol(this.legend.getDefaultSymbol());
-		getBtnOpenSymbolLevelsEditor().setEnabled(legend != null);
-		this.txtLabel.setText(legend.getDefaultSymbol().getDescription());
+	public void setData(Layer lyr, Symbolizer style) {
+		shapeType = lyr.getShapeType();
+		setSymbol(style);
+		this.style = SymbologyUtils.clone(style);
+		getSymbolPreviewPanel().setSymbol(this.style);
+		getBtnOpenSymbolLevelsEditor().setEnabled(style != null);
+		this.txtLabel.setText(style.getDescription().getAbstract().toString());
 	}
 
 	/*
@@ -128,20 +121,14 @@ public class SingleSymbol extends JPanel implements ILegendPanel,
 	 * 
 	 * @see com.iver.cit.gvsig.gui.legendmanager.panels.ILegendPanel#getLegend()
 	 */
-	public ILegend getLegend() {
-		if (this.legend == null) {
-			ISymbol symbol = getSymbolPreviewPanel().getSymbol();
-			symbol.setDescription(txtLabel.getText());
-			this.legend = new SingleSymbolLegend(symbol);
+	public Symbolizer getLegend() {
+		if (this.style == null) {
+			this.style = getSymbolPreviewPanel().getSymbol();
+			this.style.getDescription().setAbstract(txtLabel.getText());
+			this.style.getDescription().setTitle(txtLabel.getText());
 		}
-		ILegend ret = this.legend;
-		try {
-			this.legend = (SingleSymbolLegend) this.legend.cloneLegend();
-		} catch (XMLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return ret;
+
+		return SymbologyUtils.clone(style);
 	}
 
 	public String getDescription() {
@@ -150,8 +137,8 @@ public class SingleSymbol extends JPanel implements ILegendPanel,
 						"Muestra_todos_los_elementos_de_una_capa_usando_el_mismo_simbolo");
 	}
 
-	public Class getParentClass() {
-		return Features.class;
+	public Class<? extends ILegendPanel> getParentClass() {
+		return null;
 	}
 
 	public String getTitle() {
@@ -168,7 +155,7 @@ public class SingleSymbol extends JPanel implements ILegendPanel,
 	}
 
 	public Class getLegendClass() {
-		return SingleSymbolLegend.class;
+		return Style.class;
 	}
 
 	/**
@@ -195,7 +182,7 @@ public class SingleSymbol extends JPanel implements ILegendPanel,
 			btnOpenSymbolLevelsEditor = new JButton(PluginServices.getText(
 					this, "symbol_levels"));
 			btnOpenSymbolLevelsEditor.addActionListener(this);
-			btnOpenSymbolLevelsEditor.setEnabled(legend != null);
+			btnOpenSymbolLevelsEditor.setEnabled(style != null);
 		}
 
 		return btnOpenSymbolLevelsEditor;
@@ -243,62 +230,78 @@ public class SingleSymbol extends JPanel implements ILegendPanel,
 		return legendPanel;
 	}
 
-	public void setShapeType(int shapeType) {
+	public void setShapeType(Class<? extends Geometry> shapeType) {
 		this.shapeType = shapeType;
 	}
 
-	public void setSymbol(ISymbol symbol) {
-		setOnlySymbol(symbol);
-		if (symbol.getDescription() != null)
-			txtLabel.setText(symbol.getDescription());
+	public void setSymbol(Symbolizer style) {
+		setOnlySymbol(style);
+		if (style.getDescription() != null)
+			txtLabel.setText(style.getDescription().getTitle().toString());
 		// else
 		// txtLabel.setText(" ("+PluginServices.getText(this, "current")+")");
 	}
 
-	private void setOnlySymbol(ISymbol symbol) {
+	private void setOnlySymbol(Symbolizer symbol) {
 		getSymbolPreviewPanel().setSymbol(symbol);
-		if (legend != null) {
-			legend.setDefaultSymbol(symbol);
-		}
+		style = symbol;
 	}
 
-	public ISymbol getSymbol() {
-		ISymbol symbol = getSymbolPreviewPanel().getSymbol();
-		symbol.setDescription(txtLabel.getText());
+	public Symbolizer getSymbol() {
+		Symbolizer symbol = getSymbolPreviewPanel().getSymbol();
+		symbol.getDescription().setAbstract(txtLabel.getText());
+		symbol.getDescription().setTitle(txtLabel.getText());
 		return symbol;
 	}
 
-	public boolean isSuitableFor(FLayer layer) {
-		return (layer instanceof FLyrVect);
+	public boolean isSuitableFor(Layer layer) {
+		// gtintegration
+		// return (layer instanceof FLyrVect);
+		return true;
 	}
 
 	public void actionPerformed(ActionEvent e) {
 		JComponent c = (JComponent) e.getSource();
 		if (c.equals(getBtnOpenSymbolSelector())) {
-			ISymbol auxSymbol = getSymbol();
+			Symbolizer auxSymbol = getSymbol();
+
+			Class<? extends Symbolizer> symbolType;
+			if (Point.class.isAssignableFrom(shapeType)) {
+				symbolType = PointSymbolizer.class;
+			} else if (LineString.class.isAssignableFrom(shapeType)) {
+				symbolType = LineSymbolizer.class;
+			} else if (Polygon.class.isAssignableFrom(shapeType)
+					|| MultiPolygon.class.isAssignableFrom(shapeType)) {
+				symbolType = PolygonSymbolizer.class;
+			} else {
+				throw new UnsupportedOperationException();
+			}
 			ISymbolSelector se = SymbolSelector.createSymbolSelector(auxSymbol,
-					shapeType);
+					symbolType);
 			PluginServices.getMDIManager().addWindow(se);
-			ISymbol sym = (ISymbol) se.getSelectedObject();
+			Symbolizer sym = se.getSelectedObject();
 			if (sym != null && sym != auxSymbol) {
 				// no symbol, no changes
 				setOnlySymbol(sym);
 			}
 		} else if (c.equals(getBtnOpenSymbolLevelsEditor())) {
-			ZSort myZSort = null;
-			if (legend != null) {
-				myZSort = legend.getZSort();
-				if (myZSort == null) {
-					myZSort = new ZSort(legend);
-				}
-				SymbolLevelsWindow sl = new SymbolLevelsWindow(myZSort);
-				PluginServices.getMDIManager().addWindow(sl);
-				this.legend.setZSort(sl.getZSort());
-			}
+			// gtintegration
+			throw new UnsupportedOperationException("Unsupported symbol levels");
+			// ZSort myZSort = null;
+			// if (style != null) {
+			// myZSort = style.getZSort();
+			// if (myZSort == null) {
+			// myZSort = new ZSort(style);
+			// }
+			// SymbolLevelsWindow sl = new SymbolLevelsWindow(myZSort);
+			// PluginServices.getMDIManager().addWindow(sl);
+			// this.style.setZSort(sl.getZSort());
+			// }
 		} else if (c.equals(txtLabel)) {
-			getSymbolPreviewPanel().getSymbol().setDescription(
-					txtLabel.getText());
+			Description description = getSymbolPreviewPanel().getSymbol()
+					.getDescription();
+			description.setAbstract(txtLabel.getText());
+			description.setTitle(txtLabel.getText());
 		}
 	}
-
 }

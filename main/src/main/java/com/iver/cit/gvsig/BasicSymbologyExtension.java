@@ -91,6 +91,11 @@
  */
 package com.iver.cit.gvsig;
 
+import org.geotools.styling.LineSymbolizer;
+import org.geotools.styling.PointSymbolizer;
+import org.geotools.styling.PolygonSymbolizer;
+import org.geotools.styling.TextSymbolizer;
+
 import com.iver.andami.PluginServices;
 import com.iver.andami.plugins.Extension;
 import com.iver.andami.preferences.IPreference;
@@ -118,11 +123,13 @@ public class BasicSymbologyExtension extends Extension implements
 
 		// modules for symbol editor
 		SymbolEditor.addSymbolEditorPanel(SimpleFill.class,
-				SymbolEditor.POLYGON);
+				PolygonSymbolizer.class);
 		SymbolEditor.addSymbolEditorPanel(SimpleMarker.class,
-				SymbolEditor.POINT);
-		SymbolEditor.addSymbolEditorPanel(SimpleLine.class, SymbolEditor.LINE);
-		SymbolEditor.addSymbolEditorPanel(SimpleText.class, SymbolEditor.TEXT);
+				PointSymbolizer.class);
+		SymbolEditor.addSymbolEditorPanel(SimpleLine.class,
+				LineSymbolizer.class);
+		SymbolEditor.addSymbolEditorPanel(SimpleText.class,
+				TextSymbolizer.class);
 
 		// pages
 		// gtintegration ThemeManagerWindow.addPage(General.class);

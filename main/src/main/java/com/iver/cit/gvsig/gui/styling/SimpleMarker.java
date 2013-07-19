@@ -1,4 +1,4 @@
-/* gvSIG. Sistema de Información Geográfica de la Generalitat Valenciana
+/* gvSIG. Sistema de Informaciï¿½n Geogrï¿½fica de la Generalitat Valenciana
  *
  * Copyright (C) 2005 IVER T.I. and Generalitat Valenciana.
  *
@@ -20,7 +20,7 @@
  *
  *  Generalitat Valenciana
  *   Conselleria d'Infraestructures i Transport
- *   Av. Blasco Ibáñez, 50
+ *   Av. Blasco Ibï¿½ï¿½ez, 50
  *   46010 VALENCIA
  *   SPAIN
  *
@@ -108,19 +108,28 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 
+import org.geotools.filter.FilterFactoryImpl;
+import org.geotools.styling.Displacement;
+import org.geotools.styling.DisplacementImpl;
+import org.geotools.styling.Graphic;
+import org.geotools.styling.Mark;
+import org.geotools.styling.PointSymbolizer;
+import org.geotools.styling.SLD;
+import org.geotools.styling.Style;
+import org.geotools.styling.StyleFactory;
+import org.geotools.styling.StyleFactoryImpl;
+import org.geotools.styling.Symbolizer;
 import org.gvsig.gui.beans.swing.GridBagLayoutPanel;
 import org.gvsig.gui.beans.swing.JIncrementalNumberField;
+import org.opengis.filter.FilterFactory;
 
 import com.iver.andami.PluginServices;
 import com.iver.andami.messages.NotificationManager;
-import com.iver.cit.gvsig.fmap.core.symbols.ISymbol;
-import com.iver.cit.gvsig.fmap.core.symbols.SimpleMarkerSymbol;
 import com.iver.cit.gvsig.gui.panels.ColorChooserPanel;
 
 /**
@@ -147,12 +156,12 @@ import com.iver.cit.gvsig.gui.panels.ColorChooserPanel;
 public class SimpleMarker extends AbstractTypeSymbolEditor implements
 		ActionListener, FocusListener {
 
-	private ArrayList tabs = new ArrayList();
+	private ArrayList<JPanel> tabs = new ArrayList<JPanel>();
 	private ColorChooserPanel jccColor;
 	private JIncrementalNumberField txtSize;
 	private JIncrementalNumberField txtXOffset;
 	private JIncrementalNumberField txtYOffset;
-	// TODO: Comentarizado hasta que mask esté acabado
+	// TODO: Comentarizado hasta que mask estï¿½ acabado
 	// private Mask mask;
 	private JComboBoxSimpleMarkeStyles cmbStyle;
 	private JCheckBox chkUseOutline;
@@ -236,20 +245,26 @@ public class SimpleMarker extends AbstractTypeSymbolEditor implements
 		// tabs.add(mask);
 	}
 
-	public ISymbol getLayer() {
-		SimpleMarkerSymbol layer = new SimpleMarkerSymbol();
-		layer.setColor(jccColor.getColor());
-		layer.setIsShapeVisible(true);
-		layer.setSize(txtSize.getDouble());
-		// layer.setUnit(owner.getUnit());
-		// layer.setReferenceSystem(owner.getUnitsReferenceSystem());
-		layer.setOffset(new Point2D.Double(txtXOffset.getDouble(), txtYOffset
-				.getDouble()));
-		// layer.setMask(mask.getMask());
-		layer.setStyle(((Integer) cmbStyle.getSelectedItem()).intValue());
-		layer.setOutlined(chkUseOutline.isSelected());
-		layer.setOutlineColor(jccOutlineColor.getColor());
-		return layer;
+	public Symbolizer getStyle() {
+		StyleFactory styleFactory = new StyleFactoryImpl();
+		FilterFactory filterFactory = new FilterFactoryImpl();
+
+		Mark mark = styleFactory.getCircleMark();
+		mark.setStroke(styleFactory.createStroke(
+				filterFactory.literal(jccOutlineColor.getColor()),
+				filterFactory.literal(1)));
+		mark.setFill(styleFactory.createFill(filterFactory.literal(jccColor
+				.getColor())));
+
+		Graphic graphic = styleFactory.createDefaultGraphic();
+		graphic.graphicalSymbols().clear();
+		graphic.graphicalSymbols().add(mark);
+		graphic.setSize(filterFactory.literal(txtSize.getDouble()));
+		graphic.setDisplacement(new DisplacementImpl(filterFactory
+				.literal(txtXOffset.getDouble()), filterFactory
+				.literal(txtYOffset.getDouble())));
+
+		return styleFactory.createPointSymbolizer(graphic, null);
 	}
 
 	public String getName() {
@@ -257,13 +272,12 @@ public class SimpleMarker extends AbstractTypeSymbolEditor implements
 	}
 
 	public JPanel[] getTabs() {
-		return (JPanel[]) tabs.toArray(new JPanel[0]);
+		return tabs.toArray(new JPanel[0]);
 	}
 
-	public void refreshControls(ISymbol layer) {
-		SimpleMarkerSymbol sym;
+	public void refreshControls(Symbolizer sym) {
 		try {
-			if (layer == null) {
+			if (sym == null) {
 				// initialize defaults
 				System.err
 						.println("SimpleLine.java:: should be unreachable code");
@@ -273,30 +287,38 @@ public class SimpleMarker extends AbstractTypeSymbolEditor implements
 				txtXOffset.setDouble(0.0);
 				txtYOffset.setDouble(0.0);
 			} else {
-				sym = (SimpleMarkerSymbol) layer;
-				jccColor.setColor(sym.getColor());
+				if (!(sym instanceof PointSymbolizer)) {
+					return;
+				}
 
-				txtSize.setDouble(sym.getSize());
-				txtXOffset.setDouble(sym.getOffset().getX());
-				txtYOffset.setDouble(sym.getOffset().getY());
-				cmbStyle.setSymbolColor(sym.getColor());
-				chkUseOutline.setSelected(sym.hasOutline());
-				cmbStyle.setOutlineColor(sym.getOutlineColor());
-				cmbStyle.setSelectedItem(new Integer(sym.getStyle()));
+				PointSymbolizer style = (PointSymbolizer) sym;
+				Color color = SLD.color(style);
+				jccColor.setColor(color);
+
+				Graphic graphic = style.getGraphic();
+				Displacement displacement = graphic.getDisplacement();
+
+				txtSize.setDouble(graphic.getSize().evaluate(null,
+						Integer.class));
+				txtXOffset.setDouble(displacement.getDisplacementX().evaluate(
+						null, Integer.class));
+				txtYOffset.setDouble(displacement.getDisplacementY().evaluate(
+						null, Integer.class));
+				cmbStyle.setSymbolColor(color);
+				// gtintegration
+				chkUseOutline.setSelected(false);
+				// chkUseOutline.setSelected(sym.hasOutline());
+				// cmbStyle.setOutlineColor(sym.getOutlineColor());
+				// cmbStyle.setSelectedItem(new Integer(sym.getStyle()));
 			}
 		} catch (IndexOutOfBoundsException ioEx) {
 			NotificationManager.addWarning("Symbol layer index out of bounds",
 					ioEx);
-		} catch (ClassCastException ccEx) {
-			NotificationManager.addWarning(
-					"Illegal casting from " + layer.getClassName() + " to "
-							+ getSymbolClass().getName() + ".", ccEx);
-
 		}
 	}
 
-	public Class getSymbolClass() {
-		return SimpleMarkerSymbol.class;
+	public Class<? extends Style> getSymbolClass() {
+		return Style.class;
 	}
 
 	public void actionPerformed(ActionEvent e) {

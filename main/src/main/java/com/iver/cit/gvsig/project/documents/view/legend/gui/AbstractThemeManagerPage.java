@@ -4,6 +4,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.gvsig.layer.Layer;
+import org.gvsig.layer.filter.AndLayerFilter;
+import org.gvsig.layer.filter.LayerFilter;
 
 import com.iver.andami.PluginServices;
 import com.iver.andami.messages.Messages;
@@ -17,36 +19,32 @@ public abstract class AbstractThemeManagerPage extends JPanel {
 	 * 
 	 * @return la primera flayer seleccionada.
 	 */
-	protected FLayer getFirstActiveLayerVect(FLayers layers) {
-		// Comprobar en openLegendManager que hay alg�n capa activo!
-		FLayer[] activeLyrs = layers.getActives();
+	protected Layer getFirstActiveLayerVect(Layer layers) {
+		Layer[] activeLayers = layers.filter(LayerFilter.ACTIVE);
+		Layer[] activeFeatureLayers = layers.filter(new AndLayerFilter(
+				LayerFilter.ACTIVE, LayerFilter.FEATURE));
 
-		if (activeLyrs.length == 0) {
+		if (activeLayers.length == 0) {
 			JOptionPane.showMessageDialog(null,
 					Messages.getString("necesita_una_capa_activa"), "",
 					JOptionPane.ERROR_MESSAGE);
-
 			return null;
 		}
 
-		FLayer lyr = null;
-
-		for (int i = 0; i < activeLyrs.length; i++) {
-			if (activeLyrs[i] instanceof FLayers) {
-				lyr = getFirstActiveLayerVect((FLayers) activeLyrs[i]);
-			}
-
-			if (activeLyrs[i] instanceof Classifiable) {
-				Classifiable auxC = (Classifiable) activeLyrs[i];
-				ILegend theLegend = auxC.getLegend();
-
-				if (theLegend instanceof IVectorLegend) {
-					lyr = (FLayer) auxC;
+		Layer ret = null;
+		if (activeFeatureLayers.length > 0) {
+			ret = activeFeatureLayers[0];
+		} else {
+			for (Layer layer : activeLayers) {
+				Layer aux = getFirstActiveLayerVect(layer);
+				if (aux != null) {
+					ret = aux;
+					break;
 				}
 			}
 		}
 
-		if (lyr == null) {
+		if (ret == null) {
 			JOptionPane.showMessageDialog(null, Messages
 					.getString(PluginServices.getText(this,
 							"necesita_una_capa_vectorial_activa")
@@ -54,10 +52,9 @@ public abstract class AbstractThemeManagerPage extends JPanel {
 							+ PluginServices.getText(this,
 									"Por_favor_active_la_capa") + "."), "",
 					JOptionPane.ERROR_MESSAGE);
-			return null;
 		}
 
-		return lyr;
+		return ret;
 	}
 
 	/**

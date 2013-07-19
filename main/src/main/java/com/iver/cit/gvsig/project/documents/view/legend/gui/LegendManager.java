@@ -53,6 +53,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.prefs.Preferences;
 
 import javax.swing.ImageIcon;
@@ -68,7 +69,11 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import org.geotools.styling.FeatureTypeStyle;
+import org.geotools.styling.Rule;
 import org.geotools.styling.Style;
+import org.geotools.styling.StyleFactoryImpl;
+import org.geotools.styling.Symbolizer;
 import org.gvsig.gui.beans.swing.JButton;
 import org.gvsig.layer.Layer;
 
@@ -89,7 +94,8 @@ public class LegendManager extends AbstractThemeManagerPage {
 	private static ArrayList<Class<? extends IFMapLegendDriver>> legendDriverPool = new ArrayList<Class<? extends IFMapLegendDriver>>();
 
 	private Layer layer;
-	private Style legend; // Le asignaremos la leyenda del primer tema activo.
+	private Symbolizer legend; // Le asignaremos la leyenda del primer tema
+								// activo.
 	private Hashtable<Class<? extends ILegendPanel>, ILegendPanel> pages = new Hashtable<Class<? extends ILegendPanel>, ILegendPanel>();
 	private JPanel topPanel = null;
 	private JTextArea titleArea = null;
@@ -814,7 +820,16 @@ public class LegendManager extends AbstractThemeManagerPage {
 	public void applyAction() {
 		if (activePanel != null) {
 			legend = activePanel.getLegend();
-			layer.setStyle(legend);
+
+			StyleFactoryImpl factory = new StyleFactoryImpl();
+			Rule rule = factory.createRule();
+			rule.symbolizers().add(legend);
+			FeatureTypeStyle fts = factory
+					.createFeatureTypeStyle(new Rule[] { rule });
+			Style style = factory.createStyle();
+			style.featureTypeStyles().add(fts);
+
+			layer.setStyle(style);
 		}
 	}
 
@@ -831,7 +846,25 @@ public class LegendManager extends AbstractThemeManagerPage {
 	 *            , legend that the user wants to apply
 	 */
 	private void applyLegend(Style aLegend) {
-		this.legend = aLegend;
+		// gtintegration: get first symbolizer arbitrarily
+		List<FeatureTypeStyle> featureTypeStyles = aLegend.featureTypeStyles();
+		boolean set = false;
+		for (FeatureTypeStyle featureTypeStyle : featureTypeStyles) {
+			for (Rule rule : featureTypeStyle.rules()) {
+				for (Symbolizer symbolizer : rule.symbolizers()) {
+					this.legend = symbolizer;
+					set = true;
+					break;
+				}
+				if (set) {
+					break;
+				}
+			}
+			if (set) {
+				break;
+			}
+		}
+
 		fillDialog();
 		Enumeration<Class<? extends ILegendPanel>> en = pages.keys();
 		while (en.hasMoreElements()) {

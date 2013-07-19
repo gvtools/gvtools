@@ -20,6 +20,8 @@ import org.gvsig.layer.filter.LayerFilter;
 import org.gvsig.persistence.generated.CompositeLayerType;
 import org.gvsig.persistence.generated.LayerType;
 
+import com.vividsolutions.jts.geom.Geometry;
+
 public class CompositeLayer extends AbstractLayer implements Layer {
 	private List<Layer> layers = new ArrayList<Layer>();
 	private LayerFactory layerFactory;
@@ -210,5 +212,11 @@ public class CompositeLayer extends AbstractLayer implements Layer {
 	@Override
 	public Style getStyle() {
 		throw new UnsupportedOperationException("Cannot get style on groups");
+	}
+
+	@Override
+	public Class<? extends Geometry> getShapeType() {
+		throw new UnsupportedOperationException(
+				"Cannot get shape type on groups");
 	}
 }

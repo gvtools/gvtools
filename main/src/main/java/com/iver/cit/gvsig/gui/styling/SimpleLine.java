@@ -1,4 +1,4 @@
-/* gvSIG. Sistema de Información Geográfica de la Generalitat Valenciana
+/* gvSIG. Sistema de Informaciï¿½n Geogrï¿½fica de la Generalitat Valenciana
  *
  * Copyright (C) 2005 IVER T.I. and Generalitat Valenciana.
  *
@@ -20,7 +20,7 @@
  *
  *  Generalitat Valenciana
  *   Conselleria d'Infraestructures i Transport
- *   Av. Blasco Ibáñez, 50
+ *   Av. Blasco Ibï¿½ï¿½ez, 50
  *   46010 VALENCIA
  *   SPAIN
  *
@@ -122,7 +122,6 @@
  */
 package com.iver.cit.gvsig.gui.styling;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -132,18 +131,19 @@ import java.util.ArrayList;
 
 import javax.swing.JPanel;
 
-import org.gvsig.gui.beans.listeners.BeanListener;
+import org.geotools.filter.FilterFactoryImpl;
+import org.geotools.styling.LineSymbolizer;
+import org.geotools.styling.SLD;
+import org.geotools.styling.Stroke;
+import org.geotools.styling.Style;
+import org.geotools.styling.StyleFactory;
+import org.geotools.styling.StyleFactoryImpl;
+import org.geotools.styling.Symbolizer;
 import org.gvsig.gui.beans.swing.GridBagLayoutPanel;
 import org.gvsig.gui.beans.swing.JIncrementalNumberField;
+import org.opengis.filter.FilterFactory;
 
 import com.iver.andami.PluginServices;
-import com.iver.andami.messages.NotificationManager;
-import com.iver.cit.gvsig.fmap.core.SymbologyFactory;
-import com.iver.cit.gvsig.fmap.core.styles.ArrowDecoratorStyle;
-import com.iver.cit.gvsig.fmap.core.styles.ILineStyle;
-import com.iver.cit.gvsig.fmap.core.styles.SimpleLineStyle;
-import com.iver.cit.gvsig.fmap.core.symbols.ISymbol;
-import com.iver.cit.gvsig.fmap.core.symbols.SimpleLineSymbol;
 import com.iver.cit.gvsig.gui.panels.ColorChooserPanel;
 
 /**
@@ -174,8 +174,9 @@ public class SimpleLine extends AbstractTypeSymbolEditor implements
 	private ColorChooserPanel jccColor;
 	private JIncrementalNumberField txtWidth;
 	private ArrayList<JPanel> tabs = new ArrayList<JPanel>();
-	private ArrowDecorator arrowDecorator;
-	private LineProperties lineProperties;
+	// gtintegration
+	// private ArrowDecorator arrowDecorator;
+	// private LineProperties lineProperties;
 	private JIncrementalNumberField txtOffset;
 
 	public SimpleLine(SymbolEditor owner) {
@@ -222,47 +223,39 @@ public class SimpleLine extends AbstractTypeSymbolEditor implements
 		txtOffset.addActionListener(this);
 		tabs.add(myTab);
 
+		// gtintegration
 		// Arrow Decorator
-		arrowDecorator = new ArrowDecorator();
-		arrowDecorator.addListener(new BeanListener() {
+		// arrowDecorator = new ArrowDecorator();
+		// arrowDecorator.addListener(new BeanListener() {
+		//
+		// public void beanValueChanged(Object value) {
+		// fireSymbolChangedEvent();
+		// }
+		//
+		// });
+		// tabs.add(arrowDecorator);
 
-			public void beanValueChanged(Object value) {
-				fireSymbolChangedEvent();
-			}
-
-		});
-		tabs.add(arrowDecorator);
-
-		lineProperties = new LineProperties((float) txtWidth.getDouble());
-		lineProperties.addListener(new BeanListener() {
-
-			public void beanValueChanged(Object value) {
-				fireSymbolChangedEvent();
-			}
-		});
-		tabs.add(lineProperties);
+		// lineProperties = new LineProperties((float) txtWidth.getDouble());
+		// lineProperties.addListener(new BeanListener() {
+		//
+		// public void beanValueChanged(Object value) {
+		// fireSymbolChangedEvent();
+		// }
+		// });
+		// tabs.add(lineProperties);
 	}
 
-	public ISymbol getLayer() {
-		SimpleLineSymbol layer = new SimpleLineSymbol();
-		layer.setLineColor(jccColor.getColor());
-		layer.setIsShapeVisible(true);
-		// clone the selected style in the combo box
+	public Symbolizer getStyle() {
+		StyleFactory styleFactory = new StyleFactoryImpl();
+		FilterFactory filterFactory = new FilterFactoryImpl();
 
-		SimpleLineStyle simplLine = new SimpleLineStyle();
+		Stroke stroke = styleFactory.createStroke(
+				filterFactory.literal(jccColor.getColor()),
+				filterFactory.literal(txtWidth.getDouble()));
+		LineSymbolizer sym = styleFactory.createLineSymbolizer(stroke, null);
+		sym.setPerpendicularOffset(filterFactory.literal(-txtOffset.getDouble()));
 
-		simplLine.setStroke(lineProperties.getLinePropertiesStyle());
-		simplLine.setOffset(-txtOffset.getDouble());
-
-		ArrowDecoratorStyle ads = arrowDecorator.getArrowDecoratorStyle();
-		if (ads != null) {
-			ads.getMarker().setColor(jccColor.getColor());
-		}
-		simplLine.setArrowDecorator(arrowDecorator.getArrowDecoratorStyle());
-		layer.setLineStyle(simplLine);
-		layer.setLineWidth((float) txtWidth.getDouble());
-
-		return layer;
+		return sym;
 	}
 
 	public String getName() {
@@ -273,48 +266,44 @@ public class SimpleLine extends AbstractTypeSymbolEditor implements
 		return (JPanel[]) tabs.toArray(new JPanel[0]);
 	}
 
-	public void refreshControls(ISymbol layer) {
-		SimpleLineSymbol sym;
-		try {
-			if (layer == null) {
-				// initialize defaults
-				System.err.println(getClass().getName()
-						+ ":: should be unreachable code");
-				jccColor.setColor(Color.BLACK);
-				txtWidth.setDouble(1.0);
-				txtOffset.setDouble(0);
-			} else {
-				sym = (SimpleLineSymbol) layer;
-				jccColor.setColor(sym.getColor());
-				txtWidth.setDouble(sym.getLineStyle().getLineWidth());
-				txtOffset.setDouble(sym.getLineStyle().getOffset() == 0 ? 0
-						: -sym.getLineStyle().getOffset());
-				arrowDecorator.setArrowDecoratorStyle(sym.getLineStyle()
-						.getArrowDecorator());
-				/*
-				 * this line discards any temp changes in the linestyle widths
-				 * made by any previous rendering and sets all the values to
-				 * those to be persisted.
-				 */
-				ILineStyle tempLineStyle = (ILineStyle) SymbologyFactory
-						.createStyleFromXML(sym.getLineStyle().getXMLEntity(),
-								sym.getDescription());
-				lineProperties
-						.setLinePropertiesStyle((BasicStroke) tempLineStyle
-								.getStroke());
+	public void refreshControls(Symbolizer sym) {
+		if (sym == null) {
+			// initialize defaults
+			System.err.println(getClass().getName()
+					+ ":: should be unreachable code");
+			jccColor.setColor(Color.BLACK);
+			txtWidth.setDouble(1.0);
+			txtOffset.setDouble(0);
+		} else {
+			if (!(sym instanceof LineSymbolizer)) {
+				return;
 			}
-		} catch (IndexOutOfBoundsException ioEx) {
-			NotificationManager.addWarning("Symbol layer index out of bounds",
-					ioEx);
-		} catch (ClassCastException ccEx) {
-			NotificationManager.addWarning(
-					"Illegal casting from " + layer.getClassName() + " to "
-							+ getSymbolClass().getName() + ".", ccEx);
+
+			LineSymbolizer style = (LineSymbolizer) sym;
+			jccColor.setColor(SLD.color(style));
+			txtWidth.setDouble(SLD.width(style));
+			int offset = style.getPerpendicularOffset().evaluate(null,
+					Integer.class);
+			txtOffset.setDouble(offset == 0 ? 0 : -offset);
+
+			// gtintegration
+			// arrowDecorator.setArrowDecoratorStyle(style.getLineStyle()
+			// .getArrowDecorator());
+			/*
+			 * this line discards any temp changes in the linestyle widths made
+			 * by any previous rendering and sets all the values to those to be
+			 * persisted.
+			 */
+			// ILineStyle tempLineStyle = (ILineStyle) SymbologyFactory
+			// .createStyleFromXML(
+			// style.getLineStyle().getXMLEntity(),
+			// style.getDescription());
+			// lineProperties.setLinePropertiesStyle(style.getStroke());
 		}
 	}
 
-	public Class getSymbolClass() {
-		return SimpleLineSymbol.class;
+	public Class<? extends Style> getSymbolClass() {
+		return Style.class;
 	}
 
 	public void actionPerformed(ActionEvent e) {

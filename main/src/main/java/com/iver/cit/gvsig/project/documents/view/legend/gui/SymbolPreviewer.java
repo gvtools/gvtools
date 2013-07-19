@@ -113,14 +113,13 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.geom.AffineTransform;
 
 import javax.swing.JPanel;
 
+import org.geotools.styling.Symbolizer;
+
 import com.iver.andami.PluginServices;
-import com.iver.cit.gvsig.fmap.core.SymbologyFactory;
-import com.iver.cit.gvsig.fmap.core.symbols.ISymbol;
-import com.iver.cit.gvsig.fmap.core.symbols.SymbolDrawingException;
+import com.iver.cit.gvsig.gui.styling.EditorTool;
 
 /**
  * SymbolPreviewer creates a JPanel used for the user to watch the preview of a
@@ -132,7 +131,7 @@ import com.iver.cit.gvsig.fmap.core.symbols.SymbolDrawingException;
  */
 public class SymbolPreviewer extends JPanel {
 	private int hGap = 5, vGap = 5;
-	private ISymbol symbol;
+	private Symbolizer symbol;
 	private EditorTool prevTool;
 
 	/**
@@ -149,7 +148,7 @@ public class SymbolPreviewer extends JPanel {
 	 * 
 	 * @return symbol
 	 */
-	public ISymbol getSymbol() {
+	public Symbolizer getSymbol() {
 		return symbol;
 	}
 
@@ -158,7 +157,7 @@ public class SymbolPreviewer extends JPanel {
 	 * 
 	 * @param symbol
 	 */
-	public void setSymbol(ISymbol symbol) {
+	public void setSymbol(Symbolizer symbol) {
 		this.symbol = symbol;
 		repaint();
 	}
@@ -184,26 +183,7 @@ public class SymbolPreviewer extends JPanel {
 				(int) (r.getHeight() - (vGap * 2)));
 
 		if (symbol != null) {
-			try {
-				symbol.drawInsideRectangle(g2, new AffineTransform(), r, null);
-			} catch (SymbolDrawingException e) {
-				if (e.getType() == SymbolDrawingException.UNSUPPORTED_SET_OF_SETTINGS) {
-					try {
-						SymbologyFactory
-								.getWarningSymbol(
-										SymbolDrawingException.STR_UNSUPPORTED_SET_OF_SETTINGS,
-										"",
-										SymbolDrawingException.UNSUPPORTED_SET_OF_SETTINGS)
-								.drawInsideRectangle(g2, null, r, null);
-					} catch (SymbolDrawingException e1) {
-						// IMPOSSIBLE TO REACH THIS
-					}
-				} else {
-					// should be unreachable code
-					throw new Error(PluginServices.getText(this,
-							"symbol_shapetype_mismatch"));
-				}
-			}
+			SymbologyUtils.drawInsideRectangle(symbol, g2, r);
 		} else {
 			String noneSelected = "["
 					+ PluginServices.getText(this, "preview_not_available")

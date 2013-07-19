@@ -49,7 +49,7 @@ package com.iver.cit.gvsig.project.documents.view.legend.gui;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
-import org.geotools.styling.Style;
+import org.geotools.styling.Symbolizer;
 import org.gvsig.layer.Layer;
 
 /**
@@ -74,14 +74,14 @@ public interface ILegendPanel {
 	 * @param legend
 	 *            , the legend currently applied to lyr
 	 */
-	public void setData(Layer lyr, Style legend);
+	public void setData(Layer lyr, Symbolizer legend);
 
 	/**
 	 * Returns an instance of Legend
 	 * 
 	 * @return Legend, the legend result of the settings
 	 */
-	public Style getLegend();
+	public Symbolizer getLegend();
 
 	/**
 	 * Returns a brief human-readable description about what kind of legend
@@ -107,7 +107,7 @@ public interface ILegendPanel {
 	 * 
 	 * @return String containing the parent's title.
 	 */
-	public Class getParentClass();
+	public Class<? extends ILegendPanel> getParentClass();
 
 	/**
 	 * Returns the title (a human-readable one) of this panel.

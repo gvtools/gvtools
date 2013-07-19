@@ -10,6 +10,8 @@ import org.gvsig.layer.filter.LayerFilter;
 import org.gvsig.map.MapContext;
 import org.gvsig.persistence.generated.LayerType;
 
+import com.vividsolutions.jts.geom.Geometry;
+
 public interface Layer {
 
 	/**
@@ -235,4 +237,6 @@ public interface Layer {
 	void setStyle(Style style);
 
 	Style getStyle();
+	
+	Class<? extends Geometry> getShapeType();
 }
