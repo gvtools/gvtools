@@ -305,8 +305,8 @@ public class SimpleMarker extends AbstractTypeSymbolEditor implements
 				txtYOffset.setDouble(displacement.getDisplacementY().evaluate(
 						null, Integer.class));
 				cmbStyle.setSymbolColor(color);
-				// TODO gtintegration
 				chkUseOutline.setSelected(false);
+				// TODO gtintegration
 				// chkUseOutline.setSelected(sym.hasOutline());
 				// cmbStyle.setOutlineColor(sym.getOutlineColor());
 				// cmbStyle.setSelectedItem(new Integer(sym.getStyle()));

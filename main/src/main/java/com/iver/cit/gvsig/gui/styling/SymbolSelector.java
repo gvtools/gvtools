@@ -423,13 +423,6 @@ public class SymbolSelector extends JPanel implements ISymbolSelector,
 		cmbUnits.setSelectedUnit(SymbologyUtils
 				.convert2gvsigUnits(mySelectedElement.getUnitOfMeasure()));
 
-		// TODO gtintegration
-		// if (mySelectedElement instanceof IMultiLayerSymbol) {
-		// if (((IMultiLayerSymbol) mySelectedElement).getLayerCount() == 1)
-		// mySelectedElement = ((IMultiLayerSymbol) mySelectedElement)
-		// .getLayer(0);
-		// }
-
 		try {
 
 			jcc1.setEnabled(mySelectedElement != null);
@@ -833,13 +826,6 @@ public class SymbolSelector extends JPanel implements ISymbolSelector,
 	public Symbolizer getSelectedObject() {
 		Symbolizer mySelectedElement = jPanelPreview.getSymbol();
 
-		// TODO gtintegration
-		// // if this symbol only has one layer, then no multilayer is needed
-		// if (mySelectedElement instanceof IMultiLayerSymbol) {
-		// if (((IMultiLayerSymbol) mySelectedElement).getLayerCount() == 1)
-		// return ((IMultiLayerSymbol) mySelectedElement).getLayer(0);
-		// }
-
 		if (mySelectedElement != null) {
 			// TODO gtintegration
 			// mySelectedElement.setReferenceSystem(cmbReferenceSystem.getSelectedIndex());
@@ -888,13 +874,6 @@ public class SymbolSelector extends JPanel implements ISymbolSelector,
 
 		Symbolizer symbol = se.getSymbol();
 		if (symbol != null) {
-			// TODO gtintegration
-			// if (symbol instanceof IMultiLayerSymbol) {
-			// IMultiLayerSymbol mSym = (IMultiLayerSymbol) symbol;
-			// if (mSym.getLayerCount() == 1) {
-			// symbol = mSym.getLayer(0);
-			// }
-			// }
 			setSymbol(symbol);
 		}
 		// accepted = state;
@@ -984,13 +963,6 @@ public class SymbolSelector extends JPanel implements ISymbolSelector,
 	}
 
 	protected void performActionOn(Symbolizer selectedElement, JComponent comp) {
-
-		// TODO gtintegration
-		// if (selectedElement instanceof IMultiLayerSymbol) {
-		// if (((IMultiLayerSymbol) selectedElement).getLayerCount() == 1)
-		// selectedElement = ((IMultiLayerSymbol) selectedElement)
-		// .getLayer(0);
-		// }
 		FilterFactoryImpl factory = new FilterFactoryImpl();
 
 		if (comp.equals(getBtnProperties())) {

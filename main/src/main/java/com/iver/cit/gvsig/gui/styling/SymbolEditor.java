@@ -248,15 +248,6 @@ public class SymbolEditor extends JPanel implements IWindow {
 			//
 			// if (!(symbol instanceof FSymbol))
 			// nSym.addLayer(symbol);
-
-			// if (symbol instanceof CartographicSupport) {
-			// CartographicSupport cs = (CartographicSupport) symbol;
-			// CartographicSupport nCs = (CartographicSupport) nSym;
-			// nCs.setReferenceSystem(cs.getReferenceSystem());
-			// nCs.setUnit(cs.getUnit());
-			// }
-
-			// this.style = nSym;
 			// } else {
 			this.style = symbol;
 			// }
