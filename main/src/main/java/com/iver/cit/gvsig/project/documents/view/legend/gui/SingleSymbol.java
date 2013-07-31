@@ -72,6 +72,8 @@ import com.iver.andami.PluginServices;
 import com.iver.cit.gvsig.gui.styling.SymbolSelector;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
@@ -138,7 +140,7 @@ public class SingleSymbol extends JPanel implements ILegendPanel,
 	}
 
 	public Class<? extends ILegendPanel> getParentClass() {
-		return null;
+		return Features.class;
 	}
 
 	public String getTitle() {
@@ -255,7 +257,7 @@ public class SingleSymbol extends JPanel implements ILegendPanel,
 	}
 
 	public boolean isSuitableFor(Layer layer) {
-		// gtintegration
+		// TODO gtintegration
 		// return (layer instanceof FLyrVect);
 		return true;
 	}
@@ -263,12 +265,12 @@ public class SingleSymbol extends JPanel implements ILegendPanel,
 	public void actionPerformed(ActionEvent e) {
 		JComponent c = (JComponent) e.getSource();
 		if (c.equals(getBtnOpenSymbolSelector())) {
-			Symbolizer auxSymbol = getSymbol();
-
 			Class<? extends Symbolizer> symbolType;
-			if (Point.class.isAssignableFrom(shapeType)) {
+			if (Point.class.isAssignableFrom(shapeType)
+					|| MultiPoint.class.isAssignableFrom(shapeType)) {
 				symbolType = PointSymbolizer.class;
-			} else if (LineString.class.isAssignableFrom(shapeType)) {
+			} else if (LineString.class.isAssignableFrom(shapeType)
+					|| MultiLineString.class.isAssignableFrom(shapeType)) {
 				symbolType = LineSymbolizer.class;
 			} else if (Polygon.class.isAssignableFrom(shapeType)
 					|| MultiPolygon.class.isAssignableFrom(shapeType)) {
@@ -276,16 +278,16 @@ public class SingleSymbol extends JPanel implements ILegendPanel,
 			} else {
 				throw new UnsupportedOperationException();
 			}
-			ISymbolSelector se = SymbolSelector.createSymbolSelector(auxSymbol,
-					symbolType);
+			ISymbolSelector se = SymbolSelector.createSymbolSelector(
+					getSymbol(), symbolType);
 			PluginServices.getMDIManager().addWindow(se);
 			Symbolizer sym = se.getSelectedObject();
-			if (sym != null && sym != auxSymbol) {
+			if (sym != null) {
 				// no symbol, no changes
 				setOnlySymbol(sym);
 			}
 		} else if (c.equals(getBtnOpenSymbolLevelsEditor())) {
-			// gtintegration
+			// TODO gtintegration
 			throw new UnsupportedOperationException("Unsupported symbol levels");
 			// ZSort myZSort = null;
 			// if (style != null) {

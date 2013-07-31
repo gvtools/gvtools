@@ -2013,6 +2013,11 @@ public class MapControl extends JComponent implements ComponentListener {
 		public void layerRemoved(Layer parent, Layer removed) {
 			refresh(parent);
 		}
+
+		@Override
+		public void legendChanged(Layer layer) {
+			refresh(layer);
+		}
 	}
 
 	/**

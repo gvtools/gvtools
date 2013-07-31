@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.apache.log4j.Logger;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.styling.DescriptionImpl;
@@ -20,6 +21,7 @@ import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.Symbolizer;
 import org.gvsig.events.FeatureSelectionChangeEvent;
+import org.gvsig.events.LayerLegendChangeEvent;
 import org.gvsig.layer.FeatureSourceCache;
 import org.gvsig.layer.Layer;
 import org.gvsig.layer.Selection;
@@ -32,11 +34,15 @@ import org.opengis.filter.FilterFactory2;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class FeatureLayer extends AbstractLayer implements Layer {
+	private static final Logger logger = Logger.getLogger(FeatureLayer.class);
+
 	private boolean editing, active;
 	private Source source;
 	private Style style;
@@ -137,11 +143,21 @@ public class FeatureLayer extends AbstractLayer implements Layer {
 
 	@Override
 	public void setStyle(Style style) {
-		this.style = style;
+		if (this.style != style) {
+			this.style = style;
+			eventBus.fireEvent(new LayerLegendChangeEvent(this));
+		}
 	}
 
 	private void buildStyle() {
-		int width = 1;
+		int width;
+		if (Point.class.isAssignableFrom(getShapeType())
+				|| MultiPoint.class.isAssignableFrom(getShapeType())) {
+			width = 5;
+		} else {
+			width = 1;
+		}
+
 		Rule defaultRule = createRule(Color.BLUE, width);
 		defaultRule.setElseFilter(true);
 
@@ -165,10 +181,11 @@ public class FeatureLayer extends AbstractLayer implements Layer {
 
 		Symbolizer sym;
 
-		if (Point.class.isAssignableFrom(getShapeType())) {
+		if (Point.class.isAssignableFrom(getShapeType())
+				|| MultiPoint.class.isAssignableFrom(getShapeType())) {
 			Mark mark = styleFactory.getCircleMark();
 			mark.setStroke(styleFactory.createStroke(
-					filterFactory.literal(color), filterFactory.literal(1)));
+					filterFactory.literal(color), filterFactory.literal(0)));
 			mark.setFill(styleFactory.createFill(filterFactory.literal(color)));
 
 			Graphic graphic = styleFactory.createDefaultGraphic();
@@ -176,7 +193,8 @@ public class FeatureLayer extends AbstractLayer implements Layer {
 			graphic.graphicalSymbols().add(mark);
 			graphic.setSize(filterFactory.literal(width));
 			sym = styleFactory.createPointSymbolizer(graphic, null);
-		} else if (LineString.class.isAssignableFrom(getShapeType())) {
+		} else if (LineString.class.isAssignableFrom(getShapeType())
+				|| MultiLineString.class.isAssignableFrom(getShapeType())) {
 			Stroke stroke = styleFactory.createStroke(
 					filterFactory.literal(color), filterFactory.literal(width));
 			sym = styleFactory.createLineSymbolizer(stroke, null);
@@ -188,6 +206,8 @@ public class FeatureLayer extends AbstractLayer implements Layer {
 					filterFactory.literal(0));
 			sym = styleFactory.createPolygonSymbolizer(stroke, fill, null);
 		} else {
+			logger.warn("Unsupported shape type for symbology: "
+					+ getShapeType() + ". Falling back to point style.");
 			Mark mark = styleFactory.getCircleMark();
 			mark.setStroke(styleFactory.createStroke(
 					filterFactory.literal(color), filterFactory.literal(1)));
@@ -200,7 +220,7 @@ public class FeatureLayer extends AbstractLayer implements Layer {
 			sym = styleFactory.createPointSymbolizer(graphic, null);
 		}
 		sym.setDescription(new DescriptionImpl("", ""));
-		
+
 		Rule rule = styleFactory.createRule();
 		rule.symbolizers().add(sym);
 		return rule;

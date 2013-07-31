@@ -73,7 +73,7 @@ public class Features extends AbstractParentPanel {
 	}
 
 	public boolean isSuitableFor(Layer layer) {
-		// gtintegration
+		// TODO gtintegration
 		// return layer instanceof FLyrVect;
 		return true;
 	}

@@ -105,6 +105,7 @@ import com.iver.cit.gvsig.gui.styling.SimpleLine;
 import com.iver.cit.gvsig.gui.styling.SimpleMarker;
 import com.iver.cit.gvsig.gui.styling.SimpleText;
 import com.iver.cit.gvsig.gui.styling.SymbolEditor;
+import com.iver.cit.gvsig.project.documents.view.legend.gui.Features;
 import com.iver.cit.gvsig.project.documents.view.legend.gui.LegendManager;
 import com.iver.cit.gvsig.project.documents.view.legend.gui.SingleSymbol;
 import com.iver.cit.gvsig.project.documents.view.legend.gui.ThemeManagerWindow;
@@ -132,11 +133,13 @@ public class BasicSymbologyExtension extends Extension implements
 				TextSymbolizer.class);
 
 		// pages
-		// gtintegration ThemeManagerWindow.addPage(General.class);
+		// TODO gtintegration
+		// ThemeManagerWindow.addPage(General.class);
 		ThemeManagerWindow.addPage(LegendManager.class);
-		// gtintegration ThemeManagerWindow.addPage(LabelingManager.class);
+		// TODO gtintegration
+		// ThemeManagerWindow.addPage(LabelingManager.class);
 
-		// gtintegration
+		// TODO gtintegration
 		// ThemeManagerWindow.setTabEnabledForLayer(General.class,
 		// FLyrVect.class,
 		// true);
@@ -148,9 +151,9 @@ public class BasicSymbologyExtension extends Extension implements
 		// LabelingManager.addLabelingStrategy(AttrInTableLabeling.class);
 
 		// legends available in the legend page
-		// gtintegration
+		// TODO gtintegration
 		// LegendManager.addLegendPage(Quantities.class);
-		// LegendManager.addLegendPage(Features.class);
+		LegendManager.addLegendPage(Features.class);
 		// LegendManager.addLegendPage(Categories.class);
 		// LegendManager.addLegendPage(MultipleAttributes.class);
 
@@ -212,7 +215,7 @@ public class BasicSymbologyExtension extends Extension implements
 	}
 
 	public IPreference[] getPreferencesPages() {
-		// gtintegration return new IPreference[] { new
+		// TODO gtintegration return new IPreference[] { new
 		// CartographicSupportPage(),
 		// new SymbologyPage() };
 		return new IPreference[0];

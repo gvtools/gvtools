@@ -155,7 +155,6 @@ public class SymbolSelector extends JPanel implements ISymbolSelector,
 	protected boolean accepted = false;
 	private String wiTitle = null;
 
-	// gtintegration
 	protected SelectorFilter sFilter = new SelectorFilter() {
 		private GeometryFactory gf = new GeometryFactory();
 
@@ -185,7 +184,7 @@ public class SymbolSelector extends JPanel implements ISymbolSelector,
 				}
 
 				return true;
-				// gtintegration
+				// TODO gtintegration
 				// return style.isSuitableFor(compareGeometry);
 			}
 			return false;
@@ -419,14 +418,12 @@ public class SymbolSelector extends JPanel implements ISymbolSelector,
 		// if (mySelectedElement == null) return;
 		act = false; // disable events
 
-		// gtintegration
-		// if (mySelectedElement instanceof CartographicSupport) {
-		// CartographicSupport cs = (CartographicSupport) mySelectedElement;
-		// cmbUnits.setSelectedUnitIndex(cs.getUnit());
-		// cmbReferenceSystem.setSelectedIndex(cs.getReferenceSystem());
-		// }
+		// TODO gtintegration
+		// cmbReferenceSystem.setSelectedIndex(mySelectedElement.getReferenceSystem());
+		cmbUnits.setSelectedUnit(SymbologyUtils
+				.convert2gvsigUnits(mySelectedElement.getUnitOfMeasure()));
 
-		// gtintegration
+		// TODO gtintegration
 		// if (mySelectedElement instanceof IMultiLayerSymbol) {
 		// if (((IMultiLayerSymbol) mySelectedElement).getLayerCount() == 1)
 		// mySelectedElement = ((IMultiLayerSymbol) mySelectedElement)
@@ -438,7 +435,7 @@ public class SymbolSelector extends JPanel implements ISymbolSelector,
 			jcc1.setEnabled(mySelectedElement != null);
 			jcc2.setEnabled(mySelectedElement != null);
 
-			// gtintegration
+			// TODO gtintegration
 			// if (mySelectedElement instanceof IMultiLayerSymbol) {
 			// jcc1.setColor(Color.WHITE);
 			// jcc2.setColor(Color.WHITE);
@@ -487,7 +484,7 @@ public class SymbolSelector extends JPanel implements ISymbolSelector,
 					jcc2.setColor(strokeColor);
 					txtWidth.setDouble(SLD.width(f.getStroke()));
 
-					// gtintegration
+					// TODO gtintegration
 					// if (f instanceof MultiLayerFillSymbol) {
 					// txtWidth.setEnabled(false);
 					// cmbReferenceSystem.setEnabled(false);
@@ -834,23 +831,22 @@ public class SymbolSelector extends JPanel implements ISymbolSelector,
 	}
 
 	public Symbolizer getSelectedObject() {
-		return jPanelPreview.getSymbol();
-		// gtintegration
-		// Symbolizer mySelectedElement = jPanelPreview.getSymbol();
-		//
+		Symbolizer mySelectedElement = jPanelPreview.getSymbol();
+
+		// TODO gtintegration
 		// // if this symbol only has one layer, then no multilayer is needed
 		// if (mySelectedElement instanceof IMultiLayerSymbol) {
 		// if (((IMultiLayerSymbol) mySelectedElement).getLayerCount() == 1)
 		// return ((IMultiLayerSymbol) mySelectedElement).getLayer(0);
 		// }
-		//
-		// if (mySelectedElement instanceof CartographicSupport) {
-		// CartographicSupport csSym = (CartographicSupport) mySelectedElement;
-		// csSym.setUnit(cmbUnits.getSelectedUnitIndex());
-		// csSym.setReferenceSystem(cmbReferenceSystem.getSelectedIndex());
-		// }
-		//
-		// return mySelectedElement;
+
+		if (mySelectedElement != null) {
+			// TODO gtintegration
+			// mySelectedElement.setReferenceSystem(cmbReferenceSystem.getSelectedIndex());
+			mySelectedElement.setUnitOfMeasure(SymbologyUtils
+					.convert2JavaUnits(cmbUnits.getSelectedUnitIndex()));
+		}
+		return mySelectedElement;
 	}
 
 	public void setSymbol(Symbolizer symbol) {
@@ -892,7 +888,7 @@ public class SymbolSelector extends JPanel implements ISymbolSelector,
 
 		Symbolizer symbol = se.getSymbol();
 		if (symbol != null) {
-			// gtintegration
+			// TODO gtintegration
 			// if (symbol instanceof IMultiLayerSymbol) {
 			// IMultiLayerSymbol mSym = (IMultiLayerSymbol) symbol;
 			// if (mSym.getLayerCount() == 1) {
@@ -989,7 +985,7 @@ public class SymbolSelector extends JPanel implements ISymbolSelector,
 
 	protected void performActionOn(Symbolizer selectedElement, JComponent comp) {
 
-		// gtintegration
+		// TODO gtintegration
 		// if (selectedElement instanceof IMultiLayerSymbol) {
 		// if (((IMultiLayerSymbol) selectedElement).getLayerCount() == 1)
 		// selectedElement = ((IMultiLayerSymbol) selectedElement)
@@ -1015,7 +1011,14 @@ public class SymbolSelector extends JPanel implements ISymbolSelector,
 				PointSymbolizer m = (PointSymbolizer) selectedElement;
 				for (GraphicalSymbol symbol : m.getGraphic().graphicalSymbols()) {
 					if (symbol instanceof Mark) {
-						((Mark) symbol).getFill().setColor(factory.literal(c));
+						Mark mark = (Mark) symbol;
+						mark.getFill().setColor(factory.literal(c));
+						mark.getStroke().setColor(factory.literal(c));
+
+						mark.getFill().setOpacity(
+								factory.literal(c.getAlpha() / 255.0));
+						mark.getStroke().setOpacity(
+								factory.literal(c.getAlpha() / 255.0));
 					}
 				}
 			} else if (selectedElement instanceof LineSymbolizer) {
@@ -1063,17 +1066,11 @@ public class SymbolSelector extends JPanel implements ISymbolSelector,
 				l.getStroke().setWidth(factory.literal(s));
 			}
 		} else if (comp.equals(cmbUnits)) {
-			// gtintegration
-			// if (selectedElement instanceof CartographicSupport) {
-			// CartographicSupport cs = (CartographicSupport) selectedElement;
-			// cs.setUnit(cmbUnits.getSelectedUnitIndex());
-			// }
+			selectedElement.setUnitOfMeasure(SymbologyUtils
+					.convert2JavaUnits(cmbUnits.getSelectedUnitIndex()));
 		} else if (comp.equals(cmbReferenceSystem)) {
-			// gtintegration
-			// if (selectedElement instanceof CartographicSupport) {
-			// CartographicSupport cs = (CartographicSupport) selectedElement;
-			// cs.setReferenceSystem(cmbReferenceSystem.getSelectedIndex());
-			// }
+			// TODO gtintegration
+			// selectedElement.setReferenceSystem(cmbReferenceSystem.getSelectedIndex());
 		} else if (comp.equals(txtWidth)) {
 			double w = txtWidth.getDouble();
 			if (selectedElement instanceof PolygonSymbolizer) {
@@ -1115,7 +1112,7 @@ public class SymbolSelector extends JPanel implements ISymbolSelector,
 			Class<? extends Symbolizer> shapeType, SelectorFilter filter,
 			boolean showAcceptPanel) {
 		if (GeometryCollection.class.isAssignableFrom(shapeType)) {
-			// gtintegration
+			// TODO gtintegration
 			throw new UnsupportedOperationException();
 			// return new MultiShapeSymbolSelector(currSymbol);
 		} else {

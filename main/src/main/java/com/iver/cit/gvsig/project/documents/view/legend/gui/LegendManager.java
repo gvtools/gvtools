@@ -846,7 +846,7 @@ public class LegendManager extends AbstractThemeManagerPage {
 	 *            , legend that the user wants to apply
 	 */
 	private void applyLegend(Style aLegend) {
-		// gtintegration: get first symbolizer arbitrarily
+		// TODO gtintegration: get first symbolizer arbitrarily
 		List<FeatureTypeStyle> featureTypeStyles = aLegend.featureTypeStyles();
 		boolean set = false;
 		for (FeatureTypeStyle featureTypeStyle : featureTypeStyles) {
@@ -869,7 +869,7 @@ public class LegendManager extends AbstractThemeManagerPage {
 		Enumeration<Class<? extends ILegendPanel>> en = pages.keys();
 		while (en.hasMoreElements()) {
 			ILegendPanel page = (ILegendPanel) pages.get(en.nextElement());
-			if (legend.getClass().equals(page.getLegendClass())) {
+			if (Symbolizer.class.isAssignableFrom(legend.getClass())) {
 				setActivePage(page);
 				expandAndSelect(page);
 				return;

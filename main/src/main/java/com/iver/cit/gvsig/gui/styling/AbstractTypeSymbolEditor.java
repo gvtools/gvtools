@@ -121,6 +121,8 @@ import javax.swing.JPanel;
 import org.geotools.styling.Style;
 import org.geotools.styling.Symbolizer;
 
+import com.iver.cit.gvsig.project.documents.view.legend.gui.SymbologyUtils;
+
 /**
  * <p>
  * Abstract class that all the Symbol settings GUI's must extend. <b>This is not
@@ -223,13 +225,10 @@ public abstract class AbstractTypeSymbolEditor {
 			applying = true;
 			Symbolizer sym = getStyle();
 
-			// gtintegration
-			// if (sym instanceof CartographicSupport) {
-			// CartographicSupport cs = (CartographicSupport) sym;
-			// cs.setReferenceSystem(owner.getUnitsReferenceSystem());
-			// cs.setUnit(owner.getUnit());
-			// }
-
+			// TODO gtintegration
+			// sym.setReferenceSystem(owner.getUnitsReferenceSystem());
+			sym.setUnitOfMeasure(SymbologyUtils.convert2JavaUnits(owner
+					.getUnit()));
 			owner.setLayerToSymbol(sym);
 			owner.refresh();
 			applying = false;

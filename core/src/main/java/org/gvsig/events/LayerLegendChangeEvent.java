@@ -1,13 +1,18 @@
 package org.gvsig.events;
 
+import org.gvsig.layer.Layer;
+
 import geomatico.events.Event;
 
 public class LayerLegendChangeEvent implements Event<LayerLegendChangeHandler> {
+	private Layer layer;
 
-	@Override
-	public void dispatch(LayerLegendChangeHandler arg0) {
-		// TODO Auto-generated method stub
-		assert false;
+	public LayerLegendChangeEvent(Layer layer) {
+		this.layer = layer;
 	}
 
+	@Override
+	public void dispatch(LayerLegendChangeHandler handler) {
+		handler.legendChanged(layer);
+	}
 }

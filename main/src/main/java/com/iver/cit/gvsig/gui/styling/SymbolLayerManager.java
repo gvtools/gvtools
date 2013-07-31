@@ -160,23 +160,7 @@ public class SymbolLayerManager extends JPanel implements ActionListener {
 		this.owner = owner;
 		this.symbol = new ArrayList<Symbolizer>();
 		this.symbol.add(owner.getSymbol());
-		// gtintegration
-		// if (symbol.size() == 0) {
-		// int shapeType = -1;
-		// if (symbol instanceof MultiLayerMarkerSymbol) {
-		// shapeType = FShape.POINT;
-		// } else if (symbol instanceof MultiLayerLineSymbol) {
-		// shapeType = FShape.LINE;
-		// } else if (symbol instanceof MultiLayerFillSymbol) {
-		// shapeType = FShape.POLYGON;
-		// }
-		//
-		// if (shapeType != -1)
-		// symbol.addLayer(SymbologyUtils
-		// .createDefaultSymbolByShapeType(shapeType));
-		// }
 		initialize();
-
 	}
 
 	private void initialize() {

@@ -179,6 +179,7 @@ import org.geotools.styling.StyleFactoryImpl;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
 import org.gvsig.gui.beans.AcceptCancelPanel;
+import org.gvsig.units.Unit;
 
 import com.iver.andami.PluginServices;
 import com.iver.andami.messages.NotificationManager;
@@ -238,7 +239,7 @@ public class SymbolEditor extends JPanel implements IWindow {
 			this.style = (symbol == null) ? new StyleFactoryImpl()
 					.createTextSymbolizer() : symbol;
 		} else {
-			// gtintegration
+			// TODO gtintegration
 			// if (!(symbol instanceof IMultiLayerSymbol)) {
 			// this is a simple symbol (or null one); it will be
 			// converted to a multilayer one to accept layer addition
@@ -260,16 +261,12 @@ public class SymbolEditor extends JPanel implements IWindow {
 			this.style = symbol;
 			// }
 
-			// gtintegration
-			// // apply units and reference system to comboboxes
-			// if (this.style instanceof CartographicSupport) {
-			// CartographicSupport cs = (CartographicSupport) this.style;
-			// getCmbUnits().setSelectedUnitIndex(cs.getUnit());
+			// TODO gtintegration
 			// getCmbUnitsReferenceSystem().setSelectedIndex(
-			// cs.getReferenceSystem());
-			//
-			// }
-
+			// this.style.getReferenceSystem());
+			Unit unit = SymbologyUtils.convert2gvsigUnits(this.style
+					.getUnitOfMeasure());
+			getCmbUnits().setSelectedUnit(unit);
 		}
 		this.oldSymbolProperties = SymbologyUtils.getXMLEntity(style);
 		this.shapeType = shapeType;
@@ -305,14 +302,12 @@ public class SymbolEditor extends JPanel implements IWindow {
 						if (l != null
 								&& l.getClass()
 										.equals(options.getSymbolClass())) {
-							// gtintegration
-							// if (l instanceof CartographicSupport) {
-							// CartographicSupport cs = (CartographicSupport) l;
-							// getCmbUnits()
-							// .setSelectedUnitIndex(cs.getUnit());
+							// TODO gtintegration
 							// getCmbUnitsReferenceSystem().setSelectedIndex(
-							// cs.getReferenceSystem());
-							// }
+							// l.getReferenceSystem());
+							Unit unit = SymbologyUtils.convert2gvsigUnits(l
+									.getUnitOfMeasure());
+							getCmbUnits().setSelectedUnit(unit);
 							options.refreshControls(l);
 						}
 
@@ -423,13 +418,10 @@ public class SymbolEditor extends JPanel implements IWindow {
 	}
 
 	public Symbolizer getSymbol() {
-		// gtintegration
-		// if (style instanceof CartographicSupport) {
-		// CartographicSupport cs = (CartographicSupport) style;
-		// cs.setUnit(getUnit());
-		// cs.setReferenceSystem(getReferenceSystem());
-		// }
-		//
+		// TODO gtintegration
+		// style.setReferenceSystem(getReferenceSystem());
+		style.setUnitOfMeasure(SymbologyUtils.convert2JavaUnits(getUnit()));
+
 		// if (symbol instanceof MultiLayerLineSymbol) {
 		// MultiLayerLineSymbol mLineSym = (MultiLayerLineSymbol) symbol;
 		// double lineWidth = 0;
@@ -454,7 +446,7 @@ public class SymbolEditor extends JPanel implements IWindow {
 			pnlWest = new JPanel();
 			pnlWest.setLayout(new BorderLayout());
 			pnlWest.add(getPnlPreview(), java.awt.BorderLayout.NORTH);
-			// gtintegration
+			// TODO gtintegration
 			// // //////// /-------------------------------------
 			// if (style instanceof IMultiLayerSymbol) {
 			// // //////// /-------------------------------------
@@ -601,7 +593,7 @@ public class SymbolEditor extends JPanel implements IWindow {
 	 * Returns the option selected in the reference unit Jcombobox
 	 * 
 	 */
-	public int getUnit() {
+	public Unit getUnit() {
 		return getCmbUnits().getSelectedUnitIndex();
 	}
 
@@ -630,7 +622,7 @@ public class SymbolEditor extends JPanel implements IWindow {
 	 */
 	protected void setLayerToSymbol(Symbolizer layer) {
 		this.style = layer;
-		// gtintegration
+		// TODO gtintegration
 		// int i = getLayerManager().getSelectedLayerIndex();
 		// IMultiLayerSymbol s = (IMultiLayerSymbol) style;
 		// if (i >= 0 && i < s.getLayerCount()) {
@@ -730,5 +722,4 @@ public class SymbolEditor extends JPanel implements IWindow {
 	public Object getWindowProfile() {
 		return WindowInfo.DIALOG_PROFILE;
 	}
-
 }

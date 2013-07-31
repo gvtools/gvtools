@@ -112,16 +112,17 @@ public class JComboBoxUnits extends JComboBox<String> {
 
 	}
 
-	public int getSelectedUnitIndex() {
-		return getSelectedIndex();
+	public Unit getSelectedUnitIndex() {
+		int index = getSelectedIndex();
+		Unit[] units = Unit.values();
+		return index < units.length ? units[index] : null;
 	}
 
-	public void setSelectedUnitIndex(int unitIndex) {
-		if (unitIndex == -1) {
+	public void setSelectedUnit(Unit unit) {
+		if (unit == null) {
 			setSelectedIndex(getItemCount() - 1);
 		} else {
-			setSelectedIndex(unitIndex);
+			setSelectedIndex(unit.ordinal());
 		}
 	}
-
 }

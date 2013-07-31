@@ -174,7 +174,7 @@ public class SimpleLine extends AbstractTypeSymbolEditor implements
 	private ColorChooserPanel jccColor;
 	private JIncrementalNumberField txtWidth;
 	private ArrayList<JPanel> tabs = new ArrayList<JPanel>();
-	// gtintegration
+	// TODO gtintegration
 	// private ArrowDecorator arrowDecorator;
 	// private LineProperties lineProperties;
 	private JIncrementalNumberField txtOffset;
@@ -223,7 +223,7 @@ public class SimpleLine extends AbstractTypeSymbolEditor implements
 		txtOffset.addActionListener(this);
 		tabs.add(myTab);
 
-		// gtintegration
+		// TODO gtintegration
 		// Arrow Decorator
 		// arrowDecorator = new ArrowDecorator();
 		// arrowDecorator.addListener(new BeanListener() {
@@ -286,7 +286,7 @@ public class SimpleLine extends AbstractTypeSymbolEditor implements
 					Integer.class);
 			txtOffset.setDouble(offset == 0 ? 0 : -offset);
 
-			// gtintegration
+			// TODO gtintegration
 			// arrowDecorator.setArrowDecoratorStyle(style.getLineStyle()
 			// .getArrowDecorator());
 			/*

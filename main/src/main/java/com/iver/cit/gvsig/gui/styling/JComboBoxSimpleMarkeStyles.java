@@ -121,7 +121,7 @@ public class JComboBoxSimpleMarkeStyles extends JComboBox<MyItem> {
 				gr.graphicalSymbols().add(mark);
 				gr.setSize(filterFactory.literal(10));
 
-				// gtintegration: use pointTypes
+				// TODO gtintegration: use pointTypes
 				// mySymbol.setSymbol(value.style);
 
 				PointSymbolizer sym = styleFactory.createPointSymbolizer(gr,
