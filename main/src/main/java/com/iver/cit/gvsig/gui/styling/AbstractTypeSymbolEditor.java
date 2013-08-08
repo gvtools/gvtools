@@ -118,7 +118,6 @@ package com.iver.cit.gvsig.gui.styling;
 
 import javax.swing.JPanel;
 
-import org.geotools.styling.Style;
 import org.geotools.styling.Symbolizer;
 
 import com.iver.cit.gvsig.project.documents.view.legend.gui.SymbologyUtils;
@@ -241,7 +240,7 @@ public abstract class AbstractTypeSymbolEditor {
 	 * @return <b>Class</b> (of the concrete ISymbol that this configuration
 	 *         panel deals with)
 	 */
-	public abstract Class<? extends Style> getSymbolClass();
+	public abstract Class<? extends Symbolizer> getSymbolClass();
 
 	/**
 	 * Returns the editor tools that are handled by this configuration panel.

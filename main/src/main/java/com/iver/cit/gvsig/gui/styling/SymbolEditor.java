@@ -239,18 +239,7 @@ public class SymbolEditor extends JPanel implements IWindow {
 			this.style = (symbol == null) ? new StyleFactoryImpl()
 					.createTextSymbolizer() : symbol;
 		} else {
-			// TODO gtintegration
-			// if (!(symbol instanceof IMultiLayerSymbol)) {
-			// this is a simple symbol (or null one); it will be
-			// converted to a multilayer one to accept layer addition
-			// IMultiLayerSymbol nSym = SymbologyFactory
-			// .createEmptyMultiLayerSymbol(shapeType);
-			//
-			// if (!(symbol instanceof FSymbol))
-			// nSym.addLayer(symbol);
-			// } else {
 			this.style = symbol;
-			// }
 
 			// TODO gtintegration
 			// getCmbUnitsReferenceSystem().setSelectedIndex(
@@ -283,24 +272,16 @@ public class SymbolEditor extends JPanel implements IWindow {
 							.getSelectedItem();
 
 					// //////// /-------------------------------------
-					if (layerManager != null) {
-						// //////// /-------------------------------------
-						Symbolizer l = layerManager.getSelectedLayer();
-
-						// if the symbol is not null and is it managed by the
-						// "options" class
-						// refresh the controls
-						if (l != null
-								&& l.getClass()
-										.equals(options.getSymbolClass())) {
-							// TODO gtintegration
-							// getCmbUnitsReferenceSystem().setSelectedIndex(
-							// l.getReferenceSystem());
-							Unit unit = SymbologyUtils.convert2gvsigUnits(l
-									.getUnitOfMeasure());
-							getCmbUnits().setSelectedUnit(unit);
-							options.refreshControls(l);
-						}
+					if (style != null
+							&& options.getSymbolClass().isAssignableFrom(
+									style.getClass())) {
+						// TODO gtintegration
+						// getCmbUnitsReferenceSystem().setSelectedIndex(
+						// style.getReferenceSystem());
+						Unit unit = SymbologyUtils.convert2gvsigUnits(style
+								.getUnitOfMeasure());
+						getCmbUnits().setSelectedUnit(unit);
+						options.refreshControls(style);
 
 						replaceOptions(options);
 						// //////// /-------------------------------------
@@ -317,7 +298,7 @@ public class SymbolEditor extends JPanel implements IWindow {
 			public int compare(AbstractTypeSymbolEditor o1,
 					AbstractTypeSymbolEditor o2) {
 				int result = o1.getName().compareTo(o2.getName());
-				if (result == 0)
+				if (o1 != o2 && result == 0)
 					throw new IllegalArgumentException(PluginServices.getText(
 							this, "two_panels_with_the_same_name"));
 				return result;
@@ -411,7 +392,9 @@ public class SymbolEditor extends JPanel implements IWindow {
 	public Symbolizer getSymbol() {
 		// TODO gtintegration
 		// style.setReferenceSystem(getReferenceSystem());
-		style.setUnitOfMeasure(SymbologyUtils.convert2JavaUnits(getUnit()));
+		if (style != null) {
+			style.setUnitOfMeasure(SymbologyUtils.convert2JavaUnits(getUnit()));
+		}
 
 		// if (symbol instanceof MultiLayerLineSymbol) {
 		// MultiLayerLineSymbol mLineSym = (MultiLayerLineSymbol) symbol;
@@ -613,8 +596,10 @@ public class SymbolEditor extends JPanel implements IWindow {
 	 */
 	protected void setLayerToSymbol(Symbolizer layer) {
 		this.style = layer;
+		// Initialize layer manager
+		getLayerManager();
+
 		// TODO gtintegration
-		// int i = getLayerManager().getSelectedLayerIndex();
 		// IMultiLayerSymbol s = (IMultiLayerSymbol) style;
 		// if (i >= 0 && i < s.getLayerCount()) {
 		// s.setLayer(s.getLayerCount() - 1 - i, layer);

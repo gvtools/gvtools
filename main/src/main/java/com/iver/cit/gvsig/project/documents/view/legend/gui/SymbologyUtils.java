@@ -17,8 +17,11 @@ import org.geotools.renderer.lite.StyledShapePainter;
 import org.geotools.renderer.style.SLDStyleFactory;
 import org.geotools.renderer.style.Style2D;
 import org.geotools.styling.LineSymbolizer;
+import org.geotools.styling.Mark;
 import org.geotools.styling.PointSymbolizer;
 import org.geotools.styling.PolygonSymbolizer;
+import org.geotools.styling.StyleFactory;
+import org.geotools.styling.StyleFactoryImpl;
 import org.geotools.styling.Symbolizer;
 import org.geotools.util.NumberRange;
 import org.opengis.feature.Feature;
@@ -39,11 +42,16 @@ import com.vividsolutions.jts.geom.Polygon;
 public class SymbologyUtils {
 	private static final Logger logger = Logger.getLogger(SymbologyUtils.class);
 
+	public static enum PointStyle {
+		CIRCLE_STYLE, SQUARE_STYLE, CROSS_STYLE, X_STYLE, TRIANGLE_STYLE, STAR_STYLE
+	}
+
 	public static final String FactorySymbolLibraryPath = FileUtils
 			.getAppHomeDir() + "Symbols";
 	public static String SymbolLibraryPath = FactorySymbolLibraryPath;
 
 	private static final GeometryFactory gf = new GeometryFactory();
+	private static final StyleFactory sf = new StyleFactoryImpl();
 
 	public static void drawInsideRectangle(Symbolizer symbolizer, Graphics2D g,
 			Rectangle r) {
@@ -118,7 +126,7 @@ public class SymbologyUtils {
 	 */
 	public static Symbolizer createSymbolFromXML(XMLEntity xml,
 			String defaultDescription) {
-		if (!xml.contains("desc")) {
+		if (xml != null && !xml.contains("desc")) {
 			if (defaultDescription == null)
 				defaultDescription = "";
 			xml.putProperty("desc", defaultDescription);
@@ -136,6 +144,9 @@ public class SymbologyUtils {
 	 * @return Object
 	 */
 	private static Object createFromXML(XMLEntity xml) {
+		if (xml == null) {
+			return null;
+		}
 		String className = null;
 		try {
 			className = xml.getStringProperty("className");
@@ -242,6 +253,25 @@ public class SymbologyUtils {
 			return null;
 		default:
 			return null;
+		}
+	}
+
+	public static Mark createMarkFromPointStyle(PointStyle style) {
+		switch (style) {
+		case CIRCLE_STYLE:
+			return sf.getCircleMark();
+		case CROSS_STYLE:
+			return sf.getCrossMark();
+		case SQUARE_STYLE:
+			return sf.getSquareMark();
+		case STAR_STYLE:
+			return sf.getStarMark();
+		case TRIANGLE_STYLE:
+			return sf.getTriangleMark();
+		case X_STYLE:
+			return sf.getXMark();
+		default:
+			return sf.getDefaultMark();
 		}
 	}
 }

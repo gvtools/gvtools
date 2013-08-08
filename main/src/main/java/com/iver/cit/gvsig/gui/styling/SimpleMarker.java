@@ -109,6 +109,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
@@ -116,21 +117,25 @@ import javax.swing.JPanel;
 import org.geotools.filter.FilterFactoryImpl;
 import org.geotools.styling.Displacement;
 import org.geotools.styling.DisplacementImpl;
+import org.geotools.styling.Fill;
 import org.geotools.styling.Graphic;
 import org.geotools.styling.Mark;
 import org.geotools.styling.PointSymbolizer;
 import org.geotools.styling.SLD;
-import org.geotools.styling.Style;
+import org.geotools.styling.Stroke;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.StyleFactoryImpl;
 import org.geotools.styling.Symbolizer;
 import org.gvsig.gui.beans.swing.GridBagLayoutPanel;
 import org.gvsig.gui.beans.swing.JIncrementalNumberField;
 import org.opengis.filter.FilterFactory;
+import org.opengis.style.GraphicalSymbol;
 
 import com.iver.andami.PluginServices;
 import com.iver.andami.messages.NotificationManager;
 import com.iver.cit.gvsig.gui.panels.ColorChooserPanel;
+import com.iver.cit.gvsig.project.documents.view.legend.gui.SymbologyUtils;
+import com.iver.cit.gvsig.project.documents.view.legend.gui.SymbologyUtils.PointStyle;
 
 /**
  * SimpleMarker allows the user to store and modify the main properties that
@@ -249,12 +254,17 @@ public class SimpleMarker extends AbstractTypeSymbolEditor implements
 		StyleFactory styleFactory = new StyleFactoryImpl();
 		FilterFactory filterFactory = new FilterFactoryImpl();
 
-		Mark mark = styleFactory.getCircleMark();
-		mark.setStroke(styleFactory.createStroke(
+		Mark mark = SymbologyUtils.createMarkFromPointStyle(cmbStyle
+				.getItemAt(cmbStyle.getSelectedIndex()));
+		Stroke stroke = styleFactory.createStroke(
 				filterFactory.literal(jccOutlineColor.getColor()),
-				filterFactory.literal(1)));
-		mark.setFill(styleFactory.createFill(filterFactory.literal(jccColor
-				.getColor())));
+				filterFactory.literal(1));
+		stroke.setOpacity(filterFactory.literal(jccOutlineColor.getAlpha() / 255.0));
+		mark.setStroke(stroke);
+		Fill fill = styleFactory.createFill(filterFactory.literal(jccColor
+				.getColor()));
+		fill.setOpacity(filterFactory.literal(jccColor.getAlpha() / 255.0));
+		mark.setFill(fill);
 
 		Graphic graphic = styleFactory.createDefaultGraphic();
 		graphic.graphicalSymbols().clear();
@@ -292,24 +302,65 @@ public class SimpleMarker extends AbstractTypeSymbolEditor implements
 				}
 
 				PointSymbolizer style = (PointSymbolizer) sym;
-				Color color = SLD.color(style);
-				jccColor.setColor(color);
 
 				Graphic graphic = style.getGraphic();
 				Displacement displacement = graphic.getDisplacement();
 
 				txtSize.setDouble(graphic.getSize().evaluate(null,
 						Integer.class));
-				txtXOffset.setDouble(displacement.getDisplacementX().evaluate(
-						null, Integer.class));
-				txtYOffset.setDouble(displacement.getDisplacementY().evaluate(
-						null, Integer.class));
-				cmbStyle.setSymbolColor(color);
-				chkUseOutline.setSelected(false);
-				// TODO gtintegration
-				// chkUseOutline.setSelected(sym.hasOutline());
-				// cmbStyle.setOutlineColor(sym.getOutlineColor());
-				// cmbStyle.setSelectedItem(new Integer(sym.getStyle()));
+				if (displacement != null) {
+					txtXOffset.setDouble(displacement.getDisplacementX()
+							.evaluate(null, Integer.class));
+					txtYOffset.setDouble(displacement.getDisplacementY()
+							.evaluate(null, Integer.class));
+				} else {
+					txtXOffset.setDouble(0);
+					txtYOffset.setDouble(0);
+				}
+
+				List<GraphicalSymbol> graphicalSymbols = graphic
+						.graphicalSymbols();
+				for (GraphicalSymbol graphicalSymbol : graphicalSymbols) {
+					if (graphicalSymbol instanceof Mark) {
+						Mark mark = (Mark) graphicalSymbol;
+						Stroke stroke = mark.getStroke();
+						Color strokeColor = SLD.color(stroke);
+
+						Fill fill = mark.getFill();
+						Color fillColor = SLD.color(fill);
+
+						jccColor.setColor(fillColor);
+						jccColor.setAlpha((int) Math.round(SLD.opacity(fill) * 255));
+						jccOutlineColor.setColor(strokeColor);
+						jccOutlineColor.setAlpha((int) Math.round(SLD
+								.opacity(stroke) * 255));
+
+						cmbStyle.setSymbolColor(fillColor);
+						cmbStyle.setOutlineColor(strokeColor);
+
+						chkUseOutline.setSelected(stroke != null
+								&& SLD.width(stroke) > 0);
+						String name = mark.getWellKnownName().evaluate(null,
+								String.class);
+						if (name.equalsIgnoreCase("Circle")) {
+							cmbStyle.setSelectedItem(PointStyle.CIRCLE_STYLE);
+						} else if (name.equalsIgnoreCase("Cross")) {
+							cmbStyle.setSelectedItem(PointStyle.CROSS_STYLE);
+						} else if (name.equalsIgnoreCase("Square")) {
+							cmbStyle.setSelectedItem(PointStyle.SQUARE_STYLE);
+						} else if (name.equalsIgnoreCase("Star")) {
+							cmbStyle.setSelectedItem(PointStyle.STAR_STYLE);
+						} else if (name.equalsIgnoreCase("Triangle")) {
+							cmbStyle.setSelectedItem(PointStyle.TRIANGLE_STYLE);
+						} else if (name.equalsIgnoreCase("X")) {
+							cmbStyle.setSelectedItem(PointStyle.X_STYLE);
+						} else {
+							cmbStyle.setSelectedItem(PointStyle.CIRCLE_STYLE);
+						}
+
+						break;
+					}
+				}
 			}
 		} catch (IndexOutOfBoundsException ioEx) {
 			NotificationManager.addWarning("Symbol layer index out of bounds",
@@ -317,8 +368,8 @@ public class SimpleMarker extends AbstractTypeSymbolEditor implements
 		}
 	}
 
-	public Class<? extends Style> getSymbolClass() {
-		return Style.class;
+	public Class<? extends Symbolizer> getSymbolClass() {
+		return Symbolizer.class;
 	}
 
 	public void actionPerformed(ActionEvent e) {

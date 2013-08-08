@@ -428,13 +428,6 @@ public class SymbolSelector extends JPanel implements ISymbolSelector,
 			jcc1.setEnabled(mySelectedElement != null);
 			jcc2.setEnabled(mySelectedElement != null);
 
-			// TODO gtintegration
-			// if (mySelectedElement instanceof IMultiLayerSymbol) {
-			// jcc1.setColor(Color.WHITE);
-			// jcc2.setColor(Color.WHITE);
-			// jcc1.setEnabled(false);
-			// jcc2.setEnabled(false);
-			// }
 			if (mySelectedElement instanceof PointSymbolizer) {
 				PointSymbolizer m = (PointSymbolizer) mySelectedElement;
 				txtSize.setEnabled(m != null);
@@ -476,13 +469,6 @@ public class SymbolSelector extends JPanel implements ISymbolSelector,
 
 					jcc2.setColor(strokeColor);
 					txtWidth.setDouble(SLD.width(f.getStroke()));
-
-					// TODO gtintegration
-					// if (f instanceof MultiLayerFillSymbol) {
-					// txtWidth.setEnabled(false);
-					// cmbReferenceSystem.setEnabled(false);
-					// cmbUnits.setEnabled(false);
-					// }
 				}
 			} else if (mySelectedElement instanceof TextSymbolizer) {
 				TextSymbolizer t = (TextSymbolizer) mySelectedElement;

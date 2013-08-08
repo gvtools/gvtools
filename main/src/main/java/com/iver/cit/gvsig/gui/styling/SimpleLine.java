@@ -135,7 +135,6 @@ import org.geotools.filter.FilterFactoryImpl;
 import org.geotools.styling.LineSymbolizer;
 import org.geotools.styling.SLD;
 import org.geotools.styling.Stroke;
-import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.StyleFactoryImpl;
 import org.geotools.styling.Symbolizer;
@@ -302,8 +301,8 @@ public class SimpleLine extends AbstractTypeSymbolEditor implements
 		}
 	}
 
-	public Class<? extends Style> getSymbolClass() {
-		return Style.class;
+	public Class<? extends Symbolizer> getSymbolClass() {
+		return Symbolizer.class;
 	}
 
 	public void actionPerformed(ActionEvent e) {

@@ -48,8 +48,11 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -57,23 +60,34 @@ import java.util.List;
 import java.util.prefs.Preferences;
 
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JTree;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
+import javax.xml.transform.TransformerException;
 
+import org.geotools.styling.FeatureTypeConstraint;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Rule;
+import org.geotools.styling.SLDParser;
+import org.geotools.styling.SLDTransformer;
 import org.geotools.styling.Style;
+import org.geotools.styling.StyleFactory;
 import org.geotools.styling.StyleFactoryImpl;
+import org.geotools.styling.StyledLayerDescriptor;
 import org.geotools.styling.Symbolizer;
+import org.geotools.styling.UserLayer;
 import org.gvsig.gui.beans.swing.JButton;
 import org.gvsig.layer.Layer;
 
@@ -123,223 +137,128 @@ public class LegendManager extends AbstractThemeManagerPage {
 		defaultLegendFolderPath = prefs.get("LegendsFolder", "");
 	}
 
-	// private ActionListener loadSaveLegendAction = new ActionListener() {
-	// public void actionPerformed(java.awt.event.ActionEvent e) {
-	// JComponent c = (JComponent) e.getSource();
-	// if (c.equals(getBtnSaveLegend())) {
-	//
-	// JLegendFileChooser jfc = new JLegendFileChooser(
-	// getLegendDrivers(), true);
-	// jfc.setAcceptAllFileFilterUsed(false);
-	//
-	// File basedir = null;
-	//
-	// jfc.setCurrentDirectory(basedir);
-	// if (jfc.showSaveDialog((Component) PluginServices
-	// .getMainFrame()) == JFileChooser.APPROVE_OPTION) {
-	//
-	// File file = jfc.getSelectedFile();
-	// String version = JLegendFileChooser.getDriverVersion();
-	// IFMapLegendDriver driver = jfc.getSuitableDriver();
-	//
-	// if (file.exists()) {
-	// Object[] options = {
-	// PluginServices.getText(this, "yes"),
-	// PluginServices.getText(this, "no"),
-	// PluginServices.getText(this, "Cancel") };
-	//
-	// int answer = JOptionPane
-	// .showOptionDialog(
-	// (Component) PluginServices
-	// .getMainFrame(),
-	// PluginServices
-	// .getText(this,
-	// "fichero_ya_existe_seguro_desea_guardarlo"),
-	// PluginServices.getText(this,
-	// "confirmation_dialog"),
-	// JOptionPane.YES_NO_CANCEL_OPTION,
-	// JOptionPane.QUESTION_MESSAGE, null,
-	// options, options[1]);
-	// if (answer != JOptionPane.OK_OPTION) {
-	// // 'Cancel' pressed or window closed: don't save
-	// // anythig, exit save dialog
-	// return;
-	// }
-	// }
-	//
-	// try {
-	// driver.write(layer.getMapContext().getLayers(), layer,
-	// activePanel.getLegend(), file, version);
-	//
-	// } catch (LegendDriverException e1) {
-	// int type = e1.getType();
-	// String message = PluginServices.getText(this,
-	// "could_not_save_legend") + ":\n";
-	//
-	// if ((type & LegendDriverException.SAVE_LEGEND_ERROR) != 0) {
-	// type = type
-	// & ~LegendDriverException.SAVE_LEGEND_ERROR;
-	// message += PluginServices.getText(this,
-	// "error_writing_file") + ".\n";
-	// }
-	// if ((type & LegendDriverException.UNSUPPORTED_LEGEND_CREATION) != 0) {
-	// type = type
-	// & ~LegendDriverException.UNSUPPORTED_LEGEND_CREATION;
-	// message += "-"
-	// + PluginServices.getText(this,
-	// "legend_format_not_yet_supported")
-	// + "\n";
-	// }
-	// if (type != 0) {
-	// message = "-"
-	// + PluginServices.getText(this,
-	// "unknown_error") + "\n";
-	// }
-	// JOptionPane.showMessageDialog(
-	// (Component) PluginServices.getMainFrame(),
-	// message);
-	// }
-	// }
-	// } else if (c.equals(getBtnLoadLegend())) {
-	//
-	// JLegendFileChooser jfc = new JLegendFileChooser(
-	// getLegendDrivers());
-	// jfc.setAcceptAllFileFilterUsed(false);
-	//
-	// if (jfc.showOpenDialog((Component) PluginServices
-	// .getMainFrame()) == JFileChooser.APPROVE_OPTION) {
-	// File file = jfc.getSelectedFile();
-	// IFMapLegendDriver driver = jfc.getSuitableDriver();
-	// String path = file.getAbsolutePath();
-	// defaultLegendFolderPath = path.substring(0,
-	// path.lastIndexOf(File.separator));
-	//
-	// try {
-	// table = driver.read(layer.getMapContext().getLayers(),
-	// layer, file);
-	//
-	// if (table.containsKey(layer))
-	// applyLegend((ILegend) table.get(layer));
-	//
-	// } catch (LegendDriverException e1) {
-	// int type = e1.getType();
-	// String message = PluginServices.getText(this,
-	// "the_legend_will_not_be_applied") + ":\n";
-	// boolean hasReason = false;
-	//
-	// if ((type & LegendDriverException.CLASSIFICATION_FIELDS_NOT_FOUND) != 0)
-	// {
-	// type = type
-	// & ~LegendDriverException.CLASSIFICATION_FIELDS_NOT_FOUND;
-	// message += "-"
-	// + PluginServices
-	// .getText(this,
-	// "classification_field_does_not_exists")
-	// + "\n";
-	// hasReason = true;
-	// }
-	// if ((type & LegendDriverException.LEGEND_TYPE_NOT_YET_SUPPORTED) != 0) {
-	// type = type
-	// & ~LegendDriverException.LEGEND_TYPE_NOT_YET_SUPPORTED;
-	// message += "-"
-	// + PluginServices.getText(this,
-	// "legend_type_not_yet_supported")
-	// + "\n";
-	// hasReason = true;
-	// }
-	// if ((type & LegendDriverException.SYMBOL_TYPE_NOT_YET_SUPPORTED) != 0) {
-	// type = type
-	// & ~LegendDriverException.SYMBOL_TYPE_NOT_YET_SUPPORTED;
-	// message += "-"
-	// + PluginServices.getText(this,
-	// "unsupported_symbol_type") + "\n";
-	// hasReason = true;
-	// }
-	// if ((type & LegendDriverException.LAYER_SHAPETYPE_MISMATCH) != 0) {
-	// type = type
-	// & ~LegendDriverException.LAYER_SHAPETYPE_MISMATCH;
-	// message += "-"
-	// + PluginServices
-	// .getText(this,
-	// "layer_geometry_and_legend_types_are_incompatible")
-	// + "\n";
-	// hasReason = true;
-	// }
-	// if ((type & LegendDriverException.PARSE_LEGEND_FILE_ERROR) != 0) {
-	// type = type
-	// & ~LegendDriverException.PARSE_LEGEND_FILE_ERROR;
-	// message += "-"
-	// + PluginServices.getText(this,
-	// "failed_reading_file") + "\n";
-	// hasReason = true;
-	// }
-	// if ((type & LegendDriverException.UNSUPPORTED_LEGEND_FILE_VERSION) != 0)
-	// {
-	// type = type
-	// & ~LegendDriverException.UNSUPPORTED_LEGEND_FILE_VERSION;
-	// message += "-"
-	// + PluginServices.getText(this,
-	// "unsupported_legend_file_version")
-	// + "\n";
-	// hasReason = true;
-	// }
-	// if ((type & LegendDriverException.UNSUPPORTED_LEGEND_READING) != 0) {
-	// type = type
-	// & ~LegendDriverException.UNSUPPORTED_LEGEND_READING;
-	// message += "-"
-	// + PluginServices.getText(this,
-	// "unsupported_legend_file_format")
-	// + "\n";
-	// hasReason = true;
-	// }
-	// if ((type & LegendDriverException.LAYER_NAME_NOT_FOUND) != 0) {
-	// type = type
-	// & ~LegendDriverException.LAYER_NAME_NOT_FOUND;
-	// message += "-"
-	// + PluginServices.getText(this,
-	// "could_not_find_layer") + "\n";
-	// hasReason = true;
-	// }
-	// if (!hasReason) {
-	// message = "-"
-	// + PluginServices.getText(this,
-	// "unknown_error") + "\n";
-	// }
-	// JOptionPane.showMessageDialog(
-	// (Component) PluginServices.getMainFrame(),
-	// message);
-	// }
-	// getBtnSaveLegend().setEnabled(activePanel != null);
-	// }
-	// }
-	// }
-	//
-	// private IFMapLegendDriver[] getLegendDrivers() {
-	// Class<?>[] legendDriverClasses = legendDriverPool
-	// .toArray(new Class[0]);
-	// ArrayList<IFMapLegendDriver> drivers = new
-	// ArrayList<IFMapLegendDriver>();
-	// for (int i = 0; i < legendDriverClasses.length; i++) {
-	// String message = PluginServices.getText(this,
-	// "adding_legend_file_format_support") + ": ";
-	// try {
-	// Class<?> c = legendDriverClasses[i];
-	// drivers.add((IFMapLegendDriver) c.newInstance());
-	// } catch (Exception e) {
-	// NotificationManager
-	// .addError(
-	// message
-	// + PluginServices.getText(this,
-	// "failed"), e);
-	// }
-	// NotificationManager.addInfo(message
-	// + PluginServices.getText(this, "OK"));
-	//
-	// }
-	// return (IFMapLegendDriver[]) drivers
-	// .toArray(new IFMapLegendDriver[0]);
-	// };
-	// };
+	private ActionListener loadSaveLegendAction = new ActionListener() {
+		public void actionPerformed(java.awt.event.ActionEvent e) {
+			JComponent c = (JComponent) e.getSource();
+			FileFilter fileFilter = new FileFilter() {
+				@Override
+				public String getDescription() {
+					return "SLD files";
+				}
+
+				@Override
+				public boolean accept(File f) {
+					return f.isDirectory()
+							|| f.getName().toLowerCase().endsWith(".sld");
+				}
+			};
+
+			if (c.equals(getBtnSaveLegend())) {
+
+				JFileChooser jfc = new JFileChooser();
+				jfc.setFileFilter(fileFilter);
+				jfc.setAcceptAllFileFilterUsed(false);
+
+				File basedir = null;
+
+				jfc.setCurrentDirectory(basedir);
+				if (jfc.showSaveDialog((Component) PluginServices
+						.getMainFrame()) == JFileChooser.APPROVE_OPTION) {
+
+					File file = jfc.getSelectedFile();
+					if (file.exists()) {
+						Object[] options = {
+								PluginServices.getText(this, "yes"),
+								PluginServices.getText(this, "no"),
+								PluginServices.getText(this, "Cancel") };
+
+						int answer = JOptionPane
+								.showOptionDialog(
+										(Component) PluginServices
+												.getMainFrame(),
+										PluginServices
+												.getText(this,
+														"fichero_ya_existe_seguro_desea_guardarlo"),
+										PluginServices.getText(this,
+												"confirmation_dialog"),
+										JOptionPane.YES_NO_CANCEL_OPTION,
+										JOptionPane.QUESTION_MESSAGE, null,
+										options, options[1]);
+						if (answer != JOptionPane.OK_OPTION) {
+							// 'Cancel' pressed or window closed: don't save
+							// anythig, exit save dialog
+							return;
+						}
+					}
+
+					StyleFactory factory = new StyleFactoryImpl();
+
+					// Create rule
+					Rule rule = factory.createRule();
+					legend = activePanel.getLegend();
+					rule.symbolizers().add(legend);
+
+					// Create feature type style
+					FeatureTypeStyle featureTypeStyle = factory
+							.createFeatureTypeStyle();
+					featureTypeStyle.rules().clear();
+					featureTypeStyle.rules().add(rule);
+
+					// Create style
+					Style style = factory.createStyle();
+					List<FeatureTypeStyle> featureTypeStyles = style
+							.featureTypeStyles();
+					featureTypeStyles.clear();
+					featureTypeStyles.add(featureTypeStyle);
+
+					// Create SLD
+					StyledLayerDescriptor sld = factory
+							.createStyledLayerDescriptor();
+					UserLayer layer = factory.createUserLayer();
+					layer.setLayerFeatureConstraints(new FeatureTypeConstraint[] { null });
+					sld.addStyledLayer(layer);
+					layer.addUserStyle(style);
+
+					SLDTransformer styleTransform = new SLDTransformer();
+					try {
+						String xml = styleTransform.transform(sld);
+						FileWriter writer = new FileWriter(file);
+						writer.write(xml);
+						writer.close();
+					} catch (TransformerException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+			} else if (c.equals(getBtnLoadLegend())) {
+				JFileChooser jfc = new JFileChooser();
+				jfc.setAcceptAllFileFilterUsed(false);
+				jfc.setFileFilter(fileFilter);
+
+				if (jfc.showOpenDialog((Component) PluginServices
+						.getMainFrame()) == JFileChooser.APPROVE_OPTION) {
+					File file = jfc.getSelectedFile();
+					String path = file.getAbsolutePath();
+					defaultLegendFolderPath = path.substring(0,
+							path.lastIndexOf(File.separator));
+
+					try {
+						Style[] parser = new SLDParser(new StyleFactoryImpl(), file)
+								.readXML();
+						Style[] styles = parser;
+						applyLegend(styles[0]);
+						getBtnSaveLegend().setEnabled(activePanel != null);
+					} catch (FileNotFoundException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+			}
+		}
+	};
 
 	public LegendManager() {
 		initialize();
@@ -406,12 +325,7 @@ public class LegendManager extends AbstractThemeManagerPage {
 		if (btnSaveLegend == null) {
 			btnSaveLegend = new JButton(PluginServices.getText(this,
 					"Guardar_leyenda") + "...");
-			btnSaveLegend.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					throw new UnsupportedOperationException();
-				}
-			});
+			btnSaveLegend.addActionListener(loadSaveLegendAction);
 		}
 		return btnSaveLegend;
 	}
@@ -420,12 +334,7 @@ public class LegendManager extends AbstractThemeManagerPage {
 		if (btnLoadLegend == null) {
 			btnLoadLegend = new JButton(PluginServices.getText(this,
 					"Recuperar_leyenda") + "...");
-			btnLoadLegend.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					throw new UnsupportedOperationException();
-				}
-			});
+			btnLoadLegend.addActionListener(loadSaveLegendAction);
 		}
 		return btnLoadLegend;
 	}

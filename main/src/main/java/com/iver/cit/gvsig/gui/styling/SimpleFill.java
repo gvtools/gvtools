@@ -302,8 +302,8 @@ public class SimpleFill extends AbstractTypeSymbolEditor implements
 		sldOutlineTransparency.addChangeListener(this);
 	}
 
-	public Class<? extends Style> getSymbolClass() {
-		return Style.class;
+	public Class<? extends Symbolizer> getSymbolClass() {
+		return Symbolizer.class;
 	}
 
 	public void actionPerformed(ActionEvent e) {
