@@ -77,6 +77,8 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.geotools.filter.FilterFactoryImpl;
+import org.geotools.styling.Description;
+import org.geotools.styling.DescriptionImpl;
 import org.geotools.styling.LineSymbolizer;
 import org.geotools.styling.Mark;
 import org.geotools.styling.PointSymbolizer;
@@ -93,6 +95,8 @@ import org.gvsig.gui.beans.swing.JComboBoxFontSizes;
 import org.gvsig.gui.beans.swing.JComboBoxFonts;
 import org.gvsig.gui.beans.swing.JFileChooser;
 import org.gvsig.gui.beans.swing.JIncrementalNumberField;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Literal;
 import org.opengis.style.GraphicalSymbol;
 
 import com.iver.andami.PluginServices;
@@ -119,6 +123,8 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 public class SymbolSelector extends JPanel implements ISymbolSelector,
 		ActionListener, FocusListener, IWindowListener {
 	public static final String SYMBOL_FILE_EXTENSION = ".sym";
+
+	private static final FilterFactory filterFactory = new FilterFactoryImpl();
 
 	private static final long serialVersionUID = -6405660392303659551L;
 	private JPanel jPanel = null;
@@ -387,12 +393,14 @@ public class SymbolSelector extends JPanel implements ISymbolSelector,
 					sp.setSymbol(value);
 					sp.setBackground(bgColor);
 					pnl.add(sp);
-					String desc = value.getDescription().getAbstract()
-							.toString();
-					if (desc == null) {
-						desc = "[" + PluginServices.getText(this, "no_desc")
-								+ "]";
+
+					String desc = "[" + PluginServices.getText(this, "no_desc")
+							+ "]";
+					Description description = value.getDescription();
+					if (description != null && description.getTitle() != null) {
+						desc = description.getTitle().toString();
 					}
+
 					JLabel lbl = new JLabel(desc);
 					lbl.setBackground(bgColor);
 					lbl.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -433,7 +441,9 @@ public class SymbolSelector extends JPanel implements ISymbolSelector,
 				txtSize.setEnabled(m != null);
 				txtAngle.setEnabled(m != null);
 				if (m != null) {
+					Mark mark = SymbologyUtils.getFirstMark(m);
 					jcc1.setColor(SLD.color(m));
+					jcc1.setAlpha((int) (SLD.opacity(mark.getFill()) * 255));
 					txtSize.setDouble(SLD.graphic(m).getSize()
 							.evaluate(null, Double.class));
 					txtAngle.setDouble(Math.toDegrees(m.getGraphic()
@@ -444,7 +454,7 @@ public class SymbolSelector extends JPanel implements ISymbolSelector,
 				txtSize.setEnabled(l != null);
 				if (l != null) {
 					jcc1.setColor(SLD.color(l));
-					jcc1.setAlpha((int) SLD.opacity(l.getStroke()) * 255);
+					jcc1.setAlpha((int) (SLD.opacity(l.getStroke()) * 255));
 					txtSize.setDouble(SLD.width(l));
 				}
 			} else if (mySelectedElement instanceof PolygonSymbolizer) {
@@ -836,22 +846,23 @@ public class SymbolSelector extends JPanel implements ISymbolSelector,
 		if (mySelectedElement == null)
 			return;
 
-		FilterFactoryImpl factory = new FilterFactoryImpl();
 		if (mySelectedElement instanceof PolygonSymbolizer && txtWidth != null) {
 			PolygonSymbolizer f = (PolygonSymbolizer) mySelectedElement;
 			Stroke stroke = f.getStroke();
 			if (stroke != null) {
-				stroke.setWidth(factory.literal(txtWidth.getDouble()));
+				stroke.setWidth(filterFactory.literal(txtWidth.getDouble()));
 			}
 		}
 
 		if (txtSize != null) {
 			if (mySelectedElement instanceof PointSymbolizer) {
 				PointSymbolizer m = (PointSymbolizer) mySelectedElement;
-				m.getGraphic().setSize(factory.literal(txtSize.getDouble()));
+				m.getGraphic().setSize(
+						filterFactory.literal(txtSize.getDouble()));
 			} else if (mySelectedElement instanceof LineSymbolizer) {
 				LineSymbolizer l = (LineSymbolizer) mySelectedElement;
-				l.getStroke().setWidth(factory.literal(txtSize.getDouble()));
+				l.getStroke().setWidth(
+						filterFactory.literal(txtSize.getDouble()));
 			}
 		}
 
@@ -924,8 +935,7 @@ public class SymbolSelector extends JPanel implements ISymbolSelector,
 				desc = txtDesc.getText().trim();
 			}
 			Symbolizer s = getSelectedObject();
-			s.getDescription().setAbstract(desc);
-			s.getDescription().setTitle(desc);
+			s.setDescription(new DescriptionImpl(desc, desc));
 
 			String symbolFileName = targetFile.getAbsolutePath()
 					.substring(
@@ -945,12 +955,10 @@ public class SymbolSelector extends JPanel implements ISymbolSelector,
 			return;
 		Symbolizer selectedElement = jPanelPreview.getSymbol();
 		performActionOn(selectedElement, (JComponent) e.getSource());
-		SymbolSelector.this.repaint();
+		repaint();
 	}
 
 	protected void performActionOn(Symbolizer selectedElement, JComponent comp) {
-		FilterFactoryImpl factory = new FilterFactoryImpl();
-
 		if (comp.equals(getBtnProperties())) {
 			propertiesPressed();
 		} else if (comp.equals(getBtnNewSymbol())) {
@@ -964,64 +972,59 @@ public class SymbolSelector extends JPanel implements ISymbolSelector,
 				return;
 
 			Color c = jcc1.getColor();
+			Literal opacity = filterFactory.literal(jcc1.getAlpha() / 255.0);
 
 			if (selectedElement instanceof PointSymbolizer) {
 				PointSymbolizer m = (PointSymbolizer) selectedElement;
 				for (GraphicalSymbol symbol : m.getGraphic().graphicalSymbols()) {
 					if (symbol instanceof Mark) {
 						Mark mark = (Mark) symbol;
-						mark.getFill().setColor(factory.literal(c));
-						mark.getStroke().setColor(factory.literal(c));
+						mark.getFill().setColor(filterFactory.literal(c));
+						mark.getStroke().setColor(filterFactory.literal(c));
 
-						mark.getFill().setOpacity(
-								factory.literal(c.getAlpha() / 255.0));
-						mark.getStroke().setOpacity(
-								factory.literal(c.getAlpha() / 255.0));
+						mark.getFill().setOpacity(opacity);
+						mark.getStroke().setOpacity(opacity);
 					}
 				}
 			} else if (selectedElement instanceof LineSymbolizer) {
 				LineSymbolizer l = (LineSymbolizer) selectedElement;
-				l.getStroke().setColor(factory.literal(c));
+				l.getStroke().setColor(filterFactory.literal(c));
+				l.getStroke().setOpacity(opacity);
 			} else if (selectedElement instanceof PolygonSymbolizer) {
 				PolygonSymbolizer f = (PolygonSymbolizer) selectedElement;
 				if (!jcc1.getUseColorisSelected()) {
-					f.getFill().setOpacity(factory.literal(0));
+					f.getFill().setOpacity(filterFactory.literal(0));
 				} else {
-					f.getFill().setOpacity(
-							factory.literal(c.getAlpha() / 255.0));
+					f.getFill().setOpacity(opacity);
 				}
-				f.getFill().setColor(factory.literal(c));
+				f.getFill().setColor(filterFactory.literal(c));
 			} else if (selectedElement instanceof TextSymbolizer) {
 				TextSymbolizer t = (TextSymbolizer) selectedElement;
-				t.getFill().setColor(factory.literal(c));
+				t.getFill().setColor(filterFactory.literal(c));
 			}
 		} else if (comp.equals(jcc2)) {
 			if (selectedElement == null)
 				return;
-			Color c = jcc2.getColor();
 
 			if (selectedElement instanceof PolygonSymbolizer) {
 				PolygonSymbolizer f = (PolygonSymbolizer) selectedElement;
 				Stroke stroke = f.getStroke();
 
-				if (!jcc2.getUseColorisSelected()) {
-					f.getStroke().setOpacity(factory.literal(0));
-				} else {
-					f.getStroke().setOpacity(
-							factory.literal(c.getAlpha() / 255.0));
-				}
+				double alpha = jcc2.getUseColorisSelected() ? jcc2.getAlpha() / 255.0
+						: 0;
 
-				stroke.setColor(factory.literal(c));
+				stroke.setOpacity(filterFactory.literal(alpha));
+				stroke.setColor(filterFactory.literal(jcc2.getColor()));
 			}
 		} else if (comp.equals(txtSize)) {
 			double s = txtSize.getDouble();
 
 			if (selectedElement instanceof PointSymbolizer) {
 				PointSymbolizer m = (PointSymbolizer) selectedElement;
-				m.getGraphic().setSize(factory.literal(s));
+				m.getGraphic().setSize(filterFactory.literal(s));
 			} else if (selectedElement instanceof LineSymbolizer) {
 				LineSymbolizer l = (LineSymbolizer) selectedElement;
-				l.getStroke().setWidth(factory.literal(s));
+				l.getStroke().setWidth(filterFactory.literal(s));
 			}
 		} else if (comp.equals(cmbUnits)) {
 			selectedElement.setUnitOfMeasure(SymbologyUtils
@@ -1033,19 +1036,19 @@ public class SymbolSelector extends JPanel implements ISymbolSelector,
 			double w = txtWidth.getDouble();
 			if (selectedElement instanceof PolygonSymbolizer) {
 				PolygonSymbolizer f = (PolygonSymbolizer) selectedElement;
-				f.getStroke().setWidth(factory.literal(w));
+				f.getStroke().setWidth(filterFactory.literal(w));
 			}
 		} else if (comp.equals(cmbFontSize)) {
 			double s = ((Integer) cmbFontSize.getSelectedItem()).doubleValue();
 			if (selectedElement instanceof TextSymbolizer) {
 				TextSymbolizer t = (TextSymbolizer) selectedElement;
-				t.getFont().setSize(factory.literal(s));
+				t.getFont().setSize(filterFactory.literal(s));
 			}
 		} else if (comp.equals(txtAngle)) {
 			double a = Math.toRadians(txtAngle.getDouble());
 			if (selectedElement instanceof PointSymbolizer) {
 				PointSymbolizer m = (PointSymbolizer) selectedElement;
-				m.getGraphic().setRotation(factory.literal(a));
+				m.getGraphic().setRotation(filterFactory.literal(a));
 			}
 		}
 	}
@@ -1124,8 +1127,13 @@ public class SymbolSelector extends JPanel implements ISymbolSelector,
 						// int copy = MouseEvent.CTRL_DOWN_MASK |
 						// MouseEvent.BUTTON1_DOWN_MASK;
 
-						library.addElement(sym, sym.getDescription()
-								.getAbstract().toString(), destFolder);
+						String text = "";
+						Description description = sym.getDescription();
+						if (description != null
+								&& description.getTitle() != null) {
+							text = description.getTitle().toString();
+						}
+						library.addElement(sym, text, destFolder);
 						if ((e.getModifiers() & (move)) != 0) {
 							library.removeElement(sym, sourceFolder);
 						}

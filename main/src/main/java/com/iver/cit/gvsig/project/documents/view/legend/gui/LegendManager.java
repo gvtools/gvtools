@@ -77,11 +77,15 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import javax.xml.transform.TransformerException;
 
+import org.geotools.filter.FilterFactoryImpl;
+import org.geotools.styling.DescriptionImpl;
 import org.geotools.styling.FeatureTypeConstraint;
 import org.geotools.styling.FeatureTypeStyle;
+import org.geotools.styling.LineSymbolizer;
 import org.geotools.styling.Rule;
 import org.geotools.styling.SLDParser;
 import org.geotools.styling.SLDTransformer;
+import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.StyleFactoryImpl;
@@ -90,6 +94,7 @@ import org.geotools.styling.Symbolizer;
 import org.geotools.styling.UserLayer;
 import org.gvsig.gui.beans.swing.JButton;
 import org.gvsig.layer.Layer;
+import org.opengis.filter.FilterFactory;
 
 import com.iver.andami.PluginServices;
 import com.iver.andami.messages.NotificationManager;
@@ -246,8 +251,8 @@ public class LegendManager extends AbstractThemeManagerPage {
 							path.lastIndexOf(File.separator));
 
 					try {
-						Style[] parser = new SLDParser(new StyleFactoryImpl(), file)
-								.readXML();
+						Style[] parser = new SLDParser(new StyleFactoryImpl(),
+								file).readXML();
 						Style[] styles = parser;
 						applyLegend(styles[0]);
 						getBtnSaveLegend().setEnabled(activePanel != null);

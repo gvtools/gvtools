@@ -141,7 +141,6 @@ import org.geotools.styling.LineSymbolizer;
 import org.geotools.styling.PolygonSymbolizer;
 import org.geotools.styling.SLD;
 import org.geotools.styling.Stroke;
-import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.StyleFactoryImpl;
 import org.geotools.styling.Symbolizer;
@@ -252,14 +251,14 @@ public class SimpleFill extends AbstractTypeSymbolEditor implements
 			outline = ((LineSymbolizer) symbolizer).getStroke();
 			outline.setWidth(filterFactory.literal(txtOutlineWidth.getDouble()));
 			int opacity = useBorder.isSelected() ? outlineAlpha : 0;
-			outline.setOpacity(filterFactory.literal(opacity));
+			outline.setOpacity(filterFactory.literal(opacity / 255.0));
 		}
 
 		Fill fill;
 		Color color = jccFillColor.getColor();
 		if (jccFillColor.getUseColorisSelected()) {
 			fill = styleFactory.createFill(filterFactory.literal(color),
-					filterFactory.literal(color.getAlpha() / 255));
+					filterFactory.literal(jccFillColor.getAlpha() / 255.0));
 		} else {
 			fill = styleFactory.createFill(filterFactory.literal(color),
 					filterFactory.literal(0));
@@ -276,8 +275,10 @@ public class SimpleFill extends AbstractTypeSymbolEditor implements
 		PolygonSymbolizer style = (PolygonSymbolizer) sym;
 		// fill
 
-		jccFillColor.setUseColorIsSelected(SLD.opacity(style.getFill()) > 0.0);
-		jccFillColor.setColor(SLD.color(style.getFill()));
+		Fill fill = style.getFill();
+		jccFillColor.setUseColorIsSelected(SLD.opacity(fill) > 0.0);
+		jccFillColor.setColor(SLD.color(fill));
+		jccFillColor.setAlpha((int) (SLD.opacity(fill) * 255));
 		// outline
 
 		sldOutlineTransparency.removeChangeListener(this);

@@ -76,7 +76,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -86,7 +85,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
@@ -367,9 +365,11 @@ public class ColorChooserPanel extends JPanel {
 	public void setAlpha(int alpha) {
 		muteSldTransparency = true;
 
-		if (color != null)
+		if (color != null) {
+			int a = withTransp ? 255 : alpha;
 			color = new Color(color.getRed(), color.getGreen(),
-					color.getBlue(), alpha);
+					color.getBlue(), a);
+		}
 
 		if (withTransp) {
 			sldTransparency.setValue(alpha);
@@ -428,21 +428,4 @@ public class ColorChooserPanel extends JPanel {
 		}
 
 	}
-
-	public static void main(String[] args) {
-		JFrame f = new JFrame();
-
-		final ColorChooserPanel ce2 = new ColorChooserPanel(true, true);
-
-		JPanel content = new JPanel(new GridLayout(2, 1));
-
-		content.add(ce2);
-
-		f.setContentPane(content);
-		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		f.pack();
-		f.setVisible(true);
-
-	}
-
 }

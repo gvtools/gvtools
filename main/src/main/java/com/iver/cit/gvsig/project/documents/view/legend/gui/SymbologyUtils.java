@@ -26,6 +26,7 @@ import org.geotools.styling.Symbolizer;
 import org.geotools.util.NumberRange;
 import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.style.GraphicalSymbol;
 
 import com.iver.utiles.FileUtils;
 import com.iver.utiles.IPersistence;
@@ -273,5 +274,16 @@ public class SymbologyUtils {
 		default:
 			return sf.getDefaultMark();
 		}
+	}
+
+	public static Mark getFirstMark(PointSymbolizer symbolizer) {
+		for (GraphicalSymbol graphicalSymbol : symbolizer.getGraphic()
+				.graphicalSymbols()) {
+			if (graphicalSymbol instanceof Mark) {
+				return (Mark) graphicalSymbol;
+			}
+		}
+
+		return null;
 	}
 }

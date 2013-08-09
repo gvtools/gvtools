@@ -132,6 +132,7 @@ import java.util.ArrayList;
 import javax.swing.JPanel;
 
 import org.geotools.filter.FilterFactoryImpl;
+import org.geotools.styling.DescriptionImpl;
 import org.geotools.styling.LineSymbolizer;
 import org.geotools.styling.SLD;
 import org.geotools.styling.Stroke;
@@ -252,6 +253,7 @@ public class SimpleLine extends AbstractTypeSymbolEditor implements
 				filterFactory.literal(jccColor.getColor()),
 				filterFactory.literal(txtWidth.getDouble()));
 		LineSymbolizer sym = styleFactory.createLineSymbolizer(stroke, null);
+		sym.setDescription(new DescriptionImpl("", ""));
 		sym.setPerpendicularOffset(filterFactory.literal(-txtOffset.getDouble()));
 
 		return sym;
@@ -280,9 +282,15 @@ public class SimpleLine extends AbstractTypeSymbolEditor implements
 
 			LineSymbolizer style = (LineSymbolizer) sym;
 			jccColor.setColor(SLD.color(style));
+			int alpha = (int) Math
+					.round(255.0 * SLD.opacity(style.getStroke()));
+			jccColor.setAlpha(alpha);
 			txtWidth.setDouble(SLD.width(style));
-			int offset = style.getPerpendicularOffset().evaluate(null,
-					Integer.class);
+			int offset = 0;
+			if (style.getPerpendicularOffset() != null) {
+				offset = style.getPerpendicularOffset().evaluate(null,
+						Integer.class);
+			}
 			txtOffset.setDouble(offset == 0 ? 0 : -offset);
 
 			// TODO gtintegration

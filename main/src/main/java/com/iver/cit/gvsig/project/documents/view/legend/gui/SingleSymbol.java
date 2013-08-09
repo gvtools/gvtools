@@ -59,6 +59,7 @@ import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
 import org.geotools.styling.Description;
+import org.geotools.styling.DescriptionImpl;
 import org.geotools.styling.LineSymbolizer;
 import org.geotools.styling.PointSymbolizer;
 import org.geotools.styling.PolygonSymbolizer;
@@ -115,7 +116,10 @@ public class SingleSymbol extends JPanel implements ILegendPanel,
 		this.style = SymbologyUtils.clone(style);
 		getSymbolPreviewPanel().setSymbol(this.style);
 		getBtnOpenSymbolLevelsEditor().setEnabled(style != null);
-		this.txtLabel.setText(style.getDescription().getAbstract().toString());
+		Description description = style.getDescription();
+		if (description != null && description.getTitle() != null) {
+			this.txtLabel.setText(description.getTitle().toString());
+		}
 	}
 
 	/*
@@ -126,8 +130,8 @@ public class SingleSymbol extends JPanel implements ILegendPanel,
 	public Symbolizer getLegend() {
 		if (this.style == null) {
 			this.style = getSymbolPreviewPanel().getSymbol();
-			this.style.getDescription().setAbstract(txtLabel.getText());
-			this.style.getDescription().setTitle(txtLabel.getText());
+			this.style.setDescription(new DescriptionImpl(txtLabel.getText(),
+					txtLabel.getText()));
 		}
 
 		return SymbologyUtils.clone(style);
@@ -238,10 +242,14 @@ public class SingleSymbol extends JPanel implements ILegendPanel,
 
 	public void setSymbol(Symbolizer style) {
 		setOnlySymbol(style);
-		if (style.getDescription() != null)
-			txtLabel.setText(style.getDescription().getTitle().toString());
-		// else
-		// txtLabel.setText(" ("+PluginServices.getText(this, "current")+")");
+
+		Description description = style.getDescription();
+		if (description != null && description.getTitle() != null) {
+			txtLabel.setText(description.getTitle().toString());
+		} else {
+			txtLabel.setText(" (" + PluginServices.getText(this, "current")
+					+ ")");
+		}
 	}
 
 	private void setOnlySymbol(Symbolizer symbol) {
@@ -251,8 +259,8 @@ public class SingleSymbol extends JPanel implements ILegendPanel,
 
 	public Symbolizer getSymbol() {
 		Symbolizer symbol = getSymbolPreviewPanel().getSymbol();
-		symbol.getDescription().setAbstract(txtLabel.getText());
-		symbol.getDescription().setTitle(txtLabel.getText());
+		symbol.setDescription(new DescriptionImpl(txtLabel.getText(), txtLabel
+				.getText()));
 		return symbol;
 	}
 
@@ -300,10 +308,9 @@ public class SingleSymbol extends JPanel implements ILegendPanel,
 			// this.style.setZSort(sl.getZSort());
 			// }
 		} else if (c.equals(txtLabel)) {
-			Description description = getSymbolPreviewPanel().getSymbol()
-					.getDescription();
-			description.setAbstract(txtLabel.getText());
-			description.setTitle(txtLabel.getText());
+			DescriptionImpl desc = new DescriptionImpl(txtLabel.getText(),
+					txtLabel.getText());
+			getSymbolPreviewPanel().getSymbol().setDescription(desc);
 		}
 	}
 }
