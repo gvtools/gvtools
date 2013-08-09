@@ -10,7 +10,18 @@ import static org.mockito.Mockito.when;
 import geomatico.events.Event;
 import geomatico.events.EventBus;
 
+import java.awt.Color;
+
+import org.geotools.filter.FilterFactoryImpl;
 import org.geotools.filter.identity.FeatureIdImpl;
+import org.geotools.styling.FeatureTypeStyle;
+import org.geotools.styling.Mark;
+import org.geotools.styling.PointSymbolizer;
+import org.geotools.styling.Rule;
+import org.geotools.styling.SLD;
+import org.geotools.styling.Style;
+import org.geotools.styling.StyleFactory;
+import org.geotools.styling.StyleFactoryImpl;
 import org.gvsig.GVSIGTestCase;
 import org.gvsig.events.FeatureSelectionChangeEvent;
 import org.gvsig.events.LayerAddedEvent;
@@ -19,6 +30,7 @@ import org.gvsig.events.LayerSelectionChangeEvent;
 import org.gvsig.events.LayerVisibilityChangeEvent;
 import org.gvsig.layer.filter.LayerFilter;
 import org.gvsig.persistence.generated.LayerType;
+import org.opengis.filter.FilterFactory;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
@@ -295,6 +307,35 @@ public class LayerTest extends GVSIGTestCase {
 		assertTrue(copy.getSelection().equals(layer.getSelection()));
 	}
 
+	public void testLayerStyleXML() throws Exception {
+		Layer layer = layerFactory.createLayer("layer", mock(Source.class));
+
+		// Mock style
+		Color color = Color.red;
+		double opacity = 0.57;
+		FilterFactory ff = new FilterFactoryImpl();
+		Mark mark = new StyleFactoryImpl().getSquareMark();
+		mark.getFill().setColor(ff.literal(color));
+		mark.getFill().setOpacity(ff.literal(opacity));
+		layer.setStyle(mockPointStyle(mark));
+
+		// get/set XML
+		LayerType xml = layer.getXML();
+		Layer copy = layerFactory.createLayer(xml);
+
+		// Get style values from copy
+		PointSymbolizer copySymbolizer = (PointSymbolizer) copy.getStyle()
+				.featureTypeStyles().get(0).rules().get(0).symbolizers().get(0);
+		Mark copyMark = (Mark) copySymbolizer.getGraphic().graphicalSymbols()
+				.get(0);
+		Color copyColor = SLD.color(copyMark.getFill());
+		double copyOpacity = SLD.opacity(copyMark.getFill());
+
+		// Test
+		assertEquals(color, copyColor);
+		assertEquals(opacity, copyOpacity);
+	}
+
 	public void testCompositeLayerXML() throws Exception {
 		Layer root = layerFactory.createLayer("root");
 		Layer folder = layerFactory.createLayer("folder");
@@ -404,5 +445,20 @@ public class LayerTest extends GVSIGTestCase {
 		layer.setSelection(new Selection());
 
 		verify(eventBus).fireEvent(any(FeatureSelectionChangeEvent.class));
+	}
+
+	private static Style mockPointStyle(Mark mark) {
+		StyleFactory sf = new StyleFactoryImpl();
+		PointSymbolizer pointSymbolizer = sf.createPointSymbolizer();
+		pointSymbolizer.getGraphic().graphicalSymbols().add(mark);
+		Rule rule = sf.createRule();
+		rule.symbolizers().add(pointSymbolizer);
+
+		FeatureTypeStyle featureTypeStyle = sf
+				.createFeatureTypeStyle(new Rule[] { rule });
+		Style style = sf.createStyle();
+		style.featureTypeStyles().add(featureTypeStyle);
+
+		return style;
 	}
 }

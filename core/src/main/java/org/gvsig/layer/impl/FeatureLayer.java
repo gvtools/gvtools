@@ -3,23 +3,33 @@ package org.gvsig.layer.impl;
 import geomatico.events.EventBus;
 
 import java.awt.Color;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 
+import javax.xml.transform.TransformerException;
+
 import org.apache.log4j.Logger;
+import org.geotools.data.Base64;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.styling.DescriptionImpl;
+import org.geotools.styling.FeatureTypeConstraint;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Fill;
 import org.geotools.styling.Graphic;
 import org.geotools.styling.Mark;
 import org.geotools.styling.Rule;
+import org.geotools.styling.SLDParser;
+import org.geotools.styling.SLDTransformer;
 import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
+import org.geotools.styling.StyleFactoryImpl;
+import org.geotools.styling.StyledLayerDescriptor;
 import org.geotools.styling.Symbolizer;
+import org.geotools.styling.UserLayer;
 import org.gvsig.events.FeatureSelectionChangeEvent;
 import org.gvsig.events.LayerLegendChangeEvent;
 import org.gvsig.layer.FeatureSourceCache;
@@ -274,6 +284,23 @@ public class FeatureLayer extends AbstractLayer implements Layer {
 		super.fill(xml);
 
 		xml.setSource(source.getXML());
+
+		try {
+			UserLayer layer = styleFactory.createUserLayer();
+			layer.setLayerFeatureConstraints(new FeatureTypeConstraint[] { null });
+			layer.addUserStyle(style);
+
+			StyledLayerDescriptor sld = styleFactory
+					.createStyledLayerDescriptor();
+			sld.addStyledLayer(layer);
+
+			String styleEncoded = Base64.encodeBytes(new SLDTransformer()
+					.transform(sld).getBytes());
+			xml.setStyle(styleEncoded);
+		} catch (TransformerException e) {
+			logger.error("Cannot store SLD style", e);
+		}
+
 		return xml;
 	}
 
@@ -284,6 +311,12 @@ public class FeatureLayer extends AbstractLayer implements Layer {
 
 		DataLayerType dataLayerType = (DataLayerType) layer;
 		source = sourceFactory.createSource(dataLayerType.getSource());
+
+		byte[] decodedBytes = Base64.decode(dataLayerType.getStyle());
+		ByteArrayInputStream stream = new ByteArrayInputStream(decodedBytes);
+		Style[] styles = new SLDParser(new StyleFactoryImpl(), stream)
+				.readXML();
+		style = styles[0];
 	}
 
 	@Override
