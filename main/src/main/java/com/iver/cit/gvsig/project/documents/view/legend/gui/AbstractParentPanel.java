@@ -65,30 +65,35 @@ package com.iver.cit.gvsig.project.documents.view.legend.gui;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
-import org.geotools.styling.Symbolizer;
 import org.gvsig.layer.Layer;
+import org.gvsig.legend.Legend;
 
 public abstract class AbstractParentPanel implements ILegendPanel {
-
-	public final void setData(Layer lyr, Symbolizer style) {
-	}
-
-	public final Symbolizer getLegend() {
+	@Override
+	public Legend getLegend() {
 		return null;
 	}
 
-	public final ImageIcon getIcon() {
+	@Override
+	public void setData(Layer layer, Legend legend) {
+	}
+
+	@Override
+	public ImageIcon getIcon() {
 		return null;
 	}
 
+	@Override
 	public Class<? extends ILegendPanel> getParentClass() {
 		return null;
 	}
 
-	public final JPanel getPanel() {
+	@Override
+	public JPanel getPanel() {
 		return null;
 	}
 
+	@Override
 	public Class getLegendClass() {
 		return null;
 	}

@@ -61,11 +61,8 @@ import org.gvsig.layer.Layer;
 import com.iver.andami.PluginServices;
 
 public class Features extends AbstractParentPanel {
-
 	public String getDescription() {
-		// TODO Implement it
-		throw new Error("Not yet implemented!");
-
+		return PluginServices.getText(Features.class, "features");
 	}
 
 	public String getTitle() {
@@ -73,8 +70,6 @@ public class Features extends AbstractParentPanel {
 	}
 
 	public boolean isSuitableFor(Layer layer) {
-		// TODO gtintegration
-		// return layer instanceof FLyrVect;
-		return true;
+		return layer.hasFeatures();
 	}
 }

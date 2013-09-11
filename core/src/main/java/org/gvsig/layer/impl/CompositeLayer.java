@@ -10,13 +10,13 @@ import java.util.List;
 
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.styling.Style;
 import org.gvsig.events.LayerAddedEvent;
 import org.gvsig.events.LayerRemovedEvent;
 import org.gvsig.layer.Layer;
 import org.gvsig.layer.LayerFactory;
 import org.gvsig.layer.Selection;
 import org.gvsig.layer.filter.LayerFilter;
+import org.gvsig.legend.Legend;
 import org.gvsig.persistence.generated.CompositeLayerType;
 import org.gvsig.persistence.generated.LayerType;
 
@@ -205,12 +205,12 @@ public class CompositeLayer extends AbstractLayer implements Layer {
 	}
 
 	@Override
-	public void setStyle(Style style) {
+	public void setLegend(Legend style) {
 		throw new UnsupportedOperationException("Cannot set style on groups");
 	}
 
 	@Override
-	public Style getStyle() {
+	public Legend getLegend() {
 		throw new UnsupportedOperationException("Cannot get style on groups");
 	}
 

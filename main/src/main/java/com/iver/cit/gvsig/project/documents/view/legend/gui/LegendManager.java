@@ -56,7 +56,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.List;
 import java.util.prefs.Preferences;
 
 import javax.swing.ImageIcon;
@@ -77,15 +76,9 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import javax.xml.transform.TransformerException;
 
-import org.geotools.filter.FilterFactoryImpl;
-import org.geotools.styling.DescriptionImpl;
 import org.geotools.styling.FeatureTypeConstraint;
-import org.geotools.styling.FeatureTypeStyle;
-import org.geotools.styling.LineSymbolizer;
-import org.geotools.styling.Rule;
 import org.geotools.styling.SLDParser;
 import org.geotools.styling.SLDTransformer;
-import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.StyleFactoryImpl;
@@ -93,8 +86,9 @@ import org.geotools.styling.StyledLayerDescriptor;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.UserLayer;
 import org.gvsig.gui.beans.swing.JButton;
+import org.gvsig.inject.InjectorSingleton;
 import org.gvsig.layer.Layer;
-import org.opengis.filter.FilterFactory;
+import org.gvsig.legend.Legend;
 
 import com.iver.andami.PluginServices;
 import com.iver.andami.messages.NotificationManager;
@@ -113,8 +107,7 @@ public class LegendManager extends AbstractThemeManagerPage {
 	private static ArrayList<Class<? extends IFMapLegendDriver>> legendDriverPool = new ArrayList<Class<? extends IFMapLegendDriver>>();
 
 	private Layer layer;
-	private Symbolizer legend; // Le asignaremos la leyenda del primer tema
-								// activo.
+	private Legend legend;
 	private Hashtable<Class<? extends ILegendPanel>, ILegendPanel> pages = new Hashtable<Class<? extends ILegendPanel>, ILegendPanel>();
 	private JPanel topPanel = null;
 	private JTextArea titleArea = null;
@@ -198,25 +191,8 @@ public class LegendManager extends AbstractThemeManagerPage {
 
 					StyleFactory factory = new StyleFactoryImpl();
 
-					// Create rule
-					Rule rule = factory.createRule();
-					legend = activePanel.getLegend();
-					rule.symbolizers().add(legend);
-
-					// Create feature type style
-					FeatureTypeStyle featureTypeStyle = factory
-							.createFeatureTypeStyle();
-					featureTypeStyle.rules().clear();
-					featureTypeStyle.rules().add(rule);
-
-					// Create style
-					Style style = factory.createStyle();
-					List<FeatureTypeStyle> featureTypeStyles = style
-							.featureTypeStyles();
-					featureTypeStyles.clear();
-					featureTypeStyles.add(featureTypeStyle);
-
 					// Create SLD
+					Style style = legend.getStyle();
 					StyledLayerDescriptor sld = factory
 							.createStyledLayerDescriptor();
 					UserLayer layer = factory.createUserLayer();
@@ -254,7 +230,7 @@ public class LegendManager extends AbstractThemeManagerPage {
 						Style[] parser = new SLDParser(new StyleFactoryImpl(),
 								file).readXML();
 						Style[] styles = parser;
-						applyLegend(styles[0]);
+						// applyLegend(styles[0]);
 						getBtnSaveLegend().setEnabled(activePanel != null);
 					} catch (FileNotFoundException e1) {
 						// TODO Auto-generated catch block
@@ -438,63 +414,41 @@ public class LegendManager extends AbstractThemeManagerPage {
 	private void fillDialog() {
 		if (empty) {
 			for (int i = 0; i < legendPool.size(); i++) {
-				Class<?> pageClass = (Class<?>) legendPool.get(i);
-				ILegendPanel page;
-				try {
-					try {
-						page = (ILegendPanel) pageClass.newInstance();
-					} catch (NoClassDefFoundError ex) {
-						NotificationManager.addWarning(
-								"Trying to look for this class:"
-										+ pageClass.getName(), ex);
-						continue;
-					}
-					if (page.isSuitableFor(layer)) {
-						// this legend can be applied to this layer
-						pages.put(page.getClass(), page);
+				Class<? extends ILegendPanel> pageClass = legendPool.get(i);
+				ILegendPanel page = InjectorSingleton.getInjector()
+						.getInstance(pageClass);
+				if (page.isSuitableFor(layer)) {
+					// this legend can be applied to this layer
+					pages.put(page.getClass(), page);
 
-						if (dirtyTree) {
-							// rebuild page tree
-							dirtyTree = false;
+					if (dirtyTree) {
+						// rebuild page tree
+						dirtyTree = false;
 
-							ArrayList<ILegendPanel> legList = new ArrayList<ILegendPanel>(
-									pages.values());
-							ArrayList<ILegendPanel> alreadyAdded = new ArrayList<ILegendPanel>();
-							DefaultTreeModel model = new DefaultTreeModel(root);
-							while (legList.size() > 0) {
-								ILegendPanel legend = (ILegendPanel) legList
-										.get(0);
-								Class<? extends ILegendPanel> parent = legend
-										.getParentClass();
-								while (parent != null
-										&& !alreadyAdded.contains(pages
-												.get(parent))) {
-									legend = (ILegendPanel) pages.get(parent);
-								}
-								doInsertNode(model, legend);
-								legList.remove(legend);
-								alreadyAdded.add(legend);
+						ArrayList<ILegendPanel> legList = new ArrayList<ILegendPanel>(
+								pages.values());
+						ArrayList<ILegendPanel> alreadyAdded = new ArrayList<ILegendPanel>();
+						DefaultTreeModel model = new DefaultTreeModel(root);
+						while (legList.size() > 0) {
+							ILegendPanel legend = (ILegendPanel) legList.get(0);
+							Class<? extends ILegendPanel> parent = legend
+									.getParentClass();
+							while (parent != null
+									&& !alreadyAdded
+											.contains(pages.get(parent))) {
+								legend = (ILegendPanel) pages.get(parent);
 							}
-							treeModel = model;
-							jTreeLegends.setModel(model);
+							doInsertNode(model, legend);
+							legList.remove(legend);
+							alreadyAdded.add(legend);
 						}
-						doInsertNode(treeModel, page);
-
+						treeModel = model;
+						jTreeLegends.setModel(model);
 					}
-					getJTreeLegends().setModel(treeModel);
+					doInsertNode(treeModel, page);
 
-				} catch (InstantiationException e) {
-					NotificationManager.addError(
-							"Trying to instantiate an interface"
-									+ " or abstract class + "
-									+ pageClass.getName(), e);
-				} catch (IllegalAccessException e) {
-					NotificationManager.addError(
-							"IllegalAccessException: does "
-									+ pageClass.getName()
-									+ " class have an anonymous"
-									+ " constructor?", e);
 				}
+				getJTreeLegends().setModel(treeModel);
 			}
 			getJTreeLegends().repaint();
 			empty = false;
@@ -734,50 +688,24 @@ public class LegendManager extends AbstractThemeManagerPage {
 	public void applyAction() {
 		if (activePanel != null) {
 			legend = activePanel.getLegend();
-
-			StyleFactoryImpl factory = new StyleFactoryImpl();
-			Rule rule = factory.createRule();
-			rule.symbolizers().add(legend);
-			FeatureTypeStyle fts = factory
-					.createFeatureTypeStyle(new Rule[] { rule });
-			Style style = factory.createStyle();
-			style.featureTypeStyles().add(fts);
-
-			layer.setStyle(style);
+			layer.setLegend(legend);
 		}
 	}
 
 	@Override
 	public void setModel(Layer layer) {
 		this.layer = layer;
-		applyLegend(layer.getStyle());
+		applyLegend(layer.getLegend());
 	}
 
 	/**
 	 * Applies the legend to the layer.
 	 * 
-	 * @param aLegend
+	 * @param legend
 	 *            , legend that the user wants to apply
 	 */
-	private void applyLegend(Style aLegend) {
-		// TODO gtintegration: get first symbolizer arbitrarily
-		List<FeatureTypeStyle> featureTypeStyles = aLegend.featureTypeStyles();
-		boolean set = false;
-		for (FeatureTypeStyle featureTypeStyle : featureTypeStyles) {
-			for (Rule rule : featureTypeStyle.rules()) {
-				for (Symbolizer symbolizer : rule.symbolizers()) {
-					this.legend = symbolizer;
-					set = true;
-					break;
-				}
-				if (set) {
-					break;
-				}
-			}
-			if (set) {
-				break;
-			}
-		}
+	private void applyLegend(Legend legend) {
+		this.legend = legend;
 
 		fillDialog();
 		Enumeration<Class<? extends ILegendPanel>> en = pages.keys();

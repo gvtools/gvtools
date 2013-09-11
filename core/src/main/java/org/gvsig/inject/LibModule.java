@@ -12,6 +12,8 @@ import org.gvsig.layer.impl.DataStoreFinderImpl;
 import org.gvsig.layer.impl.FeatureSourceCacheImpl;
 import org.gvsig.layer.impl.LayerFactoryImpl;
 import org.gvsig.layer.impl.SourceFactoryImpl;
+import org.gvsig.legend.LegendFactory;
+import org.gvsig.legend.impl.DefaultLegendFactory;
 import org.gvsig.map.MapContextFactory;
 import org.gvsig.map.impl.MapContextFactoryImpl;
 import org.opengis.filter.FilterFactory2;
@@ -30,6 +32,7 @@ public class LibModule extends AbstractModule {
 		bind(FeatureSourceCache.class).to(FeatureSourceCacheImpl.class);
 		bind(LayerFactory.class).to(LayerFactoryImpl.class);
 		bind(MapContextFactory.class).to(MapContextFactoryImpl.class);
+		bind(LegendFactory.class).to(DefaultLegendFactory.class);
 		bind(EventBus.class).toInstance(EventBus.getInstance());
 		bind(StyleFactory.class).toInstance(
 				CommonFactoryFinder.getStyleFactory());

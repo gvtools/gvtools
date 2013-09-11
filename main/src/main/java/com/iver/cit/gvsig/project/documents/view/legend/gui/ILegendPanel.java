@@ -49,8 +49,8 @@ package com.iver.cit.gvsig.project.documents.view.legend.gui;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
-import org.geotools.styling.Symbolizer;
 import org.gvsig.layer.Layer;
+import org.gvsig.legend.Legend;
 
 /**
  * @author jaume dominguez faus - jaume.dominguez@iver.es
@@ -74,14 +74,14 @@ public interface ILegendPanel {
 	 * @param legend
 	 *            , the legend currently applied to lyr
 	 */
-	public void setData(Layer lyr, Symbolizer legend);
+	public void setData(Layer lyr, Legend legend);
 
 	/**
 	 * Returns an instance of Legend
 	 * 
 	 * @return Legend, the legend result of the settings
 	 */
-	public Symbolizer getLegend();
+	public Legend getLegend();
 
 	/**
 	 * Returns a brief human-readable description about what kind of legend

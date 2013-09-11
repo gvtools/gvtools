@@ -4,10 +4,11 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import org.gvsig.layer.FeatureSourceCacheTest;
 import org.gvsig.layer.FilterTest;
 import org.gvsig.layer.LayerTest;
-import org.gvsig.layer.FeatureSourceCacheTest;
 import org.gvsig.layer.SourceTest;
+import org.gvsig.legend.LegendTest;
 import org.gvsig.map.MapContextTest;
 
 public class AllTests extends TestCase {
@@ -19,6 +20,7 @@ public class AllTests extends TestCase {
 		suite.addTestSuite(FilterTest.class);
 		suite.addTestSuite(FeatureSourceCacheTest.class);
 		suite.addTestSuite(SourceTest.class);
+		suite.addTestSuite(LegendTest.class);
 		suite.addTestSuite(MapContextTest.class);
 
 		return suite;

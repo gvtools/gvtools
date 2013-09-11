@@ -60,15 +60,20 @@ import javax.swing.border.TitledBorder;
 
 import org.geotools.styling.Description;
 import org.geotools.styling.DescriptionImpl;
+import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.LineSymbolizer;
 import org.geotools.styling.PointSymbolizer;
 import org.geotools.styling.PolygonSymbolizer;
+import org.geotools.styling.Rule;
 import org.geotools.styling.Style;
 import org.geotools.styling.Symbolizer;
 import org.gvsig.gui.beans.swing.GridBagLayoutPanel;
 import org.gvsig.gui.beans.swing.JButton;
 import org.gvsig.layer.Layer;
+import org.gvsig.legend.Legend;
+import org.gvsig.legend.LegendFactory;
 
+import com.google.inject.Inject;
 import com.iver.andami.PluginServices;
 import com.iver.cit.gvsig.gui.styling.SymbolSelector;
 import com.vividsolutions.jts.geom.Geometry;
@@ -91,7 +96,11 @@ public class SingleSymbol extends JPanel implements ILegendPanel,
 	private JButton btnOpenSymbolSelector;
 	private JTextField txtLabel;
 	private JButton btnOpenSymbolLevelsEditor;
-	private Symbolizer style;
+	private Symbolizer symbol;
+	private Layer layer;
+
+	@Inject
+	private LegendFactory legendFactory;
 
 	public SingleSymbol() {
 		super();
@@ -110,11 +119,25 @@ public class SingleSymbol extends JPanel implements ILegendPanel,
 
 	}
 
-	public void setData(Layer lyr, Symbolizer style) {
+	@Override
+	public void setData(Layer lyr, Legend legend) {
+		this.layer = lyr;
 		shapeType = lyr.getShapeType();
-		setSymbol(style);
-		this.style = SymbologyUtils.clone(style);
-		getSymbolPreviewPanel().setSymbol(this.style);
+		FeatureTypeStyle style = legend.getStyle().featureTypeStyles().get(0);
+
+		if (style.rules().size() == 0) {
+			throw new IllegalArgumentException("At least a rule must exist");
+		}
+
+		Rule rule = style.rules().get(0);
+		if (rule.symbolizers().size() == 0) {
+			throw new IllegalArgumentException(
+					"At least one symbolizer must exist");
+		}
+
+		setSymbol(rule.symbolizers().get(0));
+
+		getSymbolPreviewPanel().setSymbol(this.symbol);
 		getBtnOpenSymbolLevelsEditor().setEnabled(style != null);
 		Description description = style.getDescription();
 		if (description != null && description.getTitle() != null) {
@@ -122,19 +145,15 @@ public class SingleSymbol extends JPanel implements ILegendPanel,
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.iver.cit.gvsig.gui.legendmanager.panels.ILegendPanel#getLegend()
-	 */
-	public Symbolizer getLegend() {
-		if (this.style == null) {
-			this.style = getSymbolPreviewPanel().getSymbol();
-			this.style.setDescription(new DescriptionImpl(txtLabel.getText(),
+	@Override
+	public Legend getLegend() {
+		if (this.symbol == null) {
+			this.symbol = getSymbolPreviewPanel().getSymbol();
+			this.symbol.setDescription(new DescriptionImpl(txtLabel.getText(),
 					txtLabel.getText()));
 		}
 
-		return SymbologyUtils.clone(style);
+		return legendFactory.createSingleSymbolLegend(layer, symbol);
 	}
 
 	public String getDescription() {
@@ -188,7 +207,7 @@ public class SingleSymbol extends JPanel implements ILegendPanel,
 			btnOpenSymbolLevelsEditor = new JButton(PluginServices.getText(
 					this, "symbol_levels"));
 			btnOpenSymbolLevelsEditor.addActionListener(this);
-			btnOpenSymbolLevelsEditor.setEnabled(style != null);
+			btnOpenSymbolLevelsEditor.setEnabled(symbol != null);
 		}
 
 		return btnOpenSymbolLevelsEditor;
@@ -240,10 +259,10 @@ public class SingleSymbol extends JPanel implements ILegendPanel,
 		this.shapeType = shapeType;
 	}
 
-	public void setSymbol(Symbolizer style) {
-		setOnlySymbol(style);
+	public void setSymbol(Symbolizer symbol) {
+		setOnlySymbol(symbol);
 
-		Description description = style.getDescription();
+		Description description = symbol.getDescription();
 		if (description != null && description.getTitle() != null) {
 			txtLabel.setText(description.getTitle().toString());
 		} else {
@@ -254,7 +273,7 @@ public class SingleSymbol extends JPanel implements ILegendPanel,
 
 	private void setOnlySymbol(Symbolizer symbol) {
 		getSymbolPreviewPanel().setSymbol(symbol);
-		style = symbol;
+		this.symbol = symbol;
 	}
 
 	public Symbolizer getSymbol() {
