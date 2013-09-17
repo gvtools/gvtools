@@ -81,7 +81,6 @@ import org.gvsig.legend.IntervalLegend;
 import org.gvsig.legend.IntervalLegend.Type;
 import org.gvsig.legend.Legend;
 import org.gvsig.legend.LegendFactory;
-import org.gvsig.legend.impl.NumericInterval;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.FilterFactory;
@@ -642,7 +641,7 @@ public class VectorialInterval extends JPanel implements ILegendPanel {
 				}
 				sym.setDescription(new DescriptionImpl("0 - 0", "0 - 0"));
 
-				symbolTable.addRow(sym, new NumericInterval(0, 0));
+				symbolTable.addRow(sym, new Interval(0, 0));
 			}
 
 			// Vacia la tabla

@@ -169,17 +169,17 @@ public class DefaultIntervalLegend implements IntervalLegend {
 		double step = (max - min) / nIntervals;
 
 		if (nIntervals > 1) {
-			intervals[0] = new NumericInterval(min, min + step);
+			intervals[0] = new Interval(min, min + step);
 
 			for (int i = 1; i < (nIntervals - 1); i++) {
-				intervals[i] = new NumericInterval(min + (i * step), min
+				intervals[i] = new Interval(min + (i * step), min
 						+ ((i + 1) * step));
 			}
 
-			intervals[nIntervals - 1] = new NumericInterval(min
+			intervals[nIntervals - 1] = new Interval(min
 					+ ((nIntervals - 1) * step), max);
 		} else {
-			intervals[0] = new NumericInterval(min, max);
+			intervals[0] = new Interval(min, max);
 		}
 
 		return intervals;

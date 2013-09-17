@@ -53,7 +53,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.gvsig.legend.Interval;
-import org.gvsig.legend.impl.NumericInterval;
 
 import com.iver.andami.PluginServices;
 import com.iver.andami.ui.mdiManager.IWindow;
@@ -115,7 +114,7 @@ public class PanelEditInterval extends JPanel implements IWindow {
 					PluginServices.getText(this, "Formato_de_numero_erroneo")
 							+ ".");
 		}
-		Interval i = new NumericInterval(from, to);
+		Interval i = new Interval(from, to);
 		return i;
 	}
 
