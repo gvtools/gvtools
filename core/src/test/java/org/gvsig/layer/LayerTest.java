@@ -29,6 +29,7 @@ import org.gvsig.events.LayerNameChangeEvent;
 import org.gvsig.events.LayerSelectionChangeEvent;
 import org.gvsig.events.LayerVisibilityChangeEvent;
 import org.gvsig.layer.filter.LayerFilter;
+import org.gvsig.legend.Legend;
 import org.gvsig.persistence.generated.LayerType;
 import org.opengis.filter.FilterFactory;
 
@@ -317,15 +318,18 @@ public class LayerTest extends GVSIGTestCase {
 		Mark mark = new StyleFactoryImpl().getSquareMark();
 		mark.getFill().setColor(ff.literal(color));
 		mark.getFill().setOpacity(ff.literal(opacity));
-		layer.setStyle(mockPointStyle(mark));
+		Legend legend = mock(Legend.class);
+		when(legend.getStyle()).thenReturn(mockPointStyle(mark));
+		layer.setLegend(legend);
 
 		// get/set XML
 		LayerType xml = layer.getXML();
 		Layer copy = layerFactory.createLayer(xml);
 
 		// Get style values from copy
-		PointSymbolizer copySymbolizer = (PointSymbolizer) copy.getStyle()
-				.featureTypeStyles().get(0).rules().get(0).symbolizers().get(0);
+		PointSymbolizer copySymbolizer = (PointSymbolizer) copy.getLegend()
+				.getStyle().featureTypeStyles().get(0).rules().get(0)
+				.symbolizers().get(0);
 		Mark copyMark = (Mark) copySymbolizer.getGraphic().graphicalSymbols()
 				.get(0);
 		Color copyColor = SLD.color(copyMark.getFill());
