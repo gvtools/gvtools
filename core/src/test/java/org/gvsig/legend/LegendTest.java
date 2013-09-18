@@ -10,12 +10,15 @@ import org.geotools.styling.LineSymbolizer;
 import org.geotools.styling.PointSymbolizer;
 import org.geotools.styling.PolygonSymbolizer;
 import org.geotools.styling.Rule;
+import org.geotools.styling.StyleFactory;
 import org.geotools.styling.Symbolizer;
 import org.gvsig.GVSIGTestCase;
 import org.gvsig.layer.Layer;
 import org.gvsig.layer.Selection;
+import org.gvsig.legend.impl.SingleSymbolLegend;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.opengis.filter.FilterFactory2;
 
 import com.google.inject.Inject;
 import com.vividsolutions.jts.geom.Geometry;
@@ -28,18 +31,25 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class LegendTest extends GVSIGTestCase {
 	@Inject
-	private LegendFactory factory;
+	private StyleFactory styleFactory;
 
-	public void testDefaultLegendPoint() throws Exception {
-		testDefaultLegend(Point.class, PointSymbolizer.class);
-		testDefaultLegend(MultiPoint.class, PointSymbolizer.class);
-		testDefaultLegend(LineString.class, LineSymbolizer.class);
-		testDefaultLegend(MultiLineString.class, LineSymbolizer.class);
-		testDefaultLegend(Polygon.class, PolygonSymbolizer.class);
-		testDefaultLegend(MultiPolygon.class, PolygonSymbolizer.class);
+	@Inject
+	private FilterFactory2 filterFactory;
+
+	@Inject
+	private DefaultSymbols defaultSymbols;
+
+	public void testSingleSymbolLegend() throws Exception {
+		testSingleSymbolLegend(Point.class, PointSymbolizer.class);
+		testSingleSymbolLegend(MultiPoint.class, PointSymbolizer.class);
+		testSingleSymbolLegend(LineString.class, LineSymbolizer.class);
+		testSingleSymbolLegend(MultiLineString.class, LineSymbolizer.class);
+		testSingleSymbolLegend(Polygon.class, PolygonSymbolizer.class);
+		testSingleSymbolLegend(MultiPolygon.class, PolygonSymbolizer.class);
 	}
 
-	private void testDefaultLegend(final Class<? extends Geometry> geomType,
+	private void testSingleSymbolLegend(
+			final Class<? extends Geometry> geomType,
 			Class<? extends Symbolizer> symbolType) {
 		Layer layer = mock(Layer.class);
 		when(layer.getShapeType()).then(
@@ -52,7 +62,8 @@ public class LegendTest extends GVSIGTestCase {
 				});
 		when(layer.getSelection()).thenReturn(new Selection());
 
-		Legend legend = factory.createDefaultLegend(layer);
+		Legend legend = new SingleSymbolLegend(layer, styleFactory,
+				filterFactory, defaultSymbols);
 		List<FeatureTypeStyle> styles = legend.getStyle().featureTypeStyles();
 		assertEquals(1, styles.size());
 		List<Rule> rules = styles.get(0).rules();

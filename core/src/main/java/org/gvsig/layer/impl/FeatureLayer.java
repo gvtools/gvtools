@@ -25,10 +25,12 @@ import org.gvsig.layer.Selection;
 import org.gvsig.layer.Source;
 import org.gvsig.layer.SourceFactory;
 import org.gvsig.layer.filter.LayerFilter;
+import org.gvsig.legend.DefaultSymbols;
 import org.gvsig.legend.Legend;
-import org.gvsig.legend.LegendFactory;
+import org.gvsig.legend.impl.SingleSymbolLegend;
 import org.gvsig.persistence.generated.DataLayerType;
 import org.gvsig.persistence.generated.LayerType;
+import org.opengis.filter.FilterFactory2;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -43,16 +45,18 @@ public class FeatureLayer extends AbstractLayer implements Layer {
 	private SourceFactory sourceFactory;
 	private FeatureSourceCache featureSourceCache;
 	private StyleFactory styleFactory;
-	private LegendFactory legendFactory;
+	private FilterFactory2 filterFactory;
+	private DefaultSymbols defaultSymbols;
 
 	FeatureLayer(EventBus eventBus, FeatureSourceCache featureSourceCache,
 			SourceFactory sourceFactory, StyleFactory styleFactory,
-			LegendFactory legendFactory, String name) {
+			FilterFactory2 filterFactory, DefaultSymbols defaultSymbols,
+			String name) {
 		super(eventBus, name);
 		this.featureSourceCache = featureSourceCache;
 		this.sourceFactory = sourceFactory;
 		this.styleFactory = styleFactory;
-		this.legendFactory = legendFactory;
+		this.defaultSymbols = defaultSymbols;
 	}
 
 	void setSource(Source source) {
@@ -87,6 +91,7 @@ public class FeatureLayer extends AbstractLayer implements Layer {
 	public void setSelection(Selection newSelection)
 			throws UnsupportedOperationException {
 		this.selection = newSelection;
+		legend.updateSelection(this.selection);
 		eventBus.fireEvent(new FeatureSelectionChangeEvent(this));
 	}
 
@@ -128,7 +133,8 @@ public class FeatureLayer extends AbstractLayer implements Layer {
 	}
 
 	private void buildLegend() {
-		legend = legendFactory.createDefaultLegend(this);
+		legend = new SingleSymbolLegend(this, styleFactory, filterFactory,
+				defaultSymbols);
 	}
 
 	@Override

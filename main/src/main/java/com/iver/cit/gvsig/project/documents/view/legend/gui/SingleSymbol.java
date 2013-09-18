@@ -66,12 +66,16 @@ import org.geotools.styling.PointSymbolizer;
 import org.geotools.styling.PolygonSymbolizer;
 import org.geotools.styling.Rule;
 import org.geotools.styling.Style;
+import org.geotools.styling.StyleFactory;
 import org.geotools.styling.Symbolizer;
 import org.gvsig.gui.beans.swing.GridBagLayoutPanel;
 import org.gvsig.gui.beans.swing.JButton;
+import org.gvsig.inject.InjectorSingleton;
 import org.gvsig.layer.Layer;
+import org.gvsig.legend.DefaultSymbols;
 import org.gvsig.legend.Legend;
-import org.gvsig.legend.LegendFactory;
+import org.gvsig.legend.impl.SingleSymbolLegend;
+import org.opengis.filter.FilterFactory2;
 
 import com.google.inject.Inject;
 import com.iver.andami.PluginServices;
@@ -100,7 +104,13 @@ public class SingleSymbol extends JPanel implements ILegendPanel,
 	private Layer layer;
 
 	@Inject
-	private LegendFactory legendFactory;
+	private StyleFactory styleFactory;
+
+	@Inject
+	private FilterFactory2 filterFactory;
+
+	@Inject
+	private DefaultSymbols defaultSymbols;
 
 	public SingleSymbol() {
 		super();
@@ -153,7 +163,10 @@ public class SingleSymbol extends JPanel implements ILegendPanel,
 					txtLabel.getText()));
 		}
 
-		return legendFactory.createSingleSymbolLegend(layer, symbol);
+		SingleSymbolLegend legend = new SingleSymbolLegend(layer, symbol,
+				styleFactory, filterFactory, defaultSymbols);
+		InjectorSingleton.getInjector().injectMembers(legend);
+		return legend;
 	}
 
 	public String getDescription() {

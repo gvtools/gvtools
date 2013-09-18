@@ -22,15 +22,19 @@ import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.Symbolizer;
 import org.gvsig.layer.Layer;
+import org.gvsig.layer.Selection;
+import org.gvsig.legend.DefaultSymbols;
 import org.gvsig.legend.Interval;
-import org.gvsig.legend.IntervalLegend;
-import org.gvsig.legend.LegendFactory;
+import org.gvsig.legend.Legend;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.FilterFactory2;
 
-public class DefaultIntervalLegend implements IntervalLegend {
-	private static final Logger logger = Logger
-			.getLogger(DefaultIntervalLegend.class);
+public class IntervalLegend implements Legend {
+	private static final Logger logger = Logger.getLogger(IntervalLegend.class);
+
+	public static enum Type {
+		EQUAL, NATURAL, QUANTILE
+	}
 
 	private Color start, end;
 	private Symbolizer defaultSymbol;
@@ -38,16 +42,19 @@ public class DefaultIntervalLegend implements IntervalLegend {
 	private Type type;
 	private Map<Interval, Symbolizer> symbols;
 
+	private Layer layer;
 	private String fieldName;
 
-	private LegendFactory legendFactory;
+	private Rule selectionRule;
+
 	private StyleFactory styleFactory;
 	private FilterFactory2 filterFactory;
+	private DefaultSymbols defaultSymbols;
 
-	public DefaultIntervalLegend(Color start, Color end, int nIntervals,
-			Symbolizer defaultSymbol, boolean useDefault, Type intervalType,
-			Layer layer, String fieldName, LegendFactory legendFactory,
-			StyleFactory styleFactory, FilterFactory2 filterFactory)
+	public IntervalLegend(Color start, Color end, Type intervalType,
+			Symbolizer defaultSymbol, boolean useDefault, Layer layer,
+			String fieldName, int nIntervals, StyleFactory styleFactory,
+			FilterFactory2 filterFactory, DefaultSymbols defaultSymbols)
 			throws IOException {
 		this.start = start;
 		this.end = end;
@@ -55,23 +62,22 @@ public class DefaultIntervalLegend implements IntervalLegend {
 		this.useDefault = useDefault;
 		this.type = intervalType;
 		this.fieldName = fieldName;
-		this.legendFactory = legendFactory;
 		this.styleFactory = styleFactory;
 		this.filterFactory = filterFactory;
+		this.layer = layer;
+		this.defaultSymbols = defaultSymbols;
 
 		createSymbols(nIntervals, layer, fieldName);
 	}
 
-	public DefaultIntervalLegend(Map<Interval, Symbolizer> symbols,
-			Symbolizer defaultSymbol, boolean useDefault, Type intervalType,
-			String fieldName, LegendFactory legendFactory,
+	public IntervalLegend(Map<Interval, Symbolizer> symbols, Type intervalType,
+			Symbolizer defaultSymbol, boolean useDefault, String fieldName,
 			StyleFactory styleFactory, FilterFactory2 filterFactory)
 			throws IOException {
 		this.defaultSymbol = defaultSymbol;
 		this.useDefault = useDefault;
 		this.type = intervalType;
 		this.fieldName = fieldName;
-		this.legendFactory = legendFactory;
 		this.styleFactory = styleFactory;
 		this.filterFactory = filterFactory;
 		this.symbols = symbols;
@@ -152,7 +158,7 @@ public class DefaultIntervalLegend implements IntervalLegend {
 					interval.getMin())
 					+ " - "
 					+ NumberFormat.getInstance().format(interval.getMax());
-			Symbolizer symbol = legendFactory.createDefaultSymbol(
+			Symbolizer symbol = defaultSymbols.createDefaultSymbol(
 					layer.getShapeType(), new Color(r, g, b), description);
 
 			r = r + stepR;
@@ -208,22 +214,28 @@ public class DefaultIntervalLegend implements IntervalLegend {
 			fts.rules().add(rule);
 		}
 
+		selectionRule = styleFactory.createRule();
+		selectionRule.setFilter(filterFactory.id(layer.getSelection()));
+		fts.rules().add(selectionRule);
+
 		Style style = styleFactory.createStyle();
 		style.featureTypeStyles().add(fts);
 		return style;
 	}
 
 	@Override
+	public void updateSelection(Selection selection) {
+		selectionRule.setFilter(filterFactory.id(selection));
+	}
+
 	public boolean usesDefaultSymbol() {
 		return useDefault;
 	}
 
-	@Override
 	public void setUseDefault(boolean useDefault) {
 		this.useDefault = useDefault;
 	}
 
-	@Override
 	public Interval[] getIntervals() {
 		List<Interval> orderedIntervals = new ArrayList<Interval>();
 		orderedIntervals.addAll(symbols.keySet());
@@ -243,7 +255,6 @@ public class DefaultIntervalLegend implements IntervalLegend {
 		return orderedIntervals.toArray(new Interval[orderedIntervals.size()]);
 	}
 
-	@Override
 	public Symbolizer[] getSymbols() {
 		Interval[] intervals = getIntervals();
 		Symbolizer[] ret = new Symbolizer[symbols.size()];
@@ -253,22 +264,18 @@ public class DefaultIntervalLegend implements IntervalLegend {
 		return ret;
 	}
 
-	@Override
 	public Color getStartColor() {
 		return start;
 	}
 
-	@Override
 	public Color getEndColor() {
 		return end;
 	}
 
-	@Override
 	public Symbolizer getDefaultSymbol() {
 		return defaultSymbol;
 	}
 
-	@Override
 	public Type getType() {
 		return type;
 	}
