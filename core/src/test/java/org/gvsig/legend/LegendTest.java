@@ -10,15 +10,13 @@ import org.geotools.styling.LineSymbolizer;
 import org.geotools.styling.PointSymbolizer;
 import org.geotools.styling.PolygonSymbolizer;
 import org.geotools.styling.Rule;
-import org.geotools.styling.StyleFactory;
 import org.geotools.styling.Symbolizer;
 import org.gvsig.GVSIGTestCase;
 import org.gvsig.layer.Layer;
 import org.gvsig.layer.Selection;
-import org.gvsig.legend.impl.SingleSymbolLegend;
+import org.gvsig.legend.impl.LegendFactory;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.opengis.filter.FilterFactory2;
 
 import com.google.inject.Inject;
 import com.vividsolutions.jts.geom.Geometry;
@@ -31,13 +29,7 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class LegendTest extends GVSIGTestCase {
 	@Inject
-	private StyleFactory styleFactory;
-
-	@Inject
-	private FilterFactory2 filterFactory;
-
-	@Inject
-	private DefaultSymbols defaultSymbols;
+	private LegendFactory legendFactory;
 
 	public void testSingleSymbolLegend() throws Exception {
 		testSingleSymbolLegend(Point.class, PointSymbolizer.class);
@@ -62,8 +54,7 @@ public class LegendTest extends GVSIGTestCase {
 				});
 		when(layer.getSelection()).thenReturn(new Selection());
 
-		Legend legend = new SingleSymbolLegend(layer, styleFactory,
-				filterFactory, defaultSymbols);
+		Legend legend = legendFactory.createSingleSymbolLegend(layer);
 		List<FeatureTypeStyle> styles = legend.getStyle().featureTypeStyles();
 		assertEquals(1, styles.size());
 		List<Rule> rules = styles.get(0).rules();

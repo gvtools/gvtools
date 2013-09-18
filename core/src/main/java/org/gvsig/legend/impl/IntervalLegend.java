@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import org.apache.log4j.Logger;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.styling.FeatureTypeStyle;
@@ -29,6 +31,9 @@ import org.gvsig.legend.Legend;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.FilterFactory2;
 
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
+
 public class IntervalLegend implements Legend {
 	private static final Logger logger = Logger.getLogger(IntervalLegend.class);
 
@@ -47,39 +52,39 @@ public class IntervalLegend implements Legend {
 
 	private Rule selectionRule;
 
+	@Inject
 	private StyleFactory styleFactory;
+	@Inject
 	private FilterFactory2 filterFactory;
+	@Inject
 	private DefaultSymbols defaultSymbols;
 
-	public IntervalLegend(Color start, Color end, Type intervalType,
-			Symbolizer defaultSymbol, boolean useDefault, Layer layer,
-			String fieldName, int nIntervals, StyleFactory styleFactory,
-			FilterFactory2 filterFactory, DefaultSymbols defaultSymbols)
-			throws IOException {
+	@AssistedInject
+	public IntervalLegend(@Assisted("start") Color start,
+			@Assisted("end") Color end, @Assisted Type intervalType,
+			@Assisted Symbolizer defaultSymbol, @Assisted boolean useDefault,
+			@Assisted Layer layer, @Assisted String fieldName,
+			@Assisted int nIntervals) throws IOException {
 		this.start = start;
 		this.end = end;
 		this.defaultSymbol = defaultSymbol;
 		this.useDefault = useDefault;
 		this.type = intervalType;
 		this.fieldName = fieldName;
-		this.styleFactory = styleFactory;
-		this.filterFactory = filterFactory;
 		this.layer = layer;
-		this.defaultSymbols = defaultSymbols;
 
 		createSymbols(nIntervals, layer, fieldName);
 	}
 
-	public IntervalLegend(Map<Interval, Symbolizer> symbols, Type intervalType,
-			Symbolizer defaultSymbol, boolean useDefault, String fieldName,
-			StyleFactory styleFactory, FilterFactory2 filterFactory)
+	@AssistedInject
+	public IntervalLegend(@Assisted Map<Interval, Symbolizer> symbols,
+			@Assisted Type intervalType, @Assisted Symbolizer defaultSymbol,
+			@Assisted boolean useDefault, @Assisted String fieldName)
 			throws IOException {
 		this.defaultSymbol = defaultSymbol;
 		this.useDefault = useDefault;
 		this.type = intervalType;
 		this.fieldName = fieldName;
-		this.styleFactory = styleFactory;
-		this.filterFactory = filterFactory;
 		this.symbols = symbols;
 
 		Interval[] intervals = getIntervals();

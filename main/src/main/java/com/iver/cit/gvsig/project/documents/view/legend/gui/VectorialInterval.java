@@ -81,10 +81,10 @@ import org.gvsig.legend.Interval;
 import org.gvsig.legend.Legend;
 import org.gvsig.legend.impl.IntervalLegend;
 import org.gvsig.legend.impl.IntervalLegend.Type;
+import org.gvsig.legend.impl.LegendFactory;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.FilterFactory;
-import org.opengis.filter.FilterFactory2;
 
 import com.google.inject.Inject;
 import com.iver.andami.PluginServices;
@@ -128,13 +128,10 @@ public class VectorialInterval extends JPanel implements ILegendPanel {
 	private GridBagLayoutPanel defaultSymbolPanel = new GridBagLayoutPanel();
 
 	@Inject
-	private StyleFactory styleFactory;
-
-	@Inject
-	private FilterFactory2 filterFactory;
-
-	@Inject
 	private DefaultSymbols defaultSymbols;
+
+	@Inject
+	private LegendFactory legendFactory;
 
 	public VectorialInterval() {
 		super();
@@ -434,10 +431,9 @@ public class VectorialInterval extends JPanel implements ILegendPanel {
 		Symbolizer defaultSymbol = defaultSymbolPrev.getSymbol();
 		boolean useDefault = chkdefaultvalues.isSelected();
 
-		legend = new IntervalLegend(startColor, endColor, intervalType,
-				defaultSymbol, useDefault, layer, cmbField.getSelectedItem()
-						.toString(), intervalCount, styleFactory,
-				filterFactory, defaultSymbols);
+		legend = legendFactory.createIntervalLegend(startColor, endColor,
+				intervalType, defaultSymbol, useDefault, layer, cmbField
+						.getSelectedItem().toString(), intervalCount);
 
 		symbolTable.fillTable(legend.getSymbols(), legend.getIntervals());
 
@@ -453,11 +449,10 @@ public class VectorialInterval extends JPanel implements ILegendPanel {
 			Symbolizer defaultSymbol = defaultSymbols.createDefaultSymbol(
 					layer.getShapeType(), Color.blue, null);
 			try {
-				this.legend = new IntervalLegend(
+				this.legend = legendFactory.createIntervalLegend(
 						new HashMap<Interval, Symbolizer>(), Type.EQUAL,
 						defaultSymbol, false, layer.getFeatureSource()
-								.getSchema().getDescriptor(0).getLocalName(),
-						styleFactory, filterFactory);
+								.getSchema().getDescriptor(0).getLocalName());
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
@@ -554,8 +549,8 @@ public class VectorialInterval extends JPanel implements ILegendPanel {
 			Symbolizer defaultSymbol = defaultSymbolPrev.getSymbol();
 			boolean useDefault = chkdefaultvalues.isSelected();
 			String field = cmbField.getSelectedItem().toString();
-			legend = new IntervalLegend(symbols, intervalType, defaultSymbol,
-					useDefault, field, styleFactory, filterFactory);
+			legend = legendFactory.createIntervalLegend(symbols, intervalType,
+					defaultSymbol, useDefault, field);
 			return legend;
 		} catch (IOException e) {
 			throw new RuntimeException(e);
