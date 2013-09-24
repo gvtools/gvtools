@@ -70,10 +70,14 @@ public abstract class AbstractLayer implements Layer {
 
 	void fill(LayerType xml) {
 		xml.setName(name);
+		xml.setVisible(visible);
+		xml.setSelected(selected);
 	}
 
 	void read(LayerType type) {
 		this.name = type.getName();
+		this.visible = type.isVisible();
+		this.selected = type.isSelected();
 	}
 
 	@Override

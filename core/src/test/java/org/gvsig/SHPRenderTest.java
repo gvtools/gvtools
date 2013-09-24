@@ -1,4 +1,4 @@
-package org.gvsig.layer.impl;
+package org.gvsig;
 
 import java.awt.Color;
 import java.awt.Graphics2D;

@@ -1,5 +1,7 @@
 package org.gvsig.legend;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -15,6 +17,7 @@ import org.gvsig.GVSIGTestCase;
 import org.gvsig.layer.Layer;
 import org.gvsig.layer.Selection;
 import org.gvsig.legend.impl.LegendFactory;
+import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -31,6 +34,7 @@ public class LegendTest extends GVSIGTestCase {
 	@Inject
 	private LegendFactory legendFactory;
 
+	@Test
 	public void testSingleSymbolLegend() throws Exception {
 		testSingleSymbolLegend(Point.class, PointSymbolizer.class);
 		testSingleSymbolLegend(MultiPoint.class, PointSymbolizer.class);

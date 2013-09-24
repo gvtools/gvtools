@@ -1,5 +1,6 @@
 package org.gvsig.layer;
 
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -13,6 +14,7 @@ import javax.inject.Inject;
 import org.geotools.data.DataStore;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.gvsig.GVSIGTestCase;
+import org.junit.Test;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
@@ -48,6 +50,7 @@ public class SourceTest extends GVSIGTestCase {
 		};
 	}
 
+	@Test
 	public void testSourceGetDefaultTypeName() throws Exception {
 		Map<String, String> properties = new HashMap<String, String>();
 		properties.put("url", "file:///tmp/my.shp");
@@ -61,6 +64,7 @@ public class SourceTest extends GVSIGTestCase {
 	/**
 	 * source must implement equals
 	 */
+	@Test
 	public void testEquals() throws Exception {
 		Map<String, String> properties = new HashMap<String, String>();
 		properties.put("url", "file:///tmp/my.shp");
@@ -76,6 +80,7 @@ public class SourceTest extends GVSIGTestCase {
 		assertTrue(!s2.equals(s3));
 	}
 
+	@Test
 	public void testPersistence() throws Exception {
 		Map<String, String> properties = new HashMap<String, String>();
 		properties.put("url", "file:///tmp/my.shp");

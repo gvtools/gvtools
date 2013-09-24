@@ -78,7 +78,7 @@ public class SourceImpl implements Source {
 		String actualTypeName = typeName;
 		if (actualTypeName == null) {
 			String[] typeNames = dataStore.getTypeNames();
-			assert typeNames.length == 0;
+			assert typeNames.length > 0;
 			actualTypeName = typeNames[0];
 		}
 		return dataStore.getFeatureSource(actualTypeName);

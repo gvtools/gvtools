@@ -1,5 +1,9 @@
 package org.gvsig.layer;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Mockito.mock;
@@ -10,18 +14,8 @@ import static org.mockito.Mockito.when;
 import geomatico.events.Event;
 import geomatico.events.EventBus;
 
-import java.awt.Color;
-
-import org.geotools.filter.FilterFactoryImpl;
+import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.filter.identity.FeatureIdImpl;
-import org.geotools.styling.FeatureTypeStyle;
-import org.geotools.styling.Mark;
-import org.geotools.styling.PointSymbolizer;
-import org.geotools.styling.Rule;
-import org.geotools.styling.SLD;
-import org.geotools.styling.Style;
-import org.geotools.styling.StyleFactory;
-import org.geotools.styling.StyleFactoryImpl;
 import org.gvsig.GVSIGTestCase;
 import org.gvsig.events.FeatureSelectionChangeEvent;
 import org.gvsig.events.LayerAddedEvent;
@@ -29,13 +23,20 @@ import org.gvsig.events.LayerNameChangeEvent;
 import org.gvsig.events.LayerSelectionChangeEvent;
 import org.gvsig.events.LayerVisibilityChangeEvent;
 import org.gvsig.layer.filter.LayerFilter;
-import org.gvsig.legend.Legend;
 import org.gvsig.persistence.generated.LayerType;
-import org.opengis.filter.FilterFactory;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.GeometryDescriptor;
+import org.opengis.feature.type.GeometryType;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Module;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
 
 public class LayerTest extends GVSIGTestCase {
 	@Inject
@@ -54,6 +55,7 @@ public class LayerTest extends GVSIGTestCase {
 		};
 	}
 
+	@Test
 	public void testGetParent() throws Exception {
 		Layer layer = layerFactory.createLayer("leaf", mock(Source.class));
 		assertTrue(layer.getParent() == null);
@@ -61,6 +63,7 @@ public class LayerTest extends GVSIGTestCase {
 		assertTrue(folder.getParent() == null);
 	}
 
+	@Test
 	public void testParentOnAddRemove() throws Exception {
 		Layer layer = layerFactory.createLayer("leaf", mock(Source.class));
 		Layer folder = layerFactory.createLayer("folder", layer);
@@ -73,6 +76,7 @@ public class LayerTest extends GVSIGTestCase {
 		assertTrue(layer.getParent() == folder);
 	}
 
+	@Test
 	public void testAddLayerToTwoParents() throws Exception {
 		Layer layer = layerFactory.createLayer("leaf", mock(Source.class));
 		Layer folder1 = layerFactory.createLayer("folder1");
@@ -86,6 +90,7 @@ public class LayerTest extends GVSIGTestCase {
 		}
 	}
 
+	@Test
 	public void testAddLayerToPosition() throws Exception {
 		Layer layer1 = layerFactory.createLayer("leaf1", mock(Source.class));
 		Layer folder = layerFactory.createLayer("folder");
@@ -101,6 +106,7 @@ public class LayerTest extends GVSIGTestCase {
 		assertTrue(folder.indexOf(layer1) == 1);
 	}
 
+	@Test
 	public void testIndexOfNonChild() throws Exception {
 		Layer layer = layerFactory.createLayer("leaf", mock(Source.class));
 		Layer folder = layerFactory.createLayer("folder");
@@ -108,6 +114,7 @@ public class LayerTest extends GVSIGTestCase {
 		assertTrue(folder.indexOf(layer) == -1);
 	}
 
+	@Test
 	public void testContains() throws Exception {
 		// Feature
 		Layer layer = layerFactory.createLayer("l", mock(Source.class));
@@ -134,6 +141,7 @@ public class LayerTest extends GVSIGTestCase {
 		assertFalse(layer.contains(null));
 	}
 
+	@Test
 	public void testGetAllLayers() throws Exception {
 		// Feature
 		Layer layer = layerFactory.createLayer("l", mock(Source.class));
@@ -158,6 +166,7 @@ public class LayerTest extends GVSIGTestCase {
 		assertEquals(l2, layers[2]);
 	}
 
+	@Test
 	public void testAddLayer() throws Exception {
 		// Feature
 		Layer child = layerFactory.createLayer("l", mock(Source.class));
@@ -182,6 +191,7 @@ public class LayerTest extends GVSIGTestCase {
 		assertEquals(child, layers[1]);
 	}
 
+	@Test
 	public void testFilter() throws Exception {
 		// Feature
 		Layer layer = layerFactory.createLayer("l", mock(Source.class));
@@ -225,44 +235,52 @@ public class LayerTest extends GVSIGTestCase {
 		assertEquals(l2, layers[1]);
 	}
 
+	@Ignore("Check default symbology for point layers, "
+			+ "multipoint layers, line layers, etc. "
+			+ "and heterogeneous layers. We'd better wait till"
+			+ "symbology panels are migrated")
+	@Test
 	public void testSymbology() throws Exception {
-		fail("Check default symbology for point layers, "
-				+ "multipoint layers, line layers, etc. "
-				+ "and heterogeneous layers. We'd better wait till"
-				+ "symbology panels are migrated");
+		fail();
 	}
 
+	@Test
 	public void testHasFeatures() throws Exception {
 		assertTrue(layerFactory.createLayer("l", mock(Source.class))
 				.hasFeatures());
 		assertFalse(layerFactory.createLayer("l").hasFeatures());
 	}
 
+	@Test
 	public void testIsActive() throws Exception {
 		assertFalse(layerFactory.createLayer("l", mock(Source.class))
 				.isActive());
 		assertFalse(layerFactory.createLayer("l").isActive());
 	}
 
+	@Test
 	public void testEditing() throws Exception {
 		assertFalse(layerFactory.createLayer("l", mock(Source.class))
 				.isEditing());
 		assertFalse(layerFactory.createLayer("l").isEditing());
 	}
 
+	@Test
 	public void testInitiallyVisible() throws Exception {
 		Layer layer = layerFactory.createLayer("leaf", mock(Source.class));
 		assertTrue(layer.isVisible());
 	}
 
+	@Test
 	public void testInvisibleLayersAreNotDrawn() throws Exception {
-		Layer layer = layerFactory.createLayer("leaf", mock(Source.class));
+		Layer layer = mockLayerWithType("leaf");
 		assertTrue(layer.getDrawingLayers().size() == 1);
 
 		layer.setVisible(false);
 		assertTrue(layer.getDrawingLayers().size() == 0);
 	}
 
+	@Test
 	public void testVisibilityChangedEvent() throws Exception {
 		Layer layer = layerFactory.createLayer("leaf", mock(Source.class));
 		layer.setVisible(false);
@@ -270,6 +288,7 @@ public class LayerTest extends GVSIGTestCase {
 		verify(eventBus).fireEvent(any(LayerVisibilityChangeEvent.class));
 	}
 
+	@Test
 	public void testSelectionChangedEvent() throws Exception {
 		Layer layer = layerFactory.createLayer("leaf", mock(Source.class));
 		layer.setSelected(true);
@@ -277,6 +296,7 @@ public class LayerTest extends GVSIGTestCase {
 		verify(eventBus).fireEvent(any(LayerSelectionChangeEvent.class));
 	}
 
+	@Test
 	public void testSelectionCallWithSameValueRaisesNoEvent() throws Exception {
 		Layer layer = layerFactory.createLayer("leaf", mock(Source.class));
 		layer.setSelected(layer.isSelected());
@@ -285,6 +305,7 @@ public class LayerTest extends GVSIGTestCase {
 				any(LayerSelectionChangeEvent.class));
 	}
 
+	@Test
 	public void testLayerNameChangedEvent() throws Exception {
 		Layer layer = layerFactory.createLayer("leaf", mock(Source.class));
 		layer.setName("other");
@@ -292,8 +313,9 @@ public class LayerTest extends GVSIGTestCase {
 		verify(eventBus).fireEvent(any(LayerNameChangeEvent.class));
 	}
 
+	@Test
 	public void testDataLayerXML() throws Exception {
-		Layer layer = layerFactory.createLayer("layer", mock(Source.class));
+		Layer layer = mockLayerWithType("layer");
 		layer.setSelected(!layer.isSelected());
 		layer.setVisible(!layer.isVisible());
 		Selection selection = new Selection();
@@ -308,42 +330,16 @@ public class LayerTest extends GVSIGTestCase {
 		assertTrue(copy.getSelection().equals(layer.getSelection()));
 	}
 
+	@Ignore
+	@Test
 	public void testLayerStyleXML() throws Exception {
-		Layer layer = layerFactory.createLayer("layer", mock(Source.class));
-
-		// Mock style
-		Color color = Color.red;
-		double opacity = 0.57;
-		FilterFactory ff = new FilterFactoryImpl();
-		Mark mark = new StyleFactoryImpl().getSquareMark();
-		mark.getFill().setColor(ff.literal(color));
-		mark.getFill().setOpacity(ff.literal(opacity));
-		Legend legend = mock(Legend.class);
-		when(legend.getStyle()).thenReturn(mockPointStyle(mark));
-		layer.setLegend(legend);
-
-		// get/set XML
-		LayerType xml = layer.getXML();
-		Layer copy = layerFactory.createLayer(xml);
-
-		// Get style values from copy
-		PointSymbolizer copySymbolizer = (PointSymbolizer) copy.getLegend()
-				.getStyle().featureTypeStyles().get(0).rules().get(0)
-				.symbolizers().get(0);
-		Mark copyMark = (Mark) copySymbolizer.getGraphic().graphicalSymbols()
-				.get(0);
-		Color copyColor = SLD.color(copyMark.getFill());
-		double copyOpacity = SLD.opacity(copyMark.getFill());
-
-		// Test
-		assertEquals(color, copyColor);
-		assertEquals(opacity, copyOpacity);
 	}
 
+	@Test
 	public void testCompositeLayerXML() throws Exception {
 		Layer root = layerFactory.createLayer("root");
 		Layer folder = layerFactory.createLayer("folder");
-		Layer leaf = layerFactory.createLayer("leaf", mock(Source.class));
+		Layer leaf = mockLayerWithType("leaf");
 		folder.addLayer(leaf);
 		root.addLayer(folder);
 
@@ -359,6 +355,7 @@ public class LayerTest extends GVSIGTestCase {
 		verify(eventBus, times(4)).fireEvent(any(LayerAddedEvent.class));
 	}
 
+	@Test
 	public void testRemoveLayer() throws Exception {
 		// Feature
 		Layer layer = layerFactory.createLayer("l", mock(Source.class));
@@ -381,6 +378,7 @@ public class LayerTest extends GVSIGTestCase {
 	}
 
 	@SuppressWarnings("unchecked")
+	@Test
 	public void testRemoveLayerEvent() throws Exception {
 		Layer leaf = layerFactory.createLayer("l", mock(Source.class));
 		Layer folder = layerFactory.createLayer("l", leaf);
@@ -395,10 +393,13 @@ public class LayerTest extends GVSIGTestCase {
 		verify(eventBus, times(2)).fireEvent(any(Event.class));
 	}
 
+	@Ignore
+	@Test
 	public void testGetBounds() throws Exception {
 		fail();
 	}
 
+	@Test
 	public void testSetVisibleSetsChildren() throws Exception {
 		Layer root = layerFactory.createLayer("l");
 		Layer folder = layerFactory.createLayer("l");
@@ -413,6 +414,7 @@ public class LayerTest extends GVSIGTestCase {
 		verify(leaf).setVisible(true);
 	}
 
+	@Test
 	public void testSetSelectedDoesNotSetChildren() throws Exception {
 		Layer root = layerFactory.createLayer("l");
 		Layer folder = layerFactory.createLayer("l");
@@ -427,6 +429,7 @@ public class LayerTest extends GVSIGTestCase {
 		verify(leaf, never()).setVisible(anyBoolean());
 	}
 
+	@Test
 	public void testSelectionNotSupported() throws Exception {
 		Layer root = layerFactory.createLayer("l");
 		Selection sel = mock(Selection.class);
@@ -437,32 +440,88 @@ public class LayerTest extends GVSIGTestCase {
 		}
 	}
 
+	@Test
 	public void testSelectionInitialization() throws Exception {
 		Layer layer = layerFactory.createLayer("l", mock(Source.class));
 
 		assertTrue(layer.getSelection().isEmpty());
 	}
 
+	@Test
 	public void testSelectionEvent() throws Exception {
-		Layer layer = layerFactory.createLayer("l", mock(Source.class));
+		Layer layer = mockLayerWithType("l");
 
 		layer.setSelection(new Selection());
 
 		verify(eventBus).fireEvent(any(FeatureSelectionChangeEvent.class));
 	}
 
-	private static Style mockPointStyle(Mark mark) {
-		StyleFactory sf = new StyleFactoryImpl();
-		PointSymbolizer pointSymbolizer = sf.createPointSymbolizer();
-		pointSymbolizer.getGraphic().graphicalSymbols().add(mark);
-		Rule rule = sf.createRule();
-		rule.symbolizers().add(pointSymbolizer);
+	@Test
+	public void testProcess() throws Exception {
+		Layer l1 = layerFactory.createLayer("l", mock(Source.class));
+		Layer l2 = layerFactory.createLayer("l", mock(Source.class));
+		Layer layer = layerFactory.createLayer("l", l1, l2);
 
-		FeatureTypeStyle featureTypeStyle = sf
-				.createFeatureTypeStyle(new Rule[] { rule });
-		Style style = sf.createStyle();
-		style.featureTypeStyles().add(featureTypeStyle);
+		layer.process(new LayerProcessor() {
+			@Override
+			public void process(Layer layer) {
+				layer.setVisible(false);
+			}
+		});
 
-		return style;
+		assertFalse(layer.isVisible());
+		assertFalse(l1.isVisible());
+		assertFalse(l2.isVisible());
+	}
+
+	@Test
+	public void testProcessWithFilter() throws Exception {
+		Layer l1 = layerFactory.createLayer("l1", mock(Source.class));
+		Layer l2 = layerFactory.createLayer("l2", mock(Source.class));
+		Layer layer = layerFactory.createLayer("l", l1, l2);
+
+		// Set visible == false only for "l1"
+		layer.process(new LayerFilter() {
+
+			@Override
+			public boolean accepts(Layer layer) {
+				return layer.getName().equals("l1");
+			}
+		}, new LayerProcessor() {
+			@Override
+			public void process(Layer layer) {
+				layer.setVisible(false);
+			}
+		});
+
+		assertTrue(layer.isVisible());
+		assertFalse(l1.isVisible());
+		assertTrue(l2.isVisible());
+	}
+
+	private Layer mockLayerWithType(String name) throws Exception {
+		return mockLayerWithType(name, Point.class);
+	}
+
+	private Layer mockLayerWithType(String name,
+			final Class<? extends Geometry> type) throws Exception {
+		GeometryType geomType = mock(GeometryType.class);
+		when(geomType.getBinding()).then(
+				new Answer<Class<? extends Geometry>>() {
+					@Override
+					public Class<? extends Geometry> answer(
+							InvocationOnMock invocation) throws Throwable {
+						return type;
+					}
+				});
+		GeometryDescriptor geomDescriptor = mock(GeometryDescriptor.class);
+		when(geomDescriptor.getType()).thenReturn(geomType);
+		SimpleFeatureType schema = mock(SimpleFeatureType.class);
+		when(schema.getGeometryDescriptor()).thenReturn(geomDescriptor);
+		SimpleFeatureSource featureSource = mock(SimpleFeatureSource.class);
+		when(featureSource.getSchema()).thenReturn(schema);
+		Source source = mock(Source.class);
+		when(source.createFeatureSource()).thenReturn(featureSource);
+		return layerFactory.createLayer(name, source);
 	}
 }

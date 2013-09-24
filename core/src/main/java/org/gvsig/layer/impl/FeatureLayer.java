@@ -5,18 +5,11 @@ import geomatico.events.EventBus;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 
-import javax.xml.transform.TransformerException;
-
-import org.apache.log4j.Logger;
-import org.geotools.data.Base64;
 import org.geotools.data.simple.SimpleFeatureSource;
+import org.geotools.filter.identity.FeatureIdImpl;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.styling.FeatureTypeConstraint;
-import org.geotools.styling.SLDTransformer;
-import org.geotools.styling.StyleFactory;
-import org.geotools.styling.StyledLayerDescriptor;
-import org.geotools.styling.UserLayer;
 import org.gvsig.events.FeatureSelectionChangeEvent;
 import org.gvsig.events.LayerLegendChangeEvent;
 import org.gvsig.layer.FeatureSourceCache;
@@ -25,18 +18,15 @@ import org.gvsig.layer.Selection;
 import org.gvsig.layer.Source;
 import org.gvsig.layer.SourceFactory;
 import org.gvsig.layer.filter.LayerFilter;
-import org.gvsig.legend.DefaultSymbols;
 import org.gvsig.legend.Legend;
-import org.gvsig.legend.impl.SingleSymbolLegend;
+import org.gvsig.legend.impl.LegendFactory;
 import org.gvsig.persistence.generated.DataLayerType;
 import org.gvsig.persistence.generated.LayerType;
-import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.identity.FeatureId;
 
 import com.vividsolutions.jts.geom.Geometry;
 
 public class FeatureLayer extends AbstractLayer implements Layer {
-	private static final Logger logger = Logger.getLogger(FeatureLayer.class);
-
 	private boolean editing, active;
 	private Source source;
 	private Legend legend;
@@ -44,19 +34,15 @@ public class FeatureLayer extends AbstractLayer implements Layer {
 
 	private SourceFactory sourceFactory;
 	private FeatureSourceCache featureSourceCache;
-	private StyleFactory styleFactory;
-	private FilterFactory2 filterFactory;
-	private DefaultSymbols defaultSymbols;
+	private LegendFactory legendFactory;
 
 	FeatureLayer(EventBus eventBus, FeatureSourceCache featureSourceCache,
-			SourceFactory sourceFactory, StyleFactory styleFactory,
-			FilterFactory2 filterFactory, DefaultSymbols defaultSymbols,
+			SourceFactory sourceFactory, LegendFactory legendFactory,
 			String name) {
 		super(eventBus, name);
 		this.featureSourceCache = featureSourceCache;
 		this.sourceFactory = sourceFactory;
-		this.styleFactory = styleFactory;
-		this.defaultSymbols = defaultSymbols;
+		this.legendFactory = legendFactory;
 	}
 
 	void setSource(Source source) {
@@ -91,7 +77,7 @@ public class FeatureLayer extends AbstractLayer implements Layer {
 	public void setSelection(Selection newSelection)
 			throws UnsupportedOperationException {
 		this.selection = newSelection;
-		legend.updateSelection(this.selection);
+		getLegend().updateSelection(this.selection);
 		eventBus.fireEvent(new FeatureSelectionChangeEvent(this));
 	}
 
@@ -133,8 +119,7 @@ public class FeatureLayer extends AbstractLayer implements Layer {
 	}
 
 	private void buildLegend() {
-		legend = new SingleSymbolLegend(this, styleFactory, filterFactory,
-				defaultSymbols);
+		legend = legendFactory.createSingleSymbolLegend(this);
 	}
 
 	@Override
@@ -185,21 +170,10 @@ public class FeatureLayer extends AbstractLayer implements Layer {
 		super.fill(xml);
 
 		xml.setSource(source.getXML());
-
-		try {
-			UserLayer layer = styleFactory.createUserLayer();
-			layer.setLayerFeatureConstraints(new FeatureTypeConstraint[] { null });
-			layer.addUserStyle(legend.getStyle());
-
-			StyledLayerDescriptor sld = styleFactory
-					.createStyledLayerDescriptor();
-			sld.addStyledLayer(layer);
-
-			String styleEncoded = Base64.encodeBytes(new SLDTransformer()
-					.transform(sld).getBytes());
-			xml.setStyle(styleEncoded);
-		} catch (TransformerException e) {
-			logger.error("Cannot store SLD style", e);
+		xml.getSelection().clear();
+		Iterator<FeatureId> iterator = selection.iterator();
+		while (iterator.hasNext()) {
+			xml.getSelection().add(iterator.next().getID());
 		}
 
 		return xml;
@@ -212,6 +186,12 @@ public class FeatureLayer extends AbstractLayer implements Layer {
 
 		DataLayerType dataLayerType = (DataLayerType) layer;
 		source = sourceFactory.createSource(dataLayerType.getSource());
+
+		dataLayerType.getSelection();
+		this.selection = new Selection();
+		for (String id : dataLayerType.getSelection()) {
+			this.selection.add(new FeatureIdImpl(id));
+		}
 	}
 
 	@Override

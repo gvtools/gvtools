@@ -161,7 +161,9 @@ public class MapContextImpl implements MapContext, RenderListener {
 	@Override
 	public void draw(BufferedImage image, Graphics2D g, Rectangle2D extent,
 			ProcessContext processContext) throws IOException {
-		assert false : "processContext.isCancelled should be taken into account";
+		if (processContext.isCancelled()) {
+			assert false : "processContext.isCancelled should be taken into account";
+		}
 
 		lastDrawnArea = extent;
 

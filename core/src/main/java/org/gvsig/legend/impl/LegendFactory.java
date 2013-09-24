@@ -28,5 +28,5 @@ public interface LegendFactory {
 
 	IntervalLegend createIntervalLegend(Map<Interval, Symbolizer> symbols,
 			Type intervalType, Symbolizer defaultSymbol, boolean useDefault,
-			String fieldName) throws IOException;
+			Layer layer, String fieldName) throws IOException;
 }

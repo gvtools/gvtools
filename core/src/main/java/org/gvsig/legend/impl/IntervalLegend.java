@@ -56,15 +56,14 @@ public class IntervalLegend implements Legend {
 	private StyleFactory styleFactory;
 	@Inject
 	private FilterFactory2 filterFactory;
-	@Inject
-	private DefaultSymbols defaultSymbols;
 
 	@AssistedInject
 	public IntervalLegend(@Assisted("start") Color start,
 			@Assisted("end") Color end, @Assisted Type intervalType,
 			@Assisted Symbolizer defaultSymbol, @Assisted boolean useDefault,
 			@Assisted Layer layer, @Assisted String fieldName,
-			@Assisted int nIntervals) throws IOException {
+			@Assisted int nIntervals, DefaultSymbols defaultSymbols)
+			throws IOException {
 		this.start = start;
 		this.end = end;
 		this.defaultSymbol = defaultSymbol;
@@ -73,17 +72,18 @@ public class IntervalLegend implements Legend {
 		this.fieldName = fieldName;
 		this.layer = layer;
 
-		createSymbols(nIntervals, layer, fieldName);
+		createSymbols(nIntervals, layer, fieldName, defaultSymbols);
 	}
 
 	@AssistedInject
 	public IntervalLegend(@Assisted Map<Interval, Symbolizer> symbols,
 			@Assisted Type intervalType, @Assisted Symbolizer defaultSymbol,
-			@Assisted boolean useDefault, @Assisted String fieldName)
-			throws IOException {
+			@Assisted boolean useDefault, @Assisted Layer layer,
+			@Assisted String fieldName) throws IOException {
 		this.defaultSymbol = defaultSymbol;
-		this.useDefault = useDefault;
 		this.type = intervalType;
+		this.useDefault = useDefault;
+		this.layer = layer;
 		this.fieldName = fieldName;
 		this.symbols = symbols;
 
@@ -106,8 +106,8 @@ public class IntervalLegend implements Legend {
 		}
 	}
 
-	private void createSymbols(int nIntervals, Layer layer, String fieldName)
-			throws IOException {
+	private void createSymbols(int nIntervals, Layer layer, String fieldName,
+			DefaultSymbols defaultSymbols) throws IOException {
 		double min = Double.MAX_VALUE;
 		double max = Double.NEGATIVE_INFINITY;
 
@@ -230,7 +230,9 @@ public class IntervalLegend implements Legend {
 
 	@Override
 	public void updateSelection(Selection selection) {
-		selectionRule.setFilter(filterFactory.id(selection));
+		if (selectionRule != null) {
+			selectionRule.setFilter(filterFactory.id(selection));
+		}
 	}
 
 	public boolean usesDefaultSymbol() {

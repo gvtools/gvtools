@@ -1,11 +1,13 @@
 package org.gvsig.layer;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertTrue;
 
 import org.geotools.filter.identity.FeatureIdImpl;
+import org.junit.Test;
 
-public class SelectionTest extends TestCase {
+public class SelectionTest {
 
+	@Test
 	public void testXor() throws Exception {
 		Selection res = createSelection("a", "b")
 				.xor(createSelection("b", "c"));
