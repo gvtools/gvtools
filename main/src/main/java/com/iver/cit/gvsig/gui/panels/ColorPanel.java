@@ -30,7 +30,7 @@
  * www.vividsolutions.com
  */
 
-/* gvSIG. Sistema de Información Geográfica de la Generalitat Valenciana
+/* gvSIG. Sistema de InformaciÃ³n GeogrÃ¡fica de la Generalitat Valenciana
  *
  * Copyright (C) 2004 IVER T.I. and Generalitat Valenciana.
  *
@@ -52,7 +52,7 @@
  *
  *  Generalitat Valenciana
  *   Conselleria d'Infraestructures i Transport
- *   Av. Blasco Ibáñez, 50
+ *   Av. Blasco IbÃ¡Ã±ez, 50
  *   46010 VALENCIA
  *   SPAIN
  *

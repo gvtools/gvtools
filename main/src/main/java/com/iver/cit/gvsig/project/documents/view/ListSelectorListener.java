@@ -1,4 +1,4 @@
-/* gvSIG. Sistema de Información Geográfica de la Generalitat Valenciana
+/* gvSIG. Sistema de InformaciÃ³n GeogrÃ¡fica de la Generalitat Valenciana
  *
  * Copyright (C) 2004 IVER T.I. and Generalitat Valenciana.
  *
@@ -20,7 +20,7 @@
  *
  *  Generalitat Valenciana
  *   Conselleria d'Infraestructures i Transport
- *   Av. Blasco Ibáñez, 50
+ *   Av. Blasco IbÃ¡Ã±ez, 50
  *   46010 VALENCIA
  *   SPAIN
  *
@@ -42,17 +42,17 @@ package com.iver.cit.gvsig.project.documents.view;
 
 /**
  * Interfaz invocada por el FPanelExtentSelector cuando el usuario ha
- * seleccionado al menos un elemento y pulsa el botón aceptar
+ * seleccionado al menos un elemento y pulsa el botÃ³n aceptar
  * 
  * @author $author$
  * @version $Revision: 7304 $
  */
 public interface ListSelectorListener {
 	/**
-	 * Método invocado cuando el usuario pulsa aceptar y hay algo seleccionado
+	 * MÃ©todo invocado cuando el usuario pulsa aceptar y hay algo seleccionado
 	 * 
 	 * @param indices
-	 *            Array con los índices de los elementos seleccionados
+	 *            Array con los Ã­ndices de los elementos seleccionados
 	 */
 	public void indexesSelected(int[] indices);
 
