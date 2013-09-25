@@ -133,7 +133,7 @@ public interface ILegendPanel {
 	/**
 	 * Returns the class of the legend produced by this ILegendPanel.
 	 */
-	public Class getLegendClass();
+	public Class<? extends Legend> getLegendClass();
 
 	/**
 	 * Returns <b>true</b> if this legend is applicable to this layer,

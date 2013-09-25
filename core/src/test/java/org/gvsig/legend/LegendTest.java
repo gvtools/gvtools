@@ -270,6 +270,28 @@ public class LegendTest extends GVSIGTestCase {
 		assertEquals(nIntervals + 1, rules.size());
 	}
 
+	@Test
+	public void testIntervalLegendDefaultSymbol() throws Exception {
+		Color start = Color.red;
+		Color end = Color.blue;
+		Layer layer = mockLayer();
+		int nIntervals = 3;
+		Symbolizer defaultSymbol = defaultSymbols.createDefaultSymbol(
+				layer.getShapeType(), Color.black, null);
+
+		IntervalLegend legend = legendFactory.createIntervalLegend(start, end,
+				Type.EQUAL, defaultSymbol, true, layer, FIELD_NAME, nIntervals);
+
+		Style style = legend.getStyle();
+		List<FeatureTypeStyle> featureTypeStyles = style.featureTypeStyles();
+		assertEquals(1, featureTypeStyles.size());
+
+		// We only check the number of rules, not the style itself
+		// +2 for selection and default symbol
+		List<Rule> rules = featureTypeStyles.get(0).rules();
+		assertEquals(nIntervals + 2, rules.size());
+	}
+
 	private Layer mockLayer() throws Exception {
 		String name = "mylayer";
 		SimpleFeatureTypeBuilder buildType = new SimpleFeatureTypeBuilder();

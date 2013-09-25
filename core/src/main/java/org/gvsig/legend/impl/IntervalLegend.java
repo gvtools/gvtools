@@ -2,7 +2,6 @@ package org.gvsig.legend.impl;
 
 import java.awt.Color;
 import java.io.IOException;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -169,17 +168,12 @@ public class IntervalLegend implements Legend {
 		symbols = new HashMap<Interval, Symbolizer>();
 
 		for (Interval interval : intervals) {
-			String description = NumberFormat.getInstance().format(
-					interval.getMin())
-					+ " - "
-					+ NumberFormat.getInstance().format(interval.getMax());
-
 			int red = Math.max(0, Math.min(255, (int) r));
 			int green = Math.max(0, Math.min(255, (int) g));
 			int blue = Math.max(0, Math.min(255, (int) b));
 			Symbolizer symbol = defaultSymbols.createDefaultSymbol(
 					layer.getShapeType(), new Color(red, green, blue),
-					description);
+					interval.toString());
 
 			r += stepR;
 			g += stepG;
@@ -244,6 +238,13 @@ public class IntervalLegend implements Legend {
 					filterFactory.literal(interval.getMin()),
 					filterFactory.literal(interval.getMax())));
 			rule.setElseFilter(false);
+			fts.rules().add(rule);
+		}
+
+		if (useDefault && defaultSymbol != null) {
+			Rule rule = styleFactory.createRule();
+			rule.symbolizers().add(defaultSymbol);
+			rule.setElseFilter(true);
 			fts.rules().add(rule);
 		}
 
@@ -313,5 +314,9 @@ public class IntervalLegend implements Legend {
 
 	public Type getType() {
 		return type;
+	}
+
+	public String getFieldName() {
+		return fieldName;
 	}
 }

@@ -94,7 +94,7 @@ public abstract class AbstractParentPanel implements ILegendPanel {
 	}
 
 	@Override
-	public Class getLegendClass() {
+	public Class<? extends Legend> getLegendClass() {
 		return null;
 	}
 }

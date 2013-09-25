@@ -69,7 +69,6 @@ import org.geotools.styling.Fill;
 import org.geotools.styling.Graphic;
 import org.geotools.styling.Mark;
 import org.geotools.styling.Stroke;
-import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.StyleFactoryImpl;
 import org.geotools.styling.Symbolizer;
@@ -449,10 +448,21 @@ public class VectorialInterval extends JPanel implements ILegendPanel {
 			Symbolizer defaultSymbol = defaultSymbols.createDefaultSymbol(
 					layer.getShapeType(), Color.blue, null);
 			try {
+				// Get first numeric field
+				String fieldName = null;
+				SimpleFeatureType schema = layer.getFeatureSource().getSchema();
+				for (AttributeDescriptor attribute : schema
+						.getAttributeDescriptors()) {
+					Class<?> type = attribute.getType().getBinding();
+					if (isNumericField(type)) {
+						fieldName = attribute.getLocalName();
+						break;
+					}
+				}
+
 				this.legend = legendFactory.createIntervalLegend(
 						new HashMap<Interval, Symbolizer>(), defaultSymbol,
-						false, layer, layer.getFeatureSource().getSchema()
-								.getDescriptor(0).getLocalName());
+						false, layer, fieldName);
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
@@ -466,7 +476,8 @@ public class VectorialInterval extends JPanel implements ILegendPanel {
 
 		getDefaultSymbolPrev();
 
-		symbolTable = new SymbolTable(SymbolTable.INTERVALS_TYPE);
+		symbolTable = new SymbolTable(SymbolTable.INTERVALS_TYPE,
+				layer.getShapeType());
 		pnlCenter.add(symbolTable);
 
 		try {
@@ -480,9 +491,7 @@ public class VectorialInterval extends JPanel implements ILegendPanel {
 		}
 
 		chkdefaultvalues.setSelected(legend.usesDefaultSymbol());
-		// TODO gtintegration
-		// cmbField.getModel().setSelectedItem(
-		// legend.getClassifyingFieldNames()[0]);
+		cmbField.getModel().setSelectedItem(legend.getFieldName());
 		Symbolizer[] symbols = legend.getSymbols();
 		symbolTable.fillTable(symbols, legend.getIntervals());
 		startColorChooser.setColor(legend.getStartColor());
@@ -579,7 +588,7 @@ public class VectorialInterval extends JPanel implements ILegendPanel {
 			} else if (e.getActionCommand() == "INTERVAL_TYPE") {
 				JComboBox cb = (JComboBox) e.getSource();
 
-				if (legend != null
+				if (legend != null && legend.getType() != null
 						&& cb.getSelectedIndex() != legend.getType().ordinal()) {
 					symbolTable.removeAllItems();
 				}
@@ -699,8 +708,8 @@ public class VectorialInterval extends JPanel implements ILegendPanel {
 		return this;
 	}
 
-	public Class<?> getLegendClass() {
-		return Style.class;
+	public Class<? extends Legend> getLegendClass() {
+		return IntervalLegend.class;
 	}
 
 	private boolean isNumericField(Class<?> fieldType) {

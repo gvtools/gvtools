@@ -47,6 +47,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.EventObject;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JTable;
@@ -58,6 +59,7 @@ import org.geotools.styling.Symbolizer;
 
 import com.iver.andami.PluginServices;
 import com.iver.cit.gvsig.project.documents.view.legend.gui.PanelEditSymbol;
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * Cell Editor de ISymbols. Controla los eventos de edici�n que se realicen
@@ -66,18 +68,17 @@ import com.iver.cit.gvsig.project.documents.view.legend.gui.PanelEditSymbol;
  * @author Vicente Caballero Navarro
  */
 public class SymbolCellEditor extends JButton implements TableCellEditor {
-	private ArrayList listeners = new ArrayList();
+	private List<CellEditorListener> listeners = new ArrayList<CellEditorListener>();
 	private Symbolizer symbol;
 	private PanelEditSymbol symbolPanel;
 
-	public SymbolCellEditor() {
+	public SymbolCellEditor(final Class<? extends Geometry> type) {
 		addMouseListener(new MouseListener() {
 
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() == 2) {
 					symbolPanel.setSymbol(symbol);
-					// TODO gtintegration
-					// symbolPanel.setShapeType(symbol.getSymbolType());
+					symbolPanel.setShapeType(type);
 					PluginServices.getMDIManager().addWindow(symbolPanel);
 					if (symbolPanel.isOK()) {
 						symbol = symbolPanel.getSymbol();
@@ -137,7 +138,7 @@ public class SymbolCellEditor extends JButton implements TableCellEditor {
 		}
 
 		for (int i = 0; i < listeners.size(); i++) {
-			CellEditorListener l = (CellEditorListener) listeners.get(i);
+			CellEditorListener l = listeners.get(i);
 			ChangeEvent evt = new ChangeEvent(this);
 			l.editingCanceled(evt);
 		}
@@ -150,7 +151,7 @@ public class SymbolCellEditor extends JButton implements TableCellEditor {
 	 */
 	public boolean stopCellEditing() {
 		for (int i = 0; i < listeners.size(); i++) {
-			CellEditorListener l = (CellEditorListener) listeners.get(i);
+			CellEditorListener l = listeners.get(i);
 			ChangeEvent evt = new ChangeEvent(this);
 			l.editingStopped(evt);
 		}
@@ -201,4 +202,4 @@ public class SymbolCellEditor extends JButton implements TableCellEditor {
 	public void removeCellEditorListener(CellEditorListener l) {
 		listeners.remove(l);
 	}
- }
+}

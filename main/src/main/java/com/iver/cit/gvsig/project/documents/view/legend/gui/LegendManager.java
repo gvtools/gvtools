@@ -83,7 +83,6 @@ import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.StyleFactoryImpl;
 import org.geotools.styling.StyledLayerDescriptor;
-import org.geotools.styling.Symbolizer;
 import org.geotools.styling.UserLayer;
 import org.gvsig.gui.beans.swing.JButton;
 import org.gvsig.inject.InjectorSingleton;
@@ -430,13 +429,13 @@ public class LegendManager extends AbstractThemeManagerPage {
 						ArrayList<ILegendPanel> alreadyAdded = new ArrayList<ILegendPanel>();
 						DefaultTreeModel model = new DefaultTreeModel(root);
 						while (legList.size() > 0) {
-							ILegendPanel legend = (ILegendPanel) legList.get(0);
+							ILegendPanel legend = legList.get(0);
 							Class<? extends ILegendPanel> parent = legend
 									.getParentClass();
 							while (parent != null
 									&& !alreadyAdded
 											.contains(pages.get(parent))) {
-								legend = (ILegendPanel) pages.get(parent);
+								legend = pages.get(parent);
 							}
 							doInsertNode(model, legend);
 							legList.remove(legend);
@@ -490,8 +489,7 @@ public class LegendManager extends AbstractThemeManagerPage {
 			return;
 		if (page.getParentClass() != null) {
 			if (pages.containsKey(page.getParentClass())) {
-				ILegendPanel parent = (ILegendPanel) pages.get(page
-						.getParentClass());
+				ILegendPanel parent = pages.get(page.getParentClass());
 				DefaultMutableTreeNode nodeParent = findNode(parent.getClass());
 				if (nodeParent == null) {
 					// the parent is empty
@@ -710,8 +708,10 @@ public class LegendManager extends AbstractThemeManagerPage {
 		fillDialog();
 		Enumeration<Class<? extends ILegendPanel>> en = pages.keys();
 		while (en.hasMoreElements()) {
-			ILegendPanel page = (ILegendPanel) pages.get(en.nextElement());
-			if (Symbolizer.class.isAssignableFrom(legend.getClass())) {
+			ILegendPanel page = pages.get(en.nextElement());
+			Class<? extends Legend> legendClass = page.getLegendClass();
+			if (legendClass != null
+					&& legendClass.isAssignableFrom(legend.getClass())) {
 				setActivePage(page);
 				expandAndSelect(page);
 				return;

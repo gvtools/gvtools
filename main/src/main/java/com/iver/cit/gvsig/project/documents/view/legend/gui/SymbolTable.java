@@ -66,6 +66,7 @@ import com.iver.cit.gvsig.project.documents.gui.TableSymbolCellRenderer;
 import com.iver.cit.gvsig.project.documents.view.legend.edition.gui.IntervalCellEditor;
 import com.iver.utiles.swing.jtable.JTable;
 import com.iver.utiles.swing.jtable.TextFieldCellEditor;
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * JPanel que contiene la tabla con los s�mbolos intervalos o valores y
@@ -93,6 +94,8 @@ public class SymbolTable extends JPanel {
 	private SymbolTableModel model;
 	private String type;
 
+	private Class<? extends Geometry> shapeType;
+
 	/**
 	 * Crea un nuevo FSymbolTable.
 	 * 
@@ -100,9 +103,10 @@ public class SymbolTable extends JPanel {
 	 *            tipo de valor si es intervalo: "intervals" y si es por
 	 *            valores: "values".
 	 */
-	public SymbolTable(String type) {
+	public SymbolTable(String type, Class<? extends Geometry> shapeType) {
 		super(new GridLayout(1, 0));
 		this.type = type;
+		this.shapeType = shapeType;
 
 		model = new SymbolTableModel();
 
@@ -202,7 +206,7 @@ public class SymbolTable extends JPanel {
 		column.setPreferredWidth(60);
 		column.setMinWidth(50);
 
-		SymbolCellEditor symboleditor = new SymbolCellEditor();
+		SymbolCellEditor symboleditor = new SymbolCellEditor(shapeType);
 		column.setCellEditor(symboleditor);
 
 		TableSymbolCellRenderer renderer = new TableSymbolCellRenderer(true);
