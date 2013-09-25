@@ -33,6 +33,8 @@ import org.opengis.filter.FilterFactory2;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import com.iver.cit.gvsig.fmap.rendering.NaturalIntervalGenerator;
+import com.iver.cit.gvsig.fmap.rendering.QuantileIntervalGenerator;
 
 public class IntervalLegend implements Legend {
 	private static final Logger logger = Logger.getLogger(IntervalLegend.class);
@@ -77,11 +79,11 @@ public class IntervalLegend implements Legend {
 
 	@AssistedInject
 	public IntervalLegend(@Assisted Map<Interval, Symbolizer> symbols,
-			@Assisted Type intervalType, @Assisted Symbolizer defaultSymbol,
-			@Assisted boolean useDefault, @Assisted Layer layer,
-			@Assisted String fieldName) throws IOException {
+			@Assisted Symbolizer defaultSymbol, @Assisted boolean useDefault,
+			@Assisted Layer layer, @Assisted String fieldName)
+			throws IOException {
 		this.defaultSymbol = defaultSymbol;
-		this.type = intervalType;
+		this.type = null;
 		this.useDefault = useDefault;
 		this.layer = layer;
 		this.fieldName = fieldName;
@@ -110,6 +112,7 @@ public class IntervalLegend implements Legend {
 			DefaultSymbols defaultSymbols) throws IOException {
 		double min = Double.MAX_VALUE;
 		double max = Double.NEGATIVE_INFINITY;
+		List<Double> valueList = new ArrayList<Double>();
 
 		SimpleFeatureIterator features = layer.getFeatureSource().getFeatures()
 				.features();
@@ -125,6 +128,8 @@ public class IntervalLegend implements Legend {
 				continue;
 			}
 
+			valueList.add(doubleValue);
+
 			if (doubleValue < min) {
 				min = doubleValue;
 			} else if (doubleValue > max) {
@@ -132,16 +137,21 @@ public class IntervalLegend implements Legend {
 			}
 		}
 
+		double[] values = new double[valueList.size()];
+		for (int i = 0; i < values.length; i++) {
+			values[i] = valueList.get(i);
+		}
+
 		Interval[] intervals = null;
 		switch (type) {
 		case NATURAL:
-			intervals = computeNaturalIntervals(min, max);
+			intervals = computeNaturalIntervals(values, min, max, nIntervals);
 			break;
 		case EQUAL:
-			intervals = computeEqualIntervals(nIntervals, min, max);
+			intervals = computeEqualIntervals(min, max, nIntervals);
 			break;
 		case QUANTILE:
-			intervals = computeQuantileIntervals();
+			intervals = computeQuantileIntervals(values, min, max, nIntervals);
 			break;
 		}
 
@@ -149,12 +159,12 @@ public class IntervalLegend implements Legend {
 			throw new IOException("bug! Unsupported interval type: " + type);
 		}
 
-		int r = start.getRed();
-		int g = start.getGreen();
-		int b = start.getBlue();
-		int stepR = (end.getRed() - r) / nIntervals;
-		int stepG = (end.getGreen() - g) / nIntervals;
-		int stepB = (end.getBlue() - b) / nIntervals;
+		double r = start.getRed();
+		double g = start.getGreen();
+		double b = start.getBlue();
+		double stepR = (end.getRed() - r) / (nIntervals - 1.0);
+		double stepG = (end.getGreen() - g) / (nIntervals - 1.0);
+		double stepB = (end.getBlue() - b) / (nIntervals - 1.0);
 
 		symbols = new HashMap<Interval, Symbolizer>();
 
@@ -163,19 +173,24 @@ public class IntervalLegend implements Legend {
 					interval.getMin())
 					+ " - "
 					+ NumberFormat.getInstance().format(interval.getMax());
-			Symbolizer symbol = defaultSymbols.createDefaultSymbol(
-					layer.getShapeType(), new Color(r, g, b), description);
 
-			r = r + stepR;
-			g = g + stepG;
-			b = b + stepB;
+			int red = Math.max(0, Math.min(255, (int) r));
+			int green = Math.max(0, Math.min(255, (int) g));
+			int blue = Math.max(0, Math.min(255, (int) b));
+			Symbolizer symbol = defaultSymbols.createDefaultSymbol(
+					layer.getShapeType(), new Color(red, green, blue),
+					description);
+
+			r += stepR;
+			g += stepG;
+			b += stepB;
 
 			symbols.put(interval, symbol);
 		}
 	}
 
-	private Interval[] computeEqualIntervals(int nIntervals, double min,
-			double max) {
+	private Interval[] computeEqualIntervals(double min, double max,
+			int nIntervals) {
 		Interval[] intervals = new Interval[nIntervals];
 		double step = (max - min) / nIntervals;
 
@@ -196,13 +211,26 @@ public class IntervalLegend implements Legend {
 		return intervals;
 	}
 
-	private Interval[] computeNaturalIntervals(double min, double max) {
-		throw new UnsupportedOperationException("Unsupported natural intervals");
+	private Interval[] computeNaturalIntervals(double[] values, double min,
+			double max, int nIntervals) {
+		NaturalIntervalGenerator generator = new NaturalIntervalGenerator(min,
+				max, values, nIntervals);
+		return getIntervalArray(generator.getIntervals());
 	}
 
-	private Interval[] computeQuantileIntervals() {
-		throw new UnsupportedOperationException(
-				"Unsupported quantile intervals");
+	private Interval[] computeQuantileIntervals(double[] values, double min,
+			double max, int nIntervals) {
+		QuantileIntervalGenerator generator = new QuantileIntervalGenerator(
+				min, max, values, nIntervals);
+		return getIntervalArray(generator.getIntervals());
+	}
+
+	private Interval[] getIntervalArray(double[][] intervals) {
+		Interval[] ret = new Interval[intervals.length];
+		for (int i = 0; i < ret.length; i++) {
+			ret[i] = new Interval(intervals[i][0], intervals[i][1]);
+		}
+		return ret;
 	}
 
 	@Override

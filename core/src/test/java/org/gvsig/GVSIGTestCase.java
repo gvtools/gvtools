@@ -9,7 +9,6 @@ import com.google.inject.Module;
 import com.google.inject.util.Modules;
 
 public abstract class GVSIGTestCase {
-
 	@Before
 	public void setUp() throws Exception {
 		Module libModule = new LibModule();

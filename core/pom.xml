@@ -16,6 +16,11 @@
 	</properties>
 	<dependencies>
 		<dependency>
+			<groupId>${parent.groupId}</groupId>
+			<artifactId>legacy</artifactId>
+			<version>${parent.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.10</version>
@@ -88,6 +93,13 @@
 						</goals>
 					</execution>
 				</executions>
+				<configuration>
+					<instrumentation>
+						<excludes>
+							<exclude>org/gvsig/persistence/generated/**/*.class</exclude>
+						</excludes>
+					</instrumentation>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

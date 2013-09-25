@@ -450,9 +450,9 @@ public class VectorialInterval extends JPanel implements ILegendPanel {
 					layer.getShapeType(), Color.blue, null);
 			try {
 				this.legend = legendFactory.createIntervalLegend(
-						new HashMap<Interval, Symbolizer>(), Type.EQUAL,
-						defaultSymbol, false, layer, layer.getFeatureSource()
-								.getSchema().getDescriptor(0).getLocalName());
+						new HashMap<Interval, Symbolizer>(), defaultSymbol,
+						false, layer, layer.getFeatureSource().getSchema()
+								.getDescriptor(0).getLocalName());
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
@@ -544,13 +544,11 @@ public class VectorialInterval extends JPanel implements ILegendPanel {
 		}
 
 		try {
-			Type intervalType = IntervalLegend.Type.values()[getCmbIntervalTypes()
-					.getSelectedIndex()];
 			Symbolizer defaultSymbol = defaultSymbolPrev.getSymbol();
 			boolean useDefault = chkdefaultvalues.isSelected();
 			String field = cmbField.getSelectedItem().toString();
-			legend = legendFactory.createIntervalLegend(symbols, intervalType,
-					defaultSymbol, useDefault, layer, field);
+			legend = legendFactory.createIntervalLegend(symbols, defaultSymbol,
+					useDefault, layer, field);
 			return legend;
 		} catch (IOException e) {
 			throw new RuntimeException(e);

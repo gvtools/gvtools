@@ -14,7 +14,7 @@ import static org.mockito.Mockito.when;
 import geomatico.events.Event;
 import geomatico.events.EventBus;
 
-import org.geotools.data.simple.SimpleFeatureSource;
+import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.filter.identity.FeatureIdImpl;
 import org.gvsig.GVSIGTestCase;
 import org.gvsig.events.FeatureSelectionChangeEvent;
@@ -514,14 +514,17 @@ public class LayerTest extends GVSIGTestCase {
 						return type;
 					}
 				});
+
 		GeometryDescriptor geomDescriptor = mock(GeometryDescriptor.class);
 		when(geomDescriptor.getType()).thenReturn(geomType);
 		SimpleFeatureType schema = mock(SimpleFeatureType.class);
 		when(schema.getGeometryDescriptor()).thenReturn(geomDescriptor);
-		SimpleFeatureSource featureSource = mock(SimpleFeatureSource.class);
-		when(featureSource.getSchema()).thenReturn(schema);
+
+		MemoryDataStore ds = new MemoryDataStore(schema);
+
 		Source source = mock(Source.class);
-		when(source.createFeatureSource()).thenReturn(featureSource);
+		when(source.createFeatureSource()).thenReturn(
+				ds.getFeatureSource(ds.getTypeNames()[0]));
 		return layerFactory.createLayer(name, source);
 	}
 }
