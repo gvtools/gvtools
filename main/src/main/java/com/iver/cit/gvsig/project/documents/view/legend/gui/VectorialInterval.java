@@ -284,12 +284,6 @@ public class VectorialInterval extends JPanel implements ILegendPanel {
 			chkdefaultvalues
 					.setBounds(new java.awt.Rectangle(342, 26, 141, 20));
 			chkdefaultvalues.setSelected(false);
-			chkdefaultvalues
-					.addActionListener(new java.awt.event.ActionListener() {
-						public void actionPerformed(java.awt.event.ActionEvent e) {
-							legend.setUseDefault(chkdefaultvalues.isSelected());
-						}
-					});
 		}
 
 		return chkdefaultvalues;
@@ -490,7 +484,7 @@ public class VectorialInterval extends JPanel implements ILegendPanel {
 			e.printStackTrace();
 		}
 
-		chkdefaultvalues.setSelected(legend.usesDefaultSymbol());
+		chkdefaultvalues.setSelected(legend.useDefaultSymbol());
 		cmbField.getModel().setSelectedItem(legend.getFieldName());
 		Symbolizer[] symbols = legend.getSymbols();
 		symbolTable.fillTable(symbols, legend.getIntervals());
@@ -498,7 +492,7 @@ public class VectorialInterval extends JPanel implements ILegendPanel {
 		endColorChooser.setColor(legend.getEndColor());
 		startColorChooser.repaint();
 		endColorChooser.repaint();
-		if (legend.usesDefaultSymbol()) {
+		if (legend.useDefaultSymbol()) {
 			txtNumIntervals.setText(String.valueOf(symbols.length - 1));
 		} else {
 			txtNumIntervals.setText(String.valueOf(symbols.length));

@@ -105,12 +105,14 @@ import com.iver.cit.gvsig.gui.styling.SimpleLine;
 import com.iver.cit.gvsig.gui.styling.SimpleMarker;
 import com.iver.cit.gvsig.gui.styling.SimpleText;
 import com.iver.cit.gvsig.gui.styling.SymbolEditor;
+import com.iver.cit.gvsig.project.documents.view.legend.gui.Categories;
 import com.iver.cit.gvsig.project.documents.view.legend.gui.Features;
 import com.iver.cit.gvsig.project.documents.view.legend.gui.LegendManager;
 import com.iver.cit.gvsig.project.documents.view.legend.gui.Quantities;
 import com.iver.cit.gvsig.project.documents.view.legend.gui.SingleSymbol;
 import com.iver.cit.gvsig.project.documents.view.legend.gui.ThemeManagerWindow;
 import com.iver.cit.gvsig.project.documents.view.legend.gui.VectorialInterval;
+import com.iver.cit.gvsig.project.documents.view.legend.gui.VectorialUniqueValue;
 
 /**
  * Extension for enable the symbology. It only installs the core symbology.
@@ -156,13 +158,13 @@ public class BasicSymbologyExtension extends Extension implements
 		// TODO gtintegration
 		LegendManager.addLegendPage(Quantities.class);
 		LegendManager.addLegendPage(Features.class);
-		// LegendManager.addLegendPage(Categories.class);
+		LegendManager.addLegendPage(Categories.class);
 		// LegendManager.addLegendPage(MultipleAttributes.class);
 
 		LegendManager.addLegendPage(SingleSymbol.class);
 		LegendManager.addLegendPage(VectorialInterval.class);
-		// LegendManager.addLegendPage(VectorialUniqueValue.class);
-		//
+		LegendManager.addLegendPage(VectorialUniqueValue.class);
+
 		// LegendManager.addLegendDriver(FMapGVLDriver.class);
 
 		registerIcons();

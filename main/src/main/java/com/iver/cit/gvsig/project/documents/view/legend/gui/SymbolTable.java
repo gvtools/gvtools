@@ -64,6 +64,7 @@ import com.iver.andami.PluginServices;
 import com.iver.cit.gvsig.project.documents.gui.SymbolCellEditor;
 import com.iver.cit.gvsig.project.documents.gui.TableSymbolCellRenderer;
 import com.iver.cit.gvsig.project.documents.view.legend.edition.gui.IntervalCellEditor;
+import com.iver.cit.gvsig.project.documents.view.legend.edition.gui.ValueCellEditor;
 import com.iver.utiles.swing.jtable.JTable;
 import com.iver.utiles.swing.jtable.TextFieldCellEditor;
 import com.vividsolutions.jts.geom.Geometry;
@@ -88,6 +89,7 @@ public class SymbolTable extends JPanel {
 
 	static {
 		cellEditors.put(INTERVALS_TYPE, new IntervalCellEditor());
+		cellEditors.put(VALUES_TYPE, new ValueCellEditor());
 	}
 
 	private JTable table;
@@ -211,6 +213,10 @@ public class SymbolTable extends JPanel {
 
 		TableSymbolCellRenderer renderer = new TableSymbolCellRenderer(true);
 		column.setCellRenderer(renderer);
+	}
+
+	public int[] getSelectedRows() {
+		return table.getSelectedRows();
 	}
 
 	public void moveDownRows(int startPos, int endPos, int numOfElements) {

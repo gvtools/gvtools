@@ -177,7 +177,7 @@ public class JSymbolPreviewButton extends JComponent implements MouseListener {
 				event = new ActionEvent(this, 0, actionCommand);
 			}
 			for (int i = 0; i < listeners.size(); i++) {
-				((ActionListener) listeners.get(i)).actionPerformed(event);
+				listeners.get(i).actionPerformed(event);
 			}
 		}
 

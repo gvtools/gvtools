@@ -1,11 +1,13 @@
 package org.gvsig.legend;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.awt.Color;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +31,7 @@ import org.gvsig.layer.Source;
 import org.gvsig.legend.impl.IntervalLegend;
 import org.gvsig.legend.impl.IntervalLegend.Type;
 import org.gvsig.legend.impl.LegendFactory;
+import org.gvsig.legend.impl.UniqueValueLegend;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -292,6 +295,58 @@ public class LegendTest extends GVSIGTestCase {
 		assertEquals(nIntervals + 2, rules.size());
 	}
 
+	@Test
+	public void testUniqueValueLegend() throws Exception {
+		testUniqueValueLegend(false);
+	}
+
+	@Test
+	public void testUniqueValueLegendDefaultSymbol() throws Exception {
+		testUniqueValueLegend(true);
+	}
+
+	private void testUniqueValueLegend(boolean useDefault) throws Exception {
+		Layer layer = mockLayer();
+		Symbolizer defaultSymbol = defaultSymbols.createDefaultSymbol(
+				layer.getShapeType(), Color.black, null);
+		Color[] scheme = new Color[] { Color.red, Color.green, Color.blue };
+		UniqueValueLegend legend = legendFactory.createUniqueValueLegend(layer,
+				FIELD_NAME, defaultSymbol, useDefault, scheme, comparator());
+
+		int numUniqueValues = 3;
+		assertEquals(numUniqueValues, legend.getSymbols().length);
+		assertEquals(numUniqueValues, legend.getValues().length);
+		assertEquals(defaultSymbol, legend.getDefaultSymbol());
+		assertArrayEquals(scheme, legend.getColorScheme());
+
+		// +1 for selection rule, +1 for default rule
+		int nRules = useDefault ? (numUniqueValues + 2) : (numUniqueValues + 1);
+		List<Rule> rules = legend.getStyle().featureTypeStyles().get(0).rules();
+		assertEquals(nRules, rules.size());
+	}
+
+	@Test
+	public void testUniqueValueLegendCustomValues() throws Exception {
+		Layer layer = mockLayer();
+		Symbolizer defaultSymbol = defaultSymbols.createDefaultSymbol(
+				layer.getShapeType(), Color.black, null);
+		Color[] scheme = new Color[] { Color.red, Color.green, Color.blue };
+		Map<Object, Symbolizer> symbols = new HashMap<Object, Symbolizer>();
+		symbols.put(20, defaultSymbols.createDefaultSymbol(
+				layer.getShapeType(), Color.gray, ""));
+		UniqueValueLegend legend = legendFactory.createUniqueValueLegend(layer,
+				FIELD_NAME, defaultSymbol, true, scheme, symbols, comparator());
+
+		assertEquals(symbols.size(), legend.getSymbols().length);
+		assertEquals(symbols.size(), legend.getValues().length);
+		assertEquals(defaultSymbol, legend.getDefaultSymbol());
+		assertArrayEquals(scheme, legend.getColorScheme());
+
+		// +1 for selection rule, +1 for default rule
+		List<Rule> rules = legend.getStyle().featureTypeStyles().get(0).rules();
+		assertEquals(symbols.size() + 2, rules.size());
+	}
+
 	private Layer mockLayer() throws Exception {
 		String name = "mylayer";
 		SimpleFeatureTypeBuilder buildType = new SimpleFeatureTypeBuilder();
@@ -318,5 +373,14 @@ public class LegendTest extends GVSIGTestCase {
 		Point geom = gf.createPoint(new Coordinate(x, y));
 		SimpleFeatureBuilder featureBuilder = new SimpleFeatureBuilder(schema);
 		return featureBuilder.buildFeature(id, new Object[] { geom, value });
+	}
+
+	private Comparator<Object> comparator() {
+		return new Comparator<Object>() {
+			@Override
+			public int compare(Object o1, Object o2) {
+				return o1.toString().compareTo(o2.toString());
+			}
+		};
 	}
 }

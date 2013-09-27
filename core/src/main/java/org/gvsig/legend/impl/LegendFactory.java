@@ -2,6 +2,7 @@ package org.gvsig.legend.impl;
 
 import java.awt.Color;
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.Map;
 
 import org.geotools.styling.Symbolizer;
@@ -29,4 +30,12 @@ public interface LegendFactory {
 	IntervalLegend createIntervalLegend(Map<Interval, Symbolizer> symbols,
 			Symbolizer defaultSymbol, boolean useDefault, Layer layer,
 			String fieldName) throws IOException;
+
+	UniqueValueLegend createUniqueValueLegend(Layer layer, String fieldName,
+			Symbolizer defaultSymbol, boolean useDefault, Color[] colorScheme,
+			Comparator<Object> order) throws IOException;
+
+	UniqueValueLegend createUniqueValueLegend(Layer layer, String fieldName,
+			Symbolizer defaultSymbol, boolean useDefault, Color[] colorScheme,
+			Map<Object, Symbolizer> symbols, Comparator<Object> order);
 }
