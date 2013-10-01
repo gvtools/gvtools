@@ -137,8 +137,6 @@ public class ExtendedSymbologyExtension extends Extension {
 		// legends available in the legend page
 		// TODO gtintegration
 		// LegendManager.addLegendPage(DotDensity.class);
-		LegendManager.addLegendPage(GraduatedSymbols.class);
-		LegendManager.addLegendPage(ProportionalSymbols.class);
 		// LegendManager.addLegendPage(QuantityByCategory.class);
 
 		// LegendManager.addLegendPage(Statistics.class);

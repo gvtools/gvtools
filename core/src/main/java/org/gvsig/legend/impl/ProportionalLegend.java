@@ -6,7 +6,6 @@ import javax.inject.Inject;
 
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.styling.Symbolizer;
-import org.geotools.styling.visitor.RescaleStyleVisitor;
 import org.gvsig.layer.Layer;
 import org.gvsig.legend.Interval;
 import org.opengis.feature.simple.SimpleFeature;
@@ -81,8 +80,8 @@ public class ProportionalLegend extends AbstractLegend {
 	protected Symbolizer[] getSymbolsForElseFilter() throws IOException {
 		if (symbols == null) {
 			createSymbols();
-			RescaleStyleVisitor visitor = new RescaleStyleVisitor(
-					filterFactory, sizeExp);
+			ResizeCopyStyleVisitor visitor = new ResizeCopyStyleVisitor(
+					sizeExp, styleFactory, filterFactory);
 			template.accept(visitor);
 			Symbolizer symbol = (Symbolizer) visitor.getCopy();
 			if (useBackground) {

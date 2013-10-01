@@ -95,6 +95,8 @@ import org.geotools.styling.LineSymbolizer;
 import org.geotools.styling.PointSymbolizer;
 import org.geotools.styling.PolygonSymbolizer;
 import org.geotools.styling.TextSymbolizer;
+import org.gvsig.symbology.gui.layerproperties.GraduatedSymbols;
+import org.gvsig.symbology.gui.layerproperties.ProportionalSymbols;
 
 import com.iver.andami.PluginServices;
 import com.iver.andami.plugins.Extension;
@@ -164,6 +166,9 @@ public class BasicSymbologyExtension extends Extension implements
 		LegendManager.addLegendPage(SingleSymbol.class);
 		LegendManager.addLegendPage(VectorialInterval.class);
 		LegendManager.addLegendPage(VectorialUniqueValue.class);
+
+		LegendManager.addLegendPage(GraduatedSymbols.class);
+		LegendManager.addLegendPage(ProportionalSymbols.class);
 
 		// TODO gtintegration
 		// LegendManager.addLegendDriver(FMapGVLDriver.class);
