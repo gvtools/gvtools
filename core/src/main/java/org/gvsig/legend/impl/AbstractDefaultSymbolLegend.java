@@ -1,9 +1,14 @@
 package org.gvsig.legend.impl;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
+import org.geotools.styling.FeatureTypeStyle;
+import org.geotools.styling.Style;
 import org.geotools.styling.Symbolizer;
 import org.gvsig.layer.Layer;
+import org.opengis.filter.Filter;
 
 import com.google.inject.assistedinject.Assisted;
 
@@ -27,8 +32,11 @@ public abstract class AbstractDefaultSymbolLegend extends AbstractLegend {
 		return defaultSymbol;
 	}
 
-	@Override
-	protected Symbolizer[] getSymbolsForElseFilter() {
-		return useDefault ? new Symbolizer[] { defaultSymbol } : null;
+	protected void addDefaultStyleIfNeeded(Style style, List<Filter> filters) {
+		if (useDefault) {
+			Filter filter = filterFactory.not(filterFactory.or(filters));
+			FeatureTypeStyle fts = featureTypeStyle(rule(filter, defaultSymbol));
+			style.featureTypeStyles().add(fts);
+		}
 	}
 }

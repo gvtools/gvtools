@@ -9,6 +9,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.geotools.data.simple.SimpleFeatureIterator;
+import org.geotools.styling.FeatureTypeStyle;
+import org.geotools.styling.Style;
 import org.geotools.styling.Symbolizer;
 import org.gvsig.layer.Layer;
 import org.gvsig.legend.Interval;
@@ -31,8 +33,8 @@ public abstract class AbstractIntervalLegend extends
 
 	private Type type;
 	private Map<Interval, Symbolizer> symbolsMap;
-	private Interval[] orderedIntervals;
-	private Symbolizer[] orderedSymbols;
+	private Interval[] intervals;
+	private Symbolizer[] symbols;
 	protected int nIntervals;
 	private String fieldName;
 
@@ -59,14 +61,9 @@ public abstract class AbstractIntervalLegend extends
 	}
 
 	public Interval[] getIntervals() throws IOException {
-		return getOrderedIntervals(symbols());
-	}
-
-	protected Interval[] getOrderedIntervals(
-			Map<Interval, Symbolizer> symbolsMap) {
-		if (orderedIntervals == null) {
+		if (intervals == null) {
 			List<Interval> list = new ArrayList<Interval>();
-			list.addAll(symbolsMap.keySet());
+			list.addAll(symbolsMap().keySet());
 			Collections.sort(list, new Comparator<Interval>() {
 				@Override
 				public int compare(Interval o1, Interval o2) {
@@ -80,35 +77,21 @@ public abstract class AbstractIntervalLegend extends
 				}
 			});
 
-			orderedIntervals = list.toArray(new Interval[list.size()]);
+			intervals = list.toArray(new Interval[list.size()]);
 		}
-		return orderedIntervals;
+		return intervals;
 	}
 
 	public Symbolizer[] getSymbols() throws IOException {
-		return getOrderedSymbols(symbols());
-	}
-
-	private Symbolizer[] getOrderedSymbols(Map<Interval, Symbolizer> symbolsMap) {
-		if (orderedSymbols == null) {
-			Interval[] intervals = getOrderedIntervals(symbolsMap);
-			orderedSymbols = new Symbolizer[symbolsMap.size()];
-			for (int i = 0; i < orderedSymbols.length; i++) {
-				orderedSymbols[i] = symbolsMap.get(intervals[i]);
+		if (symbols == null) {
+			Interval[] intervals = getIntervals();
+			symbols = new Symbolizer[symbolsMap().size()];
+			for (int i = 0; i < symbols.length; i++) {
+				symbols[i] = symbolsMap().get(intervals[i]);
 			}
-			return orderedSymbols;
+			return symbols;
 		}
-		return orderedSymbols;
-	}
-
-	@Override
-	protected Object[] getSymbolizerKeys() throws IOException {
-		return getIntervals();
-	}
-
-	@Override
-	protected Symbolizer[] getSymbols(Object value) throws IOException {
-		return new Symbolizer[] { symbols().get(value) };
+		return symbols;
 	}
 
 	public Type getType() {
@@ -120,18 +103,31 @@ public abstract class AbstractIntervalLegend extends
 	}
 
 	@Override
-	protected Filter getFilter(Object key) {
-		Interval interval = (Interval) key;
-		return filterFactory.between(filterFactory.property(fieldName),
-				filterFactory.literal(interval.getMin()),
-				filterFactory.literal(interval.getMax()));
+	protected Style createStyle() throws IOException {
+		Style style = styleFactory.createStyle();
+		List<Filter> filters = new ArrayList<Filter>();
+		for (Interval interval : symbolsMap().keySet()) {
+			Filter filter = filterFactory.between(
+					filterFactory.property(fieldName),
+					filterFactory.literal(interval.getMin()),
+					filterFactory.literal(interval.getMax()));
+			filters.add(filter);
+			FeatureTypeStyle fts = featureTypeStyle(rule(filter,
+					getSymbolsForInterval(interval)));
+			style.featureTypeStyles().add(fts);
+		}
+
+		addDefaultStyleIfNeeded(style, filters);
+		return style;
 	}
 
-	protected Map<Interval, Symbolizer> symbols() throws IOException {
+	protected abstract Symbolizer[] getSymbolsForInterval(Interval interval)
+			throws IOException;
+
+	protected Map<Interval, Symbolizer> symbolsMap() throws IOException {
 		if (symbolsMap == null) {
 			symbolsMap = createSymbols();
 		}
-
 		return symbolsMap;
 	}
 

@@ -2,13 +2,17 @@ package org.gvsig.legend.impl;
 
 import java.awt.Color;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
 import org.geotools.data.simple.SimpleFeatureIterator;
+import org.geotools.styling.FeatureTypeStyle;
+import org.geotools.styling.Style;
 import org.geotools.styling.Symbolizer;
 import org.gvsig.layer.Layer;
 import org.gvsig.legend.DefaultSymbols;
@@ -21,7 +25,8 @@ import com.vividsolutions.jts.geom.Geometry;
 public class UniqueValueLegend extends AbstractDefaultSymbolLegend {
 	private String fieldName;
 	private Map<Object, Symbolizer> symbolsMap;
-	private Object[] orderedKeys;
+	private Object[] values;
+	private Symbolizer[] symbols;
 	private Color[] colorScheme;
 	private Comparator<Object> order;
 
@@ -50,48 +55,51 @@ public class UniqueValueLegend extends AbstractDefaultSymbolLegend {
 	}
 
 	public Symbolizer[] getSymbols() throws IOException {
-		Object[] values = getValues();
-		Symbolizer[] ret = new Symbolizer[values.length];
-		for (int i = 0; i < ret.length; i++) {
-			ret[i] = symbols().get(values[i]);
+		if (symbols == null) {
+			Object[] values = getValues();
+			symbols = new Symbolizer[values.length];
+			for (int i = 0; i < values.length; i++) {
+				symbols[i] = symbols().get(values[i]);
+			}
 		}
-		return ret;
+		return symbols;
 	}
 
 	public Object[] getValues() throws IOException {
-		return getSymbolizerKeys();
+		if (values == null) {
+			values = symbols().keySet().toArray();
+			Arrays.sort(values, order);
+		}
+		return values;
 	}
 
 	public String getFieldName() {
 		return fieldName;
 	}
 
-	@Override
-	protected Symbolizer[] getSymbols(Object value) {
-		return new Symbolizer[] { symbolsMap.get(value) };
-	}
-
-	@Override
-	protected Object[] getSymbolizerKeys() throws IOException {
-		return getOrderedKeys(symbols());
-	}
-
-	private Object[] getOrderedKeys(Map<Object, Symbolizer> symbolsMap) {
-		if (orderedKeys == null) {
-			orderedKeys = symbolsMap.keySet().toArray();
-			Arrays.sort(orderedKeys, order);
-		}
-		return orderedKeys;
-	}
-
-	@Override
-	protected Filter getFilter(Object key) {
-		return filterFactory.equals(filterFactory.property(fieldName),
-				filterFactory.literal(key));
-	}
-
 	public Color[] getColorScheme() {
 		return colorScheme;
+	}
+
+	@Override
+	protected Style createStyle() throws IOException {
+		Style style = styleFactory.createStyle();
+		List<FeatureTypeStyle> styles = style.featureTypeStyles();
+		List<Filter> filters = new ArrayList<Filter>();
+		for (int i = getValues().length - 1; i >= 0; i--) {
+			Object value = getValues()[i];
+			Filter filter = filterFactory.equals(
+					filterFactory.property(fieldName),
+					filterFactory.literal(value));
+			filters.add(filter);
+			FeatureTypeStyle fts = featureTypeStyle(rule(filter,
+					symbols().get(value)));
+			styles.add(fts);
+		}
+
+		addDefaultStyleIfNeeded(style, filters);
+
+		return style;
 	}
 
 	private Map<Object, Symbolizer> symbols() throws IOException {

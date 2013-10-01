@@ -43,7 +43,7 @@ public class SizeIntervalLegend extends AbstractIntervalLegend {
 		super(symbolsMap, defaultSymbol, useDefault, layer, fieldName);
 		this.size = new Interval(1, 7);
 		this.background = background;
-		this.useBackground = false;
+		this.useBackground = useBackground;
 	}
 
 	public Interval getSize() {
@@ -52,6 +52,17 @@ public class SizeIntervalLegend extends AbstractIntervalLegend {
 
 	public Symbolizer getBackground() {
 		return background;
+	}
+
+	@Override
+	protected Symbolizer[] getSymbolsForInterval(Interval interval)
+			throws IOException {
+		Symbolizer symbol = symbolsMap().get(interval);
+		if (useBackground) {
+			return new Symbolizer[] { background, symbol };
+		} else {
+			return new Symbolizer[] { symbol };
+		}
 	}
 
 	@Override
@@ -75,14 +86,5 @@ public class SizeIntervalLegend extends AbstractIntervalLegend {
 		}
 
 		return symbolsMap;
-	}
-
-	@Override
-	protected Symbolizer[] getSymbols(Object key) throws IOException {
-		if (useBackground && background != null) {
-			return new Symbolizer[] { background, symbols().get(key) };
-		} else {
-			return new Symbolizer[] { symbols().get(key) };
-		}
 	}
 }

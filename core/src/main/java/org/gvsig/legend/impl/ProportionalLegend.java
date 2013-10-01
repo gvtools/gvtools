@@ -5,11 +5,11 @@ import java.io.IOException;
 import javax.inject.Inject;
 
 import org.geotools.data.simple.SimpleFeatureIterator;
+import org.geotools.styling.Style;
 import org.geotools.styling.Symbolizer;
 import org.gvsig.layer.Layer;
 import org.gvsig.legend.Interval;
 import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.filter.Filter;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
@@ -62,22 +62,13 @@ public class ProportionalLegend extends AbstractLegend {
 	}
 
 	@Override
-	protected Symbolizer[] getSymbols(Object key) {
-		return null;
+	protected Style createStyle() throws IOException {
+		Style style = styleFactory.createStyle();
+		style.featureTypeStyles().add(featureTypeStyle(rule(symbols())));
+		return style;
 	}
 
-	@Override
-	protected Object[] getSymbolizerKeys() {
-		return new Object[0];
-	}
-
-	@Override
-	protected Filter getFilter(Object key) {
-		return null;
-	}
-
-	@Override
-	protected Symbolizer[] getSymbolsForElseFilter() throws IOException {
+	private Symbolizer[] symbols() throws IOException {
 		if (symbols == null) {
 			createSymbols();
 			ResizeCopyStyleVisitor visitor = new ResizeCopyStyleVisitor(

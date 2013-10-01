@@ -274,22 +274,10 @@ public class ProportionalSymbols extends JPanel implements ILegendPanel {
 	}
 
 	@Override
-	public void setData(Layer layer, Legend l) {
+	public void setData(Layer layer, Legend l) throws IOException {
 		this.layer = layer;
 
-		String[] fieldNames;
-		try {
-			fieldNames = getNumericFieldNames();
-		} catch (UnsupportedOperationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		}
-
+		String[] fieldNames = getNumericFieldNames();
 		cmbValue.setModel(new DefaultComboBoxModel<String>(fieldNames));
 		cmbNormalization.setModel(new DefaultComboBoxModel<String>(fieldNames));
 		cmbNormalization.addItem(none);
@@ -303,9 +291,8 @@ public class ProportionalSymbols extends JPanel implements ILegendPanel {
 			this.shapeType = Point.class;
 		}
 
-		boolean useBackground = MultiPolygon.class
-				.isAssignableFrom(this.shapeType)
-				|| Polygon.class.isAssignableFrom(this.shapeType);
+		boolean useBackground = MultiPolygon.class.isAssignableFrom(type)
+				|| Polygon.class.isAssignableFrom(type);
 		if (useBackground) {
 			symbolPanel.add(getBackgroundPanel());
 		}
