@@ -76,6 +76,7 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import javax.xml.transform.TransformerException;
 
+import org.apache.log4j.Logger;
 import org.geotools.styling.FeatureTypeConstraint;
 import org.geotools.styling.SLDParser;
 import org.geotools.styling.SLDTransformer;
@@ -101,6 +102,8 @@ import com.iver.andami.messages.NotificationManager;
  * @author jaume dominguez faus - jaume.dominguez@iver.es
  */
 public class LegendManager extends AbstractThemeManagerPage {
+	private static final Logger logger = Logger.getLogger(LegendManager.class);
+
 	private static final long serialVersionUID = 7989057553773181019L;
 	private static ArrayList<Class<? extends ILegendPanel>> legendPool = new ArrayList<Class<? extends ILegendPanel>>();
 	private static ArrayList<Class<? extends IFMapLegendDriver>> legendDriverPool = new ArrayList<Class<? extends IFMapLegendDriver>>();
@@ -191,16 +194,16 @@ public class LegendManager extends AbstractThemeManagerPage {
 					StyleFactory factory = new StyleFactoryImpl();
 
 					// Create SLD
-					Style style = legend.getStyle();
-					StyledLayerDescriptor sld = factory
-							.createStyledLayerDescriptor();
-					UserLayer layer = factory.createUserLayer();
-					layer.setLayerFeatureConstraints(new FeatureTypeConstraint[] { null });
-					sld.addStyledLayer(layer);
-					layer.addUserStyle(style);
-
-					SLDTransformer styleTransform = new SLDTransformer();
 					try {
+						Style style = legend.getStyle();
+						StyledLayerDescriptor sld = factory
+								.createStyledLayerDescriptor();
+						UserLayer layer = factory.createUserLayer();
+						layer.setLayerFeatureConstraints(new FeatureTypeConstraint[] { null });
+						sld.addStyledLayer(layer);
+						layer.addUserStyle(style);
+
+						SLDTransformer styleTransform = new SLDTransformer();
 						String xml = styleTransform.transform(sld);
 						FileWriter writer = new FileWriter(file);
 						writer.write(xml);
@@ -593,13 +596,18 @@ public class LegendManager extends AbstractThemeManagerPage {
 				setIcon(null);
 			}
 		} else {
-			// show the page
-			activePanel = page;
-			setIcon(activePanel.getIcon());
+			try {
+				page.setData(layer, legend);
+				// show the page
+				activePanel = page;
+				setIcon(activePanel.getIcon());
 
-			activePanel.setData(layer, legend);
-			getTitleArea().setText(activePanel.getDescription());
-			jPanelContainer.setViewportView(activePanel.getPanel());
+				getTitleArea().setText(activePanel.getDescription());
+				jPanelContainer.setViewportView(activePanel.getPanel());
+			} catch (IOException e) {
+				logger.error("Cannot set legend data", e);
+				NotificationManager.addError(e);
+			}
 		}
 	}
 

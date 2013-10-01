@@ -7,6 +7,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.awt.Color;
+import java.io.IOException;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +32,7 @@ import org.gvsig.layer.Source;
 import org.gvsig.legend.impl.IntervalLegend;
 import org.gvsig.legend.impl.IntervalLegend.Type;
 import org.gvsig.legend.impl.LegendFactory;
+import org.gvsig.legend.impl.ProportionalLegend;
 import org.gvsig.legend.impl.UniqueValueLegend;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
@@ -77,7 +79,7 @@ public class LegendTest extends GVSIGTestCase {
 
 	private void testSingleSymbolLegend(
 			final Class<? extends Geometry> geomType,
-			Class<? extends Symbolizer> symbolType) {
+			Class<? extends Symbolizer> symbolType) throws IOException {
 		Layer layer = mock(Layer.class);
 		when(layer.getShapeType()).then(
 				new Answer<Class<? extends Geometry>>() {
@@ -91,12 +93,13 @@ public class LegendTest extends GVSIGTestCase {
 
 		Legend legend = legendFactory.createSingleSymbolLegend(layer);
 		List<FeatureTypeStyle> styles = legend.getStyle().featureTypeStyles();
-		assertEquals(1, styles.size());
-		List<Rule> rules = styles.get(0).rules();
-		// 2 rules: default and selected
-		assertEquals(2, rules.size());
-		for (Rule rule : rules) {
-			List<Symbolizer> symbolizers = rule.symbolizers();
+		// 2 feature type styles (each one with a single rule): default and
+		// selected
+		assertEquals(2, styles.size());
+		for (FeatureTypeStyle style : styles) {
+			List<Rule> rules = style.rules();
+			assertEquals(1, rules.size());
+			List<Symbolizer> symbolizers = rules.get(0).symbolizers();
 			assertEquals(1, symbolizers.size());
 			assertTrue(symbolType.isAssignableFrom(symbolizers.get(0)
 					.getClass()));
@@ -265,12 +268,13 @@ public class LegendTest extends GVSIGTestCase {
 
 		Style style = legend.getStyle();
 		List<FeatureTypeStyle> featureTypeStyles = style.featureTypeStyles();
-		assertEquals(1, featureTypeStyles.size());
-
-		// We only check the number of rules, not the style itself
+		// We only check the number of feature type styles, not the styles
+		// themselves
 		// +1 because of the selection rule
-		List<Rule> rules = featureTypeStyles.get(0).rules();
-		assertEquals(nIntervals + 1, rules.size());
+		assertEquals(nIntervals + 1, featureTypeStyles.size());
+		for (FeatureTypeStyle featureTypeStyle : featureTypeStyles) {
+			assertEquals(1, featureTypeStyle.rules().size());
+		}
 	}
 
 	@Test
@@ -287,12 +291,13 @@ public class LegendTest extends GVSIGTestCase {
 
 		Style style = legend.getStyle();
 		List<FeatureTypeStyle> featureTypeStyles = style.featureTypeStyles();
-		assertEquals(1, featureTypeStyles.size());
-
-		// We only check the number of rules, not the style itself
+		// We only check the number of feature type styles, not the styles
+		// themselves
 		// +2 for selection and default symbol
-		List<Rule> rules = featureTypeStyles.get(0).rules();
-		assertEquals(nIntervals + 2, rules.size());
+		assertEquals(nIntervals + 2, featureTypeStyles.size());
+		for (FeatureTypeStyle featureTypeStyle : featureTypeStyles) {
+			assertEquals(1, featureTypeStyle.rules().size());
+		}
 	}
 
 	@Test
@@ -319,10 +324,14 @@ public class LegendTest extends GVSIGTestCase {
 		assertEquals(defaultSymbol, legend.getDefaultSymbol());
 		assertArrayEquals(scheme, legend.getColorScheme());
 
-		// +1 for selection rule, +1 for default rule
-		int nRules = useDefault ? (numUniqueValues + 2) : (numUniqueValues + 1);
-		List<Rule> rules = legend.getStyle().featureTypeStyles().get(0).rules();
-		assertEquals(nRules, rules.size());
+		// +1 for selection style, +1 for default style
+		int nStyles = useDefault ? (numUniqueValues + 2)
+				: (numUniqueValues + 1);
+		List<FeatureTypeStyle> styles = legend.getStyle().featureTypeStyles();
+		assertEquals(nStyles, styles.size());
+		for (FeatureTypeStyle style : styles) {
+			assertEquals(1, style.rules().size());
+		}
 	}
 
 	@Test
@@ -342,9 +351,38 @@ public class LegendTest extends GVSIGTestCase {
 		assertEquals(defaultSymbol, legend.getDefaultSymbol());
 		assertArrayEquals(scheme, legend.getColorScheme());
 
-		// +1 for selection rule, +1 for default rule
-		List<Rule> rules = legend.getStyle().featureTypeStyles().get(0).rules();
-		assertEquals(symbols.size() + 2, rules.size());
+		// +1 for selection style, +1 for default style
+		List<FeatureTypeStyle> styles = legend.getStyle().featureTypeStyles();
+		assertEquals(symbols.size() + 2, styles.size());
+		for (FeatureTypeStyle style : styles) {
+			assertEquals(1, style.rules().size());
+		}
+	}
+
+	@Test
+	public void testProportionalLegend() throws Exception {
+		Layer layer = mockLayer();
+		Symbolizer template = defaultSymbols.createDefaultSymbol(
+				layer.getShapeType(), Color.black, null);
+		Symbolizer background = defaultSymbols.createDefaultSymbol(
+				Polygon.class, Color.black, null);
+		Interval size = new Interval(1, 10);
+		ProportionalLegend legend = legendFactory.createProportionalLegend(
+				layer, FIELD_NAME, FIELD_NAME, template, background, false,
+				size);
+
+		assertEquals(FIELD_NAME, legend.getNormalizationField());
+		assertEquals(FIELD_NAME, legend.getValueField());
+		assertEquals(template, legend.getTemplate());
+		assertEquals(background, legend.getBackground());
+		assertEquals(size, legend.getSize());
+
+		// +1 for selection style, +1 for the proportional style
+		List<FeatureTypeStyle> styles = legend.getStyle().featureTypeStyles();
+		assertEquals(2, styles.size());
+		for (FeatureTypeStyle style : styles) {
+			assertEquals(1, style.rules().size());
+		}
 	}
 
 	private Layer mockLayer() throws Exception {

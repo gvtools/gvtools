@@ -1,6 +1,7 @@
 package org.gvsig.legend.impl;
 
 import java.awt.Color;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,16 +21,14 @@ import org.opengis.filter.FilterFactory2;
 
 import com.google.inject.assistedinject.Assisted;
 
-public abstract class AbstractMultiSymbolLegend implements Legend {
+public abstract class AbstractLegend implements Legend {
 	private Rule selectionRule;
 	private Map<Rule, Object> ruleValues;
 
-	private boolean useDefault;
-	private Symbolizer defaultSymbol;
 	protected Layer layer;
 
 	@Inject
-	private StyleFactory styleFactory;
+	protected StyleFactory styleFactory;
 
 	@Inject
 	protected FilterFactory2 filterFactory;
@@ -38,78 +37,73 @@ public abstract class AbstractMultiSymbolLegend implements Legend {
 	protected DefaultSymbols defaultSymbols;
 
 	@Inject
-	public AbstractMultiSymbolLegend(@Assisted Layer layer,
-			@Assisted Symbolizer defaultSymbol, @Assisted boolean useDefault) {
+	public AbstractLegend(@Assisted Layer layer) {
 		this.layer = layer;
-		this.defaultSymbol = defaultSymbol;
-		this.useDefault = useDefault;
 	}
 
 	@Override
-	public Style getStyle() {
-		Object[] keys = getSymbolizerKeys();
-		FeatureTypeStyle fts = styleFactory.createFeatureTypeStyle();
+	public Style getStyle() throws IOException {
+		Style style = styleFactory.createStyle();
 
 		Filter selectionFilter = filterFactory.id(layer.getSelection());
 		ruleValues = new HashMap<Rule, Object>();
 
-		for (int i = 0; i < keys.length; i++) {
+		Object[] keys = getSymbolizerKeys();
+		// From last to first the implement the painter's model
+		for (int i = keys.length - 1; i >= 0; i--) {
 			Object value = keys[i];
 
-			Rule rule = styleFactory.createRule();
-			rule.symbolizers().add(getSymbol(value));
-			rule.setFilter(doGetFilter(value, selectionFilter));
-			rule.setElseFilter(false);
-
-			fts.rules().add(rule);
+			Rule rule = addRule(style, doGetFilter(value, selectionFilter),
+					false, getSymbols(value));
 			ruleValues.put(rule, value);
 		}
 
-		if (useDefault && defaultSymbol != null) {
-			Rule rule = styleFactory.createRule();
-			rule.symbolizers().add(defaultSymbol);
-			rule.setElseFilter(true);
-			fts.rules().add(rule);
+		Symbolizer selectionSymbol = defaultSymbols.createDefaultSymbol(
+				layer.getShapeType(), Color.yellow, null);
+		selectionRule = addRule(style, selectionFilter, false, selectionSymbol);
+
+		Symbolizer[] symbols = getSymbolsForElseFilter();
+		if (symbols != null) {
+			addRule(style, null, true, symbols);
 		}
 
-		selectionRule = styleFactory.createRule();
-		selectionRule.symbolizers().add(
-				defaultSymbols.createDefaultSymbol(layer.getShapeType(),
-						Color.yellow, null));
-		selectionRule.setFilter(selectionFilter);
-		fts.rules().add(selectionRule);
-
-		Style style = styleFactory.createStyle();
-		style.featureTypeStyles().add(fts);
 		return style;
 	}
 
-	public boolean useDefaultSymbol() {
-		return useDefault;
-	}
+	private Rule addRule(Style style, Filter filter, boolean elseFilter,
+			Symbolizer... symbols) {
+		Rule rule = styleFactory.createRule();
+		for (Symbolizer symbol : symbols) {
+			rule.symbolizers().add(symbol);
+		}
+		rule.setFilter(filter);
+		rule.setElseFilter(elseFilter);
 
-	public Symbolizer getDefaultSymbol() {
-		return defaultSymbol;
+		FeatureTypeStyle fts = styleFactory.createFeatureTypeStyle();
+		fts.rules().add(rule);
+		style.featureTypeStyles().add(fts);
+
+		return rule;
 	}
 
 	/**
-	 * Gets the symbolizer for the given key.
+	 * Gets the symbolizers for the given key.
 	 * 
 	 * @param key
-	 *            The key to obtain the symbolizer. It will always be one of the
-	 *            objects returned by {@link #getSymbolizerKeys()}, so it is
+	 *            The key to obtain the symbolizers. It will always be one of
+	 *            the objects returned by {@link #getSymbolizerKeys()}, so it is
 	 *            safe to cast it to the type of objects returned by
 	 *            {@link #getSymbolizerKeys()}.
 	 * @return the symbolizer for the style rule
 	 */
-	protected abstract Symbolizer getSymbol(Object key);
+	protected abstract Symbolizer[] getSymbols(Object key) throws IOException;
 
 	/**
 	 * Gets the array of values to style.
 	 * 
 	 * @return the array of values to style.
 	 */
-	protected abstract Object[] getSymbolizerKeys();
+	protected abstract Object[] getSymbolizerKeys() throws IOException;
 
 	/**
 	 * Gets the filter for the given key.
@@ -123,12 +117,18 @@ public abstract class AbstractMultiSymbolLegend implements Legend {
 	 */
 	protected abstract Filter getFilter(Object key);
 
+	protected abstract Symbolizer[] getSymbolsForElseFilter()
+			throws IOException;
+
 	@Override
 	public void updateSelection(Selection selection) {
-		Filter selectionFilter = filterFactory.id(selection);
-		selectionRule.setFilter(selectionFilter);
-		for (Rule rule : ruleValues.keySet()) {
-			rule.setFilter(doGetFilter(ruleValues.get(rule), selectionFilter));
+		if (selectionRule != null) {
+			Filter selectionFilter = filterFactory.id(selection);
+			selectionRule.setFilter(selectionFilter);
+			for (Rule rule : ruleValues.keySet()) {
+				rule.setFilter(doGetFilter(ruleValues.get(rule),
+						selectionFilter));
+			}
 		}
 	}
 

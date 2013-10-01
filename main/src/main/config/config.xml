@@ -161,6 +161,8 @@
 		<extension class-name="com.iver.cit.gvsig.BasicSymbologyExtension"
 			description="Enables the symbology." active="true" priority="20">
 		</extension>
-
+		<extension class-name="org.gvsig.symbology.ExtendedSymbologyExtension"
+			description="Enables the extended symbology." active="true" priority="20">
+		</extension>
 	</extensions>
 </plugin-config>

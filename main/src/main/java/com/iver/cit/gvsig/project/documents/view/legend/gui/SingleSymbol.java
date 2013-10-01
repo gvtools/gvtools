@@ -60,11 +60,9 @@ import javax.swing.border.TitledBorder;
 
 import org.geotools.styling.Description;
 import org.geotools.styling.DescriptionImpl;
-import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.LineSymbolizer;
 import org.geotools.styling.PointSymbolizer;
 import org.geotools.styling.PolygonSymbolizer;
-import org.geotools.styling.Rule;
 import org.geotools.styling.Symbolizer;
 import org.gvsig.gui.beans.swing.GridBagLayoutPanel;
 import org.gvsig.gui.beans.swing.JButton;
@@ -120,26 +118,22 @@ public class SingleSymbol extends JPanel implements ILegendPanel,
 	}
 
 	@Override
-	public void setData(Layer lyr, Legend legend) {
+	public void setData(Layer lyr, Legend l) {
 		this.layer = lyr;
 		shapeType = lyr.getShapeType();
-		FeatureTypeStyle style = legend.getStyle().featureTypeStyles().get(0);
 
-		if (style.rules().size() == 0) {
-			throw new IllegalArgumentException("At least a rule must exist");
+		SingleSymbolLegend legend;
+		if (l instanceof SingleSymbolLegend) {
+			legend = (SingleSymbolLegend) l;
+		} else {
+			legend = legendFactory.createSingleSymbolLegend(layer);
 		}
 
-		Rule rule = style.rules().get(0);
-		if (rule.symbolizers().size() == 0) {
-			throw new IllegalArgumentException(
-					"At least one symbolizer must exist");
-		}
+		setSymbol(legend.getSymbol());
 
-		setSymbol(rule.symbolizers().get(0));
-
-		getSymbolPreviewPanel().setSymbol(this.symbol);
-		getBtnOpenSymbolLevelsEditor().setEnabled(style != null);
-		Description description = style.getDescription();
+		getSymbolPreviewPanel().setSymbol(legend.getSymbol());
+		getBtnOpenSymbolLevelsEditor().setEnabled(false);
+		Description description = legend.getSymbol().getDescription();
 		if (description != null && description.getTitle() != null) {
 			this.txtLabel.setText(description.getTitle().toString());
 		}

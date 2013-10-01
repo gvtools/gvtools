@@ -108,6 +108,7 @@ import com.iver.cit.gvsig.gui.styling.SymbolEditor;
 import com.iver.cit.gvsig.project.documents.view.legend.gui.Categories;
 import com.iver.cit.gvsig.project.documents.view.legend.gui.Features;
 import com.iver.cit.gvsig.project.documents.view.legend.gui.LegendManager;
+import com.iver.cit.gvsig.project.documents.view.legend.gui.MultipleAttributes;
 import com.iver.cit.gvsig.project.documents.view.legend.gui.Quantities;
 import com.iver.cit.gvsig.project.documents.view.legend.gui.SingleSymbol;
 import com.iver.cit.gvsig.project.documents.view.legend.gui.ThemeManagerWindow;
@@ -155,16 +156,16 @@ public class BasicSymbologyExtension extends Extension implements
 		// LabelingManager.addLabelingStrategy(AttrInTableLabeling.class);
 
 		// legends available in the legend page
-		// TODO gtintegration
 		LegendManager.addLegendPage(Quantities.class);
 		LegendManager.addLegendPage(Features.class);
 		LegendManager.addLegendPage(Categories.class);
-		// LegendManager.addLegendPage(MultipleAttributes.class);
+		LegendManager.addLegendPage(MultipleAttributes.class);
 
 		LegendManager.addLegendPage(SingleSymbol.class);
 		LegendManager.addLegendPage(VectorialInterval.class);
 		LegendManager.addLegendPage(VectorialUniqueValue.class);
 
+		// TODO gtintegration
 		// LegendManager.addLegendDriver(FMapGVLDriver.class);
 
 		registerIcons();

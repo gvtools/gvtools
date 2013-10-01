@@ -1,7 +1,6 @@
 package org.gvsig.legend.impl;
 
 import java.awt.Color;
-import java.io.IOException;
 import java.util.Comparator;
 import java.util.Map;
 
@@ -25,17 +24,24 @@ public interface LegendFactory {
 	IntervalLegend createIntervalLegend(@Assisted("start") Color start,
 			@Assisted("end") Color end, Type intervalType,
 			Symbolizer defaultSymbol, boolean useDefault, Layer layer,
-			String fieldName, int nIntervals) throws IOException;
+			String fieldName, int nIntervals);
 
 	IntervalLegend createIntervalLegend(Map<Interval, Symbolizer> symbols,
 			Symbolizer defaultSymbol, boolean useDefault, Layer layer,
-			String fieldName) throws IOException;
+			String fieldName);
 
 	UniqueValueLegend createUniqueValueLegend(Layer layer, String fieldName,
 			Symbolizer defaultSymbol, boolean useDefault, Color[] colorScheme,
-			Comparator<Object> order) throws IOException;
+			Comparator<Object> order);
 
 	UniqueValueLegend createUniqueValueLegend(Layer layer, String fieldName,
 			Symbolizer defaultSymbol, boolean useDefault, Color[] colorScheme,
 			Map<Object, Symbolizer> symbols, Comparator<Object> order);
+
+	ProportionalLegend createProportionalLegend(Layer layer,
+			@Assisted("value") String valueField,
+			@Assisted("normalization") String normalizationField,
+			@Assisted("template") Symbolizer template,
+			@Assisted("background") Symbolizer background,
+			@Assisted boolean useBackground, Interval size);
 }

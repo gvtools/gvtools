@@ -9,4 +9,7 @@ import com.vividsolutions.jts.geom.Geometry;
 public interface DefaultSymbols {
 	Symbolizer createDefaultSymbol(Class<? extends Geometry> type, Color color,
 			String description);
+
+	Symbolizer createDefaultSymbol(Class<? extends Geometry> type, Color color,
+			int size, String description);
 }

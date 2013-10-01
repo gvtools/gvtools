@@ -222,23 +222,23 @@ public class VectorialUniqueValue extends JPanel implements ILegendPanel,
 		symbolTable.removeAllItems();
 
 		UniqueValueLegend legend;
+		Comparator<Object> defaultComparator = new Comparator<Object>() {
+			@Override
+			public int compare(Object o1, Object o2) {
+				return o1.toString().compareTo(o2.toString());
+			}
+		};
+		legend = legendFactory.createUniqueValueLegend(layer, fieldName,
+				defaultSymbolPrev.getSymbol(), chbUseDefault.isSelected(),
+				getColorScheme(), defaultComparator);
 		try {
-			Comparator<Object> defaultComparator = new Comparator<Object>() {
-				@Override
-				public int compare(Object o1, Object o2) {
-					return o1.toString().compareTo(o2.toString());
-				}
-			};
-			legend = legendFactory.createUniqueValueLegend(layer, fieldName,
-					defaultSymbolPrev.getSymbol(), chbUseDefault.isSelected(),
-					getColorScheme(), defaultComparator);
+			symbolTable.fillTable(legend.getSymbols(), legend.getValues());
 		} catch (IOException e) {
 			logger.error("Cannot create legend", e);
 			NotificationManager.addWarning(
 					PluginServices.getText(this, "error_adding_leyend"), null);
 			return;
 		}
-		symbolTable.fillTable(legend.getSymbols(), legend.getValues());
 
 		btnRemoveAll.setEnabled(true);
 		btnRemove.setEnabled(true);
@@ -274,7 +274,7 @@ public class VectorialUniqueValue extends JPanel implements ILegendPanel,
 	}
 
 	@Override
-	public void setData(Layer layer, Legend l) {
+	public void setData(Layer layer, Legend l) throws IOException {
 		this.layer = layer;
 		Class<? extends Geometry> shapeType = layer.getShapeType();
 

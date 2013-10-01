@@ -435,7 +435,7 @@ public class VectorialInterval extends JPanel implements ILegendPanel {
 	}
 
 	@Override
-	public void setData(Layer layer, Legend l) {
+	public void setData(Layer layer, Legend l) throws IOException {
 		if (l instanceof IntervalLegend) {
 			this.legend = (IntervalLegend) l;
 		} else {
@@ -546,16 +546,12 @@ public class VectorialInterval extends JPanel implements ILegendPanel {
 			}
 		}
 
-		try {
-			Symbolizer defaultSymbol = defaultSymbolPrev.getSymbol();
-			boolean useDefault = chkdefaultvalues.isSelected();
-			String field = cmbField.getSelectedItem().toString();
-			legend = legendFactory.createIntervalLegend(symbols, defaultSymbol,
-					useDefault, layer, field);
-			return legend;
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		Symbolizer defaultSymbol = defaultSymbolPrev.getSymbol();
+		boolean useDefault = chkdefaultvalues.isSelected();
+		String field = cmbField.getSelectedItem().toString();
+		legend = legendFactory.createIntervalLegend(symbols, defaultSymbol,
+				useDefault, layer, field);
+		return legend;
 	}
 
 	/**

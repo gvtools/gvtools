@@ -30,7 +30,7 @@ import com.google.inject.assistedinject.AssistedInject;
 import com.iver.cit.gvsig.fmap.rendering.NaturalIntervalGenerator;
 import com.iver.cit.gvsig.fmap.rendering.QuantileIntervalGenerator;
 
-public class IntervalLegend extends AbstractMultiSymbolLegend {
+public class IntervalLegend extends AbstractDefaultSymbolLegend {
 	private static final Logger logger = Logger.getLogger(IntervalLegend.class);
 
 	public static enum Type {
@@ -39,8 +39,10 @@ public class IntervalLegend extends AbstractMultiSymbolLegend {
 
 	private Color start, end;
 	private Type type;
-	private Map<Interval, Symbolizer> symbols;
-
+	private Map<Interval, Symbolizer> symbolsMap;
+	private Interval[] orderedIntervals;
+	private Symbolizer[] orderedSymbols;
+	private int nIntervals;
 	private String fieldName;
 
 	@Inject
@@ -51,31 +53,29 @@ public class IntervalLegend extends AbstractMultiSymbolLegend {
 			@Assisted("end") Color end, @Assisted Type intervalType,
 			@Assisted Symbolizer defaultSymbol, @Assisted boolean useDefault,
 			@Assisted Layer layer, @Assisted String fieldName,
-			@Assisted int nIntervals, DefaultSymbols defaultSymbols)
-			throws IOException {
+			@Assisted int nIntervals, DefaultSymbols defaultSymbols) {
 		super(layer, defaultSymbol, useDefault);
 		this.start = start;
 		this.end = end;
 		this.type = intervalType;
 		this.fieldName = fieldName;
-
-		createSymbols(nIntervals, layer, fieldName, defaultSymbols);
+		this.nIntervals = nIntervals;
 	}
 
 	@AssistedInject
-	public IntervalLegend(@Assisted Map<Interval, Symbolizer> symbols,
+	public IntervalLegend(@Assisted Map<Interval, Symbolizer> symbolsMap,
 			@Assisted Symbolizer defaultSymbol, @Assisted boolean useDefault,
-			@Assisted Layer layer, @Assisted String fieldName)
-			throws IOException {
+			@Assisted Layer layer, @Assisted String fieldName) {
 		super(layer, defaultSymbol, useDefault);
 		this.type = null;
 		this.fieldName = fieldName;
-		this.symbols = symbols;
+		this.symbolsMap = symbolsMap;
 
-		Interval[] intervals = getIntervals();
+		Interval[] intervals = getOrderedIntervals(symbolsMap);
+		this.nIntervals = intervals.length;
 		if (intervals.length > 0) {
-			this.start = getColor(symbols.get(intervals[0]));
-			this.end = getColor(symbols.get(intervals[intervals.length - 1]));
+			this.start = getColor(symbolsMap.get(intervals[0]));
+			this.end = getColor(symbolsMap.get(intervals[intervals.length - 1]));
 		}
 	}
 
@@ -91,8 +91,91 @@ public class IntervalLegend extends AbstractMultiSymbolLegend {
 		}
 	}
 
-	private void createSymbols(int nIntervals, Layer layer, String fieldName,
-			DefaultSymbols defaultSymbols) throws IOException {
+	public Interval[] getIntervals() throws IOException {
+		return getOrderedIntervals(symbols());
+	}
+
+	private Interval[] getOrderedIntervals(Map<Interval, Symbolizer> symbolsMap) {
+		if (orderedIntervals == null) {
+			List<Interval> list = new ArrayList<Interval>();
+			list.addAll(symbolsMap.keySet());
+			Collections.sort(list, new Comparator<Interval>() {
+				@Override
+				public int compare(Interval o1, Interval o2) {
+					if (o1.getMin() < o2.getMax()) {
+						return -1;
+					} else if (o1.getMin() == o2.getMax()) {
+						return 0;
+					} else {
+						return 1;
+					}
+				}
+			});
+
+			orderedIntervals = list.toArray(new Interval[list.size()]);
+		}
+		return orderedIntervals;
+	}
+
+	public Symbolizer[] getSymbols() throws IOException {
+		return getOrderedSymbols(symbols());
+	}
+
+	private Symbolizer[] getOrderedSymbols(Map<Interval, Symbolizer> symbolsMap) {
+		if (orderedSymbols == null) {
+			Interval[] intervals = getOrderedIntervals(symbolsMap);
+			orderedSymbols = new Symbolizer[symbolsMap.size()];
+			for (int i = 0; i < orderedSymbols.length; i++) {
+				orderedSymbols[i] = symbolsMap.get(intervals[i]);
+			}
+			return orderedSymbols;
+		}
+		return orderedSymbols;
+	}
+
+	@Override
+	protected Object[] getSymbolizerKeys() throws IOException {
+		return getIntervals();
+	}
+
+	@Override
+	protected Symbolizer[] getSymbols(Object value) throws IOException {
+		return new Symbolizer[] { symbols().get(value) };
+	}
+
+	public Color getStartColor() {
+		return start;
+	}
+
+	public Color getEndColor() {
+		return end;
+	}
+
+	public Type getType() {
+		return type;
+	}
+
+	public String getFieldName() {
+		return fieldName;
+	}
+
+	@Override
+	protected Filter getFilter(Object key) {
+		Interval interval = (Interval) key;
+		return filterFactory.between(filterFactory.property(fieldName),
+				filterFactory.literal(interval.getMin()),
+				filterFactory.literal(interval.getMax()));
+	}
+
+	private Map<Interval, Symbolizer> symbols() throws IOException {
+		if (symbolsMap == null) {
+			symbolsMap = createSymbols();
+		}
+
+		return symbolsMap;
+	}
+
+	private Map<Interval, Symbolizer> createSymbols() throws IOException {
 		double min = Double.MAX_VALUE;
 		double max = Double.NEGATIVE_INFINITY;
 		List<Double> valueList = new ArrayList<Double>();
@@ -149,7 +232,7 @@ public class IntervalLegend extends AbstractMultiSymbolLegend {
 		double stepG = (end.getGreen() - g) / (nIntervals - 1.0);
 		double stepB = (end.getBlue() - b) / (nIntervals - 1.0);
 
-		symbols = new HashMap<Interval, Symbolizer>();
+		Map<Interval, Symbolizer> symbolsMap = new HashMap<Interval, Symbolizer>();
 
 		for (Interval interval : intervals) {
 			int red = Math.max(0, Math.min(255, (int) r));
@@ -163,8 +246,10 @@ public class IntervalLegend extends AbstractMultiSymbolLegend {
 			g += stepG;
 			b += stepB;
 
-			symbols.put(interval, symbol);
+			symbolsMap.put(interval, symbol);
 		}
+
+		return symbolsMap;
 	}
 
 	private Interval[] computeEqualIntervals(double min, double max,
@@ -209,67 +294,5 @@ public class IntervalLegend extends AbstractMultiSymbolLegend {
 			ret[i] = new Interval(intervals[i][0], intervals[i][1]);
 		}
 		return ret;
-	}
-
-	public Interval[] getIntervals() {
-		List<Interval> orderedIntervals = new ArrayList<Interval>();
-		orderedIntervals.addAll(symbols.keySet());
-		Collections.sort(orderedIntervals, new Comparator<Interval>() {
-			@Override
-			public int compare(Interval o1, Interval o2) {
-				if (o1.getMin() < o2.getMax()) {
-					return -1;
-				} else if (o1.getMin() == o2.getMax()) {
-					return 0;
-				} else {
-					return 1;
-				}
-			}
-		});
-
-		return orderedIntervals.toArray(new Interval[orderedIntervals.size()]);
-	}
-
-	public Symbolizer[] getSymbols() {
-		Interval[] intervals = getIntervals();
-		Symbolizer[] ret = new Symbolizer[symbols.size()];
-		for (int i = 0; i < ret.length; i++) {
-			ret[i] = symbols.get(intervals[i]);
-		}
-		return ret;
-	}
-
-	@Override
-	protected Object[] getSymbolizerKeys() {
-		return getIntervals();
-	}
-
-	@Override
-	protected Symbolizer getSymbol(Object value) {
-		return symbols.get(value);
-	}
-
-	public Color getStartColor() {
-		return start;
-	}
-
-	public Color getEndColor() {
-		return end;
-	}
-
-	public Type getType() {
-		return type;
-	}
-
-	public String getFieldName() {
-		return fieldName;
-	}
-
-	@Override
-	protected Filter getFilter(Object key) {
-		Interval interval = (Interval) key;
-		return filterFactory.between(filterFactory.property(fieldName),
-				filterFactory.literal(interval.getMin()),
-				filterFactory.literal(interval.getMax()));
 	}
 }

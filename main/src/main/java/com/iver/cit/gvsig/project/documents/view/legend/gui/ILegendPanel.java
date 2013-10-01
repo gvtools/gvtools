@@ -46,6 +46,8 @@
  */
 package com.iver.cit.gvsig.project.documents.view.legend.gui;
 
+import java.io.IOException;
+
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
@@ -74,7 +76,7 @@ public interface ILegendPanel {
 	 * @param legend
 	 *            , the legend currently applied to lyr
 	 */
-	public void setData(Layer lyr, Legend legend);
+	public void setData(Layer lyr, Legend legend) throws IOException;
 
 	/**
 	 * Returns an instance of Legend

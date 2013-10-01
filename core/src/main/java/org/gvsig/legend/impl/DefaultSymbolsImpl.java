@@ -31,14 +31,21 @@ public class DefaultSymbolsImpl implements DefaultSymbols {
 	@Override
 	public Symbolizer createDefaultSymbol(Class<? extends Geometry> type,
 			Color color, String description) {
+		int size = (Point.class.isAssignableFrom(type) || MultiPoint.class
+				.isAssignableFrom(type)) ? 5 : 1;
+		return createDefaultSymbol(type, color, size, description);
+	}
+
+	@Override
+	public Symbolizer createDefaultSymbol(Class<? extends Geometry> type,
+			Color color, int size, String description) {
 		/*
 		 * gtintegration Look here to complete
 		 * 
 		 * http://docs.geotools.org/latest/userguide/tutorial/map/style.html#
 		 * creating-a-style-based-on-the-selection
 		 */
-		int width = (Point.class.isAssignableFrom(type) || MultiPoint.class
-				.isAssignableFrom(type)) ? 5 : 1;
+
 		Symbolizer sym;
 		if (Point.class.isAssignableFrom(type)
 				|| MultiPoint.class.isAssignableFrom(type)) {
@@ -50,17 +57,17 @@ public class DefaultSymbolsImpl implements DefaultSymbols {
 			Graphic graphic = styleFactory.createDefaultGraphic();
 			graphic.graphicalSymbols().clear();
 			graphic.graphicalSymbols().add(mark);
-			graphic.setSize(filterFactory.literal(width));
+			graphic.setSize(filterFactory.literal(size));
 			sym = styleFactory.createPointSymbolizer(graphic, null);
 		} else if (LineString.class.isAssignableFrom(type)
 				|| MultiLineString.class.isAssignableFrom(type)) {
 			Stroke stroke = styleFactory.createStroke(
-					filterFactory.literal(color), filterFactory.literal(width));
+					filterFactory.literal(color), filterFactory.literal(size));
 			sym = styleFactory.createLineSymbolizer(stroke, null);
 		} else if (Polygon.class.isAssignableFrom(type)
 				|| MultiPolygon.class.isAssignableFrom(type)) {
 			Stroke stroke = styleFactory.createStroke(
-					filterFactory.literal(color), filterFactory.literal(width));
+					filterFactory.literal(color), filterFactory.literal(size));
 			Fill fill = styleFactory.createFill(filterFactory.literal(color),
 					filterFactory.literal(0));
 			sym = styleFactory.createPolygonSymbolizer(stroke, fill, null);

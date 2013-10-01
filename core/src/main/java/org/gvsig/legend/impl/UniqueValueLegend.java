@@ -18,9 +18,10 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.vividsolutions.jts.geom.Geometry;
 
-public class UniqueValueLegend extends AbstractMultiSymbolLegend {
+public class UniqueValueLegend extends AbstractDefaultSymbolLegend {
 	private String fieldName;
-	private Map<Object, Symbolizer> symbols;
+	private Map<Object, Symbolizer> symbolsMap;
+	private Object[] orderedKeys;
 	private Color[] colorScheme;
 	private Comparator<Object> order;
 
@@ -32,7 +33,7 @@ public class UniqueValueLegend extends AbstractMultiSymbolLegend {
 			@Assisted Comparator<Object> order) {
 		super(layer, defaultSymbol, useDefault);
 		this.fieldName = fieldName;
-		this.symbols = symbols;
+		this.symbolsMap = symbols;
 		this.order = order;
 		this.colorScheme = colorScheme;
 	}
@@ -41,39 +42,23 @@ public class UniqueValueLegend extends AbstractMultiSymbolLegend {
 	public UniqueValueLegend(@Assisted Layer layer, @Assisted String fieldName,
 			@Assisted Symbolizer defaultSymbol, @Assisted boolean useDefault,
 			@Assisted Color[] colorScheme, @Assisted Comparator<Object> order,
-			DefaultSymbols defaultSymbols) throws IOException {
+			DefaultSymbols defaultSymbols) {
 		super(layer, defaultSymbol, useDefault);
-		this.symbols = new HashMap<Object, Symbolizer>();
 		this.fieldName = fieldName;
 		this.colorScheme = colorScheme;
 		this.order = order;
-
-		Random rand = new Random(System.currentTimeMillis());
-		SimpleFeatureIterator iterator = layer.getFeatureSource().getFeatures()
-				.features();
-		while (iterator.hasNext()) {
-			Object value = iterator.next().getAttribute(fieldName);
-
-			if (symbols.get(value) == null) {
-				Class<? extends Geometry> type = layer.getShapeType();
-				Color color = colorScheme[rand.nextInt(colorScheme.length)];
-				Symbolizer symbol = defaultSymbols.createDefaultSymbol(type,
-						color, value.toString());
-				symbols.put(value, symbol);
-			}
-		}
 	}
 
-	public Symbolizer[] getSymbols() {
+	public Symbolizer[] getSymbols() throws IOException {
 		Object[] values = getValues();
 		Symbolizer[] ret = new Symbolizer[values.length];
 		for (int i = 0; i < ret.length; i++) {
-			ret[i] = symbols.get(values[i]);
+			ret[i] = symbols().get(values[i]);
 		}
 		return ret;
 	}
 
-	public Object[] getValues() {
+	public Object[] getValues() throws IOException {
 		return getSymbolizerKeys();
 	}
 
@@ -82,15 +67,21 @@ public class UniqueValueLegend extends AbstractMultiSymbolLegend {
 	}
 
 	@Override
-	protected Symbolizer getSymbol(Object value) {
-		return symbols.get(value);
+	protected Symbolizer[] getSymbols(Object value) {
+		return new Symbolizer[] { symbolsMap.get(value) };
 	}
 
 	@Override
-	protected Object[] getSymbolizerKeys() {
-		Object[] keys = symbols.keySet().toArray();
-		Arrays.sort(keys, order);
-		return keys;
+	protected Object[] getSymbolizerKeys() throws IOException {
+		return getOrderedKeys(symbols());
+	}
+
+	private Object[] getOrderedKeys(Map<Object, Symbolizer> symbolsMap) {
+		if (orderedKeys == null) {
+			orderedKeys = symbolsMap.keySet().toArray();
+			Arrays.sort(orderedKeys, order);
+		}
+		return orderedKeys;
 	}
 
 	@Override
@@ -101,5 +92,27 @@ public class UniqueValueLegend extends AbstractMultiSymbolLegend {
 
 	public Color[] getColorScheme() {
 		return colorScheme;
+	}
+
+	private Map<Object, Symbolizer> symbols() throws IOException {
+		if (symbolsMap == null) {
+			this.symbolsMap = new HashMap<Object, Symbolizer>();
+
+			Random rand = new Random(System.currentTimeMillis());
+			SimpleFeatureIterator iterator = layer.getFeatureSource()
+					.getFeatures().features();
+			while (iterator.hasNext()) {
+				Object value = iterator.next().getAttribute(fieldName);
+
+				if (symbolsMap.get(value) == null) {
+					Class<? extends Geometry> type = layer.getShapeType();
+					Color color = colorScheme[rand.nextInt(colorScheme.length)];
+					Symbolizer symbol = defaultSymbols.createDefaultSymbol(
+							type, color, value.toString());
+					symbolsMap.put(value, symbol);
+				}
+			}
+		}
+		return symbolsMap;
 	}
 }
