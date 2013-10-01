@@ -40,6 +40,7 @@
  */
 package org.gvsig.symbology;
 
+import org.gvsig.symbology.gui.layerproperties.GraduatedSymbols;
 import org.gvsig.symbology.gui.layerproperties.ProportionalSymbols;
 
 import com.iver.andami.plugins.Extension;
@@ -136,7 +137,7 @@ public class ExtendedSymbologyExtension extends Extension {
 		// legends available in the legend page
 		// TODO gtintegration
 		// LegendManager.addLegendPage(DotDensity.class);
-		// LegendManager.addLegendPage(GraduatedSymbols.class);
+		LegendManager.addLegendPage(GraduatedSymbols.class);
 		LegendManager.addLegendPage(ProportionalSymbols.class);
 		// LegendManager.addLegendPage(QuantityByCategory.class);
 

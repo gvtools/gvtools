@@ -92,6 +92,10 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 public class VectorialUniqueValue extends JPanel implements ILegendPanel,
 		ActionListener {
+	private static final ImageIcon ICON = new ImageIcon(
+			VectorialUniqueValue.class.getClassLoader().getResource(
+					"images/ValoresUnicos.png"));
+
 	private static final Logger logger = Logger
 			.getLogger(VectorialUniqueValue.class);
 
@@ -480,8 +484,7 @@ public class VectorialUniqueValue extends JPanel implements ILegendPanel,
 	}
 
 	public ImageIcon getIcon() {
-		return new ImageIcon(this.getClass().getClassLoader()
-				.getResource("images/ValoresUnicos.png"));
+		return ICON;
 	}
 
 	public Class<? extends ILegendPanel> getParentClass() {

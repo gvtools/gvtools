@@ -87,6 +87,9 @@ import com.vividsolutions.jts.geom.Polygon;
  */
 public class SingleSymbol extends JPanel implements ILegendPanel,
 		ActionListener {
+	private static final ImageIcon ICON = new ImageIcon(SingleSymbol.class
+			.getClassLoader().getResource("images/single-symbol.png"));
+
 	private JPanel symbolPanel = null;
 	private Class<? extends Geometry> shapeType;
 	private GridBagLayoutPanel legendPanel = null;
@@ -169,8 +172,7 @@ public class SingleSymbol extends JPanel implements ILegendPanel,
 	}
 
 	public ImageIcon getIcon() {
-		return new ImageIcon(this.getClass().getClassLoader()
-				.getResource("images/single-symbol.png"));
+		return ICON;
 	}
 
 	public Class<? extends Legend> getLegendClass() {

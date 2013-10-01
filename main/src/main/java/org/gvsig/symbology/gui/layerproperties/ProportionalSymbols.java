@@ -99,6 +99,10 @@ import com.vividsolutions.jts.geom.Polygon;
  * @author jaume dominguez faus - jaume.dominguez@iver.es
  */
 public class ProportionalSymbols extends JPanel implements ILegendPanel {
+	private static final ImageIcon ICON = new ImageIcon(
+			ProportionalSymbols.class.getClassLoader().getResource(
+					"images/ProportionalSymbols.PNG"));
+
 	private static Logger logger = Logger.getLogger(ProportionalSymbols.class
 			.getName());
 
@@ -387,8 +391,7 @@ public class ProportionalSymbols extends JPanel implements ILegendPanel {
 	}
 
 	public ImageIcon getIcon() {
-		return new ImageIcon(this.getClass().getClassLoader()
-				.getResource("images/ProportionalSymbols.PNG"));
+		return ICON;
 	}
 
 	public Class<? extends ILegendPanel> getParentClass() {

@@ -78,8 +78,8 @@ import org.gvsig.layer.Layer;
 import org.gvsig.legend.DefaultSymbols;
 import org.gvsig.legend.Interval;
 import org.gvsig.legend.Legend;
+import org.gvsig.legend.impl.AbstractIntervalLegend.Type;
 import org.gvsig.legend.impl.IntervalLegend;
-import org.gvsig.legend.impl.IntervalLegend.Type;
 import org.gvsig.legend.impl.LegendFactory;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -104,6 +104,10 @@ import com.vividsolutions.jts.geom.Polygon;
 public class VectorialInterval extends JPanel implements ILegendPanel {
 	protected static Logger logger = Logger.getLogger(VectorialInterval.class
 			.getName());
+
+	private static final ImageIcon ICON = new ImageIcon(VectorialInterval.class
+			.getClassLoader().getResource("images/Intervalos.png"));
+
 	private GridBagLayoutPanel pnlGeneral = null;
 	protected JComboBox<String> cmbField = null;
 	protected JTextField txtNumIntervals = null;
@@ -117,7 +121,6 @@ public class VectorialInterval extends JPanel implements ILegendPanel {
 	protected JButton bDelAll = null;
 	protected JButton bDel = null;
 	protected Layer layer;
-	protected IntervalLegend legend = null;
 	protected SymbolTable symbolTable;
 	protected MyListener listener = new MyListener();
 	protected JPanel pnlCenter = null;
@@ -424,10 +427,9 @@ public class VectorialInterval extends JPanel implements ILegendPanel {
 		Symbolizer defaultSymbol = defaultSymbolPrev.getSymbol();
 		boolean useDefault = chkdefaultvalues.isSelected();
 
-		legend = legendFactory.createIntervalLegend(startColor, endColor,
-				intervalType, defaultSymbol, useDefault, layer, cmbField
-						.getSelectedItem().toString(), intervalCount);
-
+		IntervalLegend legend = legendFactory.createIntervalLegend(startColor,
+				endColor, intervalType, defaultSymbol, useDefault, layer,
+				cmbField.getSelectedItem().toString(), intervalCount);
 		symbolTable.fillTable(legend.getSymbols(), legend.getIntervals());
 
 		bDelAll.setEnabled(true);
@@ -436,30 +438,28 @@ public class VectorialInterval extends JPanel implements ILegendPanel {
 
 	@Override
 	public void setData(Layer layer, Legend l) throws IOException {
+		IntervalLegend legend;
+
 		if (l instanceof IntervalLegend) {
-			this.legend = (IntervalLegend) l;
+			legend = (IntervalLegend) l;
 		} else {
 			Symbolizer defaultSymbol = defaultSymbols.createDefaultSymbol(
 					layer.getShapeType(), Color.blue, null);
-			try {
-				// Get first numeric field
-				String fieldName = null;
-				SimpleFeatureType schema = layer.getFeatureSource().getSchema();
-				for (AttributeDescriptor attribute : schema
-						.getAttributeDescriptors()) {
-					Class<?> type = attribute.getType().getBinding();
-					if (isNumericField(type)) {
-						fieldName = attribute.getLocalName();
-						break;
-					}
+			// Get first numeric field
+			String fieldName = null;
+			SimpleFeatureType schema = layer.getFeatureSource().getSchema();
+			for (AttributeDescriptor attribute : schema
+					.getAttributeDescriptors()) {
+				Class<?> type = attribute.getType().getBinding();
+				if (isNumericField(type)) {
+					fieldName = attribute.getLocalName();
+					break;
 				}
-
-				this.legend = legendFactory.createIntervalLegend(
-						new HashMap<Interval, Symbolizer>(), defaultSymbol,
-						false, layer, fieldName);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
 			}
+
+			legend = legendFactory.createIntervalLegend(
+					new HashMap<Interval, Symbolizer>(), defaultSymbol, false,
+					layer, fieldName);
 		}
 
 		this.layer = layer;
@@ -549,9 +549,8 @@ public class VectorialInterval extends JPanel implements ILegendPanel {
 		Symbolizer defaultSymbol = defaultSymbolPrev.getSymbol();
 		boolean useDefault = chkdefaultvalues.isSelected();
 		String field = cmbField.getSelectedItem().toString();
-		legend = legendFactory.createIntervalLegend(symbols, defaultSymbol,
+		return legendFactory.createIntervalLegend(symbols, defaultSymbol,
 				useDefault, layer, field);
-		return legend;
 	}
 
 	/**
@@ -576,10 +575,7 @@ public class VectorialInterval extends JPanel implements ILegendPanel {
 			if (e.getActionCommand() == "FIELD_SELECTED") {
 				fieldSelectedActionPerformed((JComboBox) e.getSource());
 			} else if (e.getActionCommand() == "INTERVAL_TYPE") {
-				JComboBox cb = (JComboBox) e.getSource();
-
-				if (legend != null && legend.getType() != null
-						&& cb.getSelectedIndex() != legend.getType().ordinal()) {
+				if (symbolTable != null) {
 					symbolTable.removeAllItems();
 				}
 			}
@@ -679,8 +675,7 @@ public class VectorialInterval extends JPanel implements ILegendPanel {
 
 	@Override
 	public ImageIcon getIcon() {
-		return new ImageIcon(this.getClass().getClassLoader()
-				.getResource("images/Intervalos.png"));
+		return ICON;
 	}
 
 	@Override
@@ -702,7 +697,7 @@ public class VectorialInterval extends JPanel implements ILegendPanel {
 		return IntervalLegend.class;
 	}
 
-	private boolean isNumericField(Class<?> fieldType) {
+	protected boolean isNumericField(Class<?> fieldType) {
 		return Integer.class.isAssignableFrom(fieldType)
 				|| Double.class.isAssignableFrom(fieldType);
 	}

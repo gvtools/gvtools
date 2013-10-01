@@ -7,7 +7,7 @@ import java.util.Map;
 import org.geotools.styling.Symbolizer;
 import org.gvsig.layer.Layer;
 import org.gvsig.legend.Interval;
-import org.gvsig.legend.impl.IntervalLegend.Type;
+import org.gvsig.legend.impl.AbstractIntervalLegend.Type;
 
 import com.google.inject.assistedinject.Assisted;
 
@@ -43,5 +43,19 @@ public interface LegendFactory {
 			@Assisted("normalization") String normalizationField,
 			@Assisted("template") Symbolizer template,
 			@Assisted("background") Symbolizer background,
-			@Assisted boolean useBackground, Interval size);
+			boolean useBackground, Interval size);
+
+	SizeIntervalLegend createSizeIntervalLegend(Interval size,
+			Type intervalType, Symbolizer defaultSymbol,
+			@Assisted("usedefault") boolean useDefault, Layer layer,
+			String fieldName, int nIntervals,
+			@Assisted("template") Symbolizer template,
+			@Assisted("background") Symbolizer background,
+			@Assisted("usebackground") boolean useBackground);
+
+	SizeIntervalLegend createSizeIntervalLegend(
+			Map<Interval, Symbolizer> symbolsMap, Symbolizer defaultSymbol,
+			@Assisted("usedefault") boolean useDefault, Layer layer,
+			String fieldName, @Assisted("background") Symbolizer background,
+			@Assisted("usebackground") boolean useBackground);
 }

@@ -435,7 +435,7 @@ public class LegendManager extends AbstractThemeManagerPage {
 							ILegendPanel legend = legList.get(0);
 							Class<? extends ILegendPanel> parent = legend
 									.getParentClass();
-							while (parent != null
+							if (parent != null
 									&& !alreadyAdded
 											.contains(pages.get(parent))) {
 								legend = pages.get(parent);
