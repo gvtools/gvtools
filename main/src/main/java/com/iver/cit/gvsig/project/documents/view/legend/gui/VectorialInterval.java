@@ -75,7 +75,6 @@ import org.geotools.styling.Symbolizer;
 import org.gvsig.gui.beans.swing.GridBagLayoutPanel;
 import org.gvsig.gui.beans.swing.JButton;
 import org.gvsig.layer.Layer;
-import org.gvsig.legend.DefaultSymbols;
 import org.gvsig.legend.Interval;
 import org.gvsig.legend.Legend;
 import org.gvsig.legend.impl.AbstractIntervalLegend.Type;
@@ -128,9 +127,6 @@ public class VectorialInterval extends JPanel implements ILegendPanel {
 	private JPanel pnlNorth;
 	protected JSymbolPreviewButton defaultSymbolPrev;
 	private GridBagLayoutPanel defaultSymbolPanel = new GridBagLayoutPanel();
-
-	@Inject
-	private DefaultSymbols defaultSymbols;
 
 	@Inject
 	private LegendFactory legendFactory;
@@ -443,8 +439,6 @@ public class VectorialInterval extends JPanel implements ILegendPanel {
 		if (l instanceof IntervalLegend) {
 			legend = (IntervalLegend) l;
 		} else {
-			Symbolizer defaultSymbol = defaultSymbols.createDefaultSymbol(
-					layer.getShapeType(), Color.blue, null);
 			// Get first numeric field
 			String fieldName = null;
 			SimpleFeatureType schema = layer.getFeatureSource().getSchema();
@@ -457,9 +451,7 @@ public class VectorialInterval extends JPanel implements ILegendPanel {
 				}
 			}
 
-			legend = legendFactory.createIntervalLegend(
-					new HashMap<Interval, Symbolizer>(), defaultSymbol, false,
-					layer, fieldName);
+			legend = legendFactory.createIntervalLegend(layer, fieldName);
 		}
 
 		this.layer = layer;

@@ -12,6 +12,7 @@ import org.geotools.styling.SLD;
 import org.geotools.styling.Style;
 import org.geotools.styling.Symbolizer;
 import org.gvsig.layer.Layer;
+import org.gvsig.legend.DefaultSymbols;
 import org.gvsig.legend.Interval;
 
 import com.google.inject.assistedinject.Assisted;
@@ -37,6 +38,14 @@ public class IntervalLegend extends AbstractIntervalLegend {
 			@Assisted Symbolizer defaultSymbol, @Assisted boolean useDefault,
 			@Assisted Layer layer, @Assisted String fieldName) {
 		super(symbolsMap, defaultSymbol, useDefault, layer, fieldName);
+	}
+
+	@AssistedInject
+	public IntervalLegend(@Assisted Layer layer, @Assisted String fieldName,
+			DefaultSymbols defaultSymbols) {
+		super(layer, fieldName, defaultSymbols);
+		this.start = Color.red;
+		this.end = Color.blue;
 	}
 
 	private Color getColor(Symbolizer symbolizer) {

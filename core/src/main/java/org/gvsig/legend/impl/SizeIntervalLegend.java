@@ -1,5 +1,6 @@
 package org.gvsig.legend.impl;
 
+import java.awt.Color;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -7,10 +8,12 @@ import java.util.Map;
 import org.geotools.styling.DescriptionImpl;
 import org.geotools.styling.Symbolizer;
 import org.gvsig.layer.Layer;
+import org.gvsig.legend.DefaultSymbols;
 import org.gvsig.legend.Interval;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import com.vividsolutions.jts.geom.Polygon;
 
 public class SizeIntervalLegend extends AbstractIntervalLegend {
 	private Interval size;
@@ -46,12 +49,28 @@ public class SizeIntervalLegend extends AbstractIntervalLegend {
 		this.useBackground = useBackground;
 	}
 
+	@AssistedInject
+	public SizeIntervalLegend(@Assisted Layer layer,
+			@Assisted String fieldName, DefaultSymbols defaultSymbols) {
+		super(layer, fieldName, defaultSymbols);
+		this.size = new Interval(1, 7);
+		this.background = defaultSymbols.createDefaultSymbol(Polygon.class,
+				Color.white, "");
+		this.template = defaultSymbols.createDefaultSymbol(
+				layer.getShapeType(), Color.lightGray, "");
+		this.useBackground = false;
+	}
+
 	public Interval getSize() {
 		return size;
 	}
 
 	public Symbolizer getBackground() {
 		return background;
+	}
+
+	public boolean useBackground() {
+		return useBackground;
 	}
 
 	@Override

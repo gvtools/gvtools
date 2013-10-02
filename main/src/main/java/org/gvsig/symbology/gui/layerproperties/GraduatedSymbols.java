@@ -234,8 +234,6 @@ public class GraduatedSymbols extends VectorialInterval implements ILegendPanel 
 		if (l instanceof SizeIntervalLegend) {
 			legend = (SizeIntervalLegend) l;
 		} else {
-			Symbolizer defaultSymbol = defaultSymbols.createDefaultSymbol(
-					layer.getShapeType(), Color.blue, "");
 			// Get first numeric field
 			String fieldName = null;
 			SimpleFeatureType schema = layer.getFeatureSource().getSchema();
@@ -248,9 +246,7 @@ public class GraduatedSymbols extends VectorialInterval implements ILegendPanel 
 				}
 			}
 
-			legend = legendFactory.createSizeIntervalLegend(
-					new HashMap<Interval, Symbolizer>(), defaultSymbol, false,
-					layer, fieldName, getBtnBackground().getSymbol(), false);
+			legend = legendFactory.createSizeIntervalLegend(layer, fieldName);
 		}
 
 		Symbolizer[] symbols = legend.getSymbols();

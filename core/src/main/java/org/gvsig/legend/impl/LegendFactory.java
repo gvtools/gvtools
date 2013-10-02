@@ -30,6 +30,8 @@ public interface LegendFactory {
 			Symbolizer defaultSymbol, boolean useDefault, Layer layer,
 			String fieldName);
 
+	IntervalLegend createIntervalLegend(Layer layer, String fieldName);
+
 	UniqueValueLegend createUniqueValueLegend(Layer layer, String fieldName,
 			Symbolizer defaultSymbol, boolean useDefault, Color[] colorScheme,
 			Comparator<Object> order);
@@ -58,4 +60,9 @@ public interface LegendFactory {
 			@Assisted("usedefault") boolean useDefault, Layer layer,
 			String fieldName, @Assisted("background") Symbolizer background,
 			@Assisted("usebackground") boolean useBackground);
+
+	SizeIntervalLegend createSizeIntervalLegend(Layer layer, String fieldName);
+
+	QuantityByCategoryLegend createQuantityByCategoryLegend(Layer layer,
+			IntervalLegend colorLegend, SizeIntervalLegend sizeLegend);
 }

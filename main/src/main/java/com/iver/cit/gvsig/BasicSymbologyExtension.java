@@ -97,6 +97,7 @@ import org.geotools.styling.PolygonSymbolizer;
 import org.geotools.styling.TextSymbolizer;
 import org.gvsig.symbology.gui.layerproperties.GraduatedSymbols;
 import org.gvsig.symbology.gui.layerproperties.ProportionalSymbols;
+import org.gvsig.symbology.gui.layerproperties.QuantityByCategory;
 
 import com.iver.andami.PluginServices;
 import com.iver.andami.plugins.Extension;
@@ -169,6 +170,7 @@ public class BasicSymbologyExtension extends Extension implements
 
 		LegendManager.addLegendPage(GraduatedSymbols.class);
 		LegendManager.addLegendPage(ProportionalSymbols.class);
+		LegendManager.addLegendPage(QuantityByCategory.class);
 
 		// TODO gtintegration
 		// LegendManager.addLegendDriver(FMapGVLDriver.class);

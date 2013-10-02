@@ -1,9 +1,11 @@
 package org.gvsig.legend.impl;
 
+import java.awt.Color;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,6 +15,7 @@ import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Style;
 import org.geotools.styling.Symbolizer;
 import org.gvsig.layer.Layer;
+import org.gvsig.legend.DefaultSymbols;
 import org.gvsig.legend.Interval;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.Filter;
@@ -58,6 +61,18 @@ public abstract class AbstractIntervalLegend extends
 		this.type = null;
 		this.fieldName = fieldName;
 		this.symbolsMap = symbolsMap;
+		this.nIntervals = symbolsMap.size();
+	}
+
+	@AssistedInject
+	public AbstractIntervalLegend(@Assisted Layer layer,
+			@Assisted String fieldName, DefaultSymbols defaultSymbols) {
+		super(layer, defaultSymbols.createDefaultSymbol(layer.getShapeType(),
+				Color.blue, ""), false);
+		this.type = Type.EQUAL;
+		this.fieldName = fieldName;
+		this.nIntervals = 0;
+		this.symbolsMap = new HashMap<Interval, Symbolizer>();
 	}
 
 	public Interval[] getIntervals() throws IOException {
