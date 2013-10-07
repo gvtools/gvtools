@@ -83,7 +83,7 @@ public interface ILegendPanel {
 	 * 
 	 * @return Legend, the legend result of the settings
 	 */
-	public Legend getLegend();
+	public Legend getLegend() throws IOException;
 
 	/**
 	 * Returns a brief human-readable description about what kind of legend

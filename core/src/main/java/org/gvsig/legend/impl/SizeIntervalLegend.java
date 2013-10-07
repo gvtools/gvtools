@@ -6,6 +6,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.geotools.styling.DescriptionImpl;
+import org.geotools.styling.LineSymbolizer;
+import org.geotools.styling.PointSymbolizer;
+import org.geotools.styling.PolygonSymbolizer;
+import org.geotools.styling.SLD;
 import org.geotools.styling.Symbolizer;
 import org.gvsig.layer.Layer;
 import org.gvsig.legend.DefaultSymbols;
@@ -42,11 +46,36 @@ public class SizeIntervalLegend extends AbstractIntervalLegend {
 			@Assisted("usedefault") boolean useDefault, @Assisted Layer layer,
 			@Assisted String fieldName,
 			@Assisted("background") Symbolizer background,
-			@Assisted("usebackground") boolean useBackground) {
+			@Assisted("usebackground") boolean useBackground)
+			throws IOException {
 		super(symbolsMap, defaultSymbol, useDefault, layer, fieldName);
-		this.size = new Interval(1, 7);
 		this.background = background;
 		this.useBackground = useBackground;
+
+		double min = Double.MAX_VALUE;
+		double max = -1;
+
+		for (Symbolizer symbol : getSymbols()) {
+			int s = -1;
+			if (symbol instanceof PointSymbolizer) {
+				s = SLD.pointSize((PointSymbolizer) symbol);
+			} else if (symbol instanceof LineSymbolizer) {
+				s = SLD.width((LineSymbolizer) symbol);
+			} else if (symbol instanceof PolygonSymbolizer) {
+				s = SLD.width(((PolygonSymbolizer) symbol).getStroke());
+			}
+			if (s < 0) {
+				continue;
+			}
+			if (s < min) {
+				min = s;
+			}
+			if (s > max) {
+				max = s;
+			}
+		}
+
+		this.size = new Interval(min, max);
 	}
 
 	@AssistedInject

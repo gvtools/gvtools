@@ -36,6 +36,7 @@ import org.opengis.feature.type.AttributeDescriptor;
 
 import com.google.inject.Inject;
 import com.iver.andami.PluginServices;
+import com.iver.andami.messages.NotificationManager;
 import com.iver.andami.ui.mdiManager.IWindow;
 import com.iver.andami.ui.mdiManager.WindowInfo;
 import com.iver.cit.gvsig.project.documents.view.legend.gui.ILegendPanel;
@@ -247,7 +248,7 @@ public class QuantityByCategory extends JPanel implements ILegendPanel,
 	}
 
 	@Override
-	public Legend getLegend() {
+	public Legend getLegend() throws IOException {
 		Map<Interval, Symbolizer> colorSymbols = new HashMap<Interval, Symbolizer>();
 		Map<Interval, Symbolizer> sizeSymbols = new HashMap<Interval, Symbolizer>();
 
@@ -387,7 +388,12 @@ public class QuantityByCategory extends JPanel implements ILegendPanel,
 	private class InnerWindow extends JPanel implements IWindow {
 		private ActionListener okAction = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				legend = panel.getLegend();
+				try {
+					legend = panel.getLegend();
+				} catch (IOException e1) {
+					logger.error("Cannot obtain legend", e1);
+					NotificationManager.addError(e1);
+				}
 				PluginServices.getMDIManager().closeWindow(InnerWindow.this);
 			}
 

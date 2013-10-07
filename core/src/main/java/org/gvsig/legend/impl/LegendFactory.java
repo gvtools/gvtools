@@ -1,6 +1,7 @@
 package org.gvsig.legend.impl;
 
 import java.awt.Color;
+import java.io.IOException;
 import java.util.Comparator;
 import java.util.Map;
 
@@ -28,7 +29,7 @@ public interface LegendFactory {
 
 	IntervalLegend createIntervalLegend(Map<Interval, Symbolizer> symbols,
 			Symbolizer defaultSymbol, boolean useDefault, Layer layer,
-			String fieldName);
+			String fieldName) throws IOException;
 
 	IntervalLegend createIntervalLegend(Layer layer, String fieldName);
 

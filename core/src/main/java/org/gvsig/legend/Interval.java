@@ -24,4 +24,14 @@ public class Interval {
 		return NumberFormat.getInstance().format(min) + " - "
 				+ NumberFormat.getInstance().format(max);
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Interval) {
+			Interval other = (Interval) obj;
+			return other.min == this.min && other.max == this.max;
+		} else {
+			return false;
+		}
+	}
 }

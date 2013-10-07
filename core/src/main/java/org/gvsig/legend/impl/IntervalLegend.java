@@ -9,7 +9,6 @@ import org.geotools.styling.LineSymbolizer;
 import org.geotools.styling.PointSymbolizer;
 import org.geotools.styling.PolygonSymbolizer;
 import org.geotools.styling.SLD;
-import org.geotools.styling.Style;
 import org.geotools.styling.Symbolizer;
 import org.gvsig.layer.Layer;
 import org.gvsig.legend.DefaultSymbols;
@@ -36,8 +35,17 @@ public class IntervalLegend extends AbstractIntervalLegend {
 	@AssistedInject
 	public IntervalLegend(@Assisted Map<Interval, Symbolizer> symbolsMap,
 			@Assisted Symbolizer defaultSymbol, @Assisted boolean useDefault,
-			@Assisted Layer layer, @Assisted String fieldName) {
+			@Assisted Layer layer, @Assisted String fieldName)
+			throws IOException {
 		super(symbolsMap, defaultSymbol, useDefault, layer, fieldName);
+
+		Interval[] intervals = getIntervals();
+		this.nIntervals = intervals.length;
+		if (intervals.length > 0) {
+			this.start = getColor(symbolsMap().get(intervals[0]));
+			this.end = getColor(symbolsMap().get(
+					intervals[intervals.length - 1]));
+		}
 	}
 
 	@AssistedInject
@@ -58,21 +66,6 @@ public class IntervalLegend extends AbstractIntervalLegend {
 		} else {
 			throw new IllegalArgumentException("bug! Unrecognized symbolizer");
 		}
-	}
-
-	@Override
-	protected Style createStyle() throws IOException {
-		Style style = super.createStyle();
-
-		Interval[] intervals = getIntervals();
-		this.nIntervals = intervals.length;
-		if (intervals.length > 0) {
-			this.start = getColor(symbolsMap().get(intervals[0]));
-			this.end = getColor(symbolsMap().get(
-					intervals[intervals.length - 1]));
-		}
-
-		return style;
 	}
 
 	@Override

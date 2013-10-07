@@ -523,7 +523,7 @@ public class VectorialInterval extends JPanel implements ILegendPanel {
 	}
 
 	@Override
-	public Legend getLegend() {
+	public Legend getLegend() throws IOException {
 		// Fill legend from symbol table
 		Map<Interval, Symbolizer> symbols = new HashMap<Interval, Symbolizer>();
 		for (int row = 0; row < symbolTable.getRowCount(); row++) {

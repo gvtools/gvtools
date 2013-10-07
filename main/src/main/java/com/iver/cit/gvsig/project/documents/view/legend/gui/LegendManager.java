@@ -693,8 +693,13 @@ public class LegendManager extends AbstractThemeManagerPage {
 
 	public void applyAction() {
 		if (activePanel != null) {
-			legend = activePanel.getLegend();
-			layer.setLegend(legend);
+			try {
+				legend = activePanel.getLegend();
+				layer.setLegend(legend);
+			} catch (IOException e) {
+				logger.error("Cannot obtain legend", e);
+				NotificationManager.addError(e);
+			}
 		}
 	}
 

@@ -33,6 +33,7 @@ import org.gvsig.legend.impl.AbstractIntervalLegend.Type;
 import org.gvsig.legend.impl.IntervalLegend;
 import org.gvsig.legend.impl.LegendFactory;
 import org.gvsig.legend.impl.ProportionalLegend;
+import org.gvsig.legend.impl.SizeIntervalLegend;
 import org.gvsig.legend.impl.UniqueValueLegend;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
@@ -382,6 +383,90 @@ public class LegendTest extends GVSIGTestCase {
 		assertEquals(2, styles.size());
 		for (FeatureTypeStyle style : styles) {
 			assertEquals(1, style.rules().size());
+		}
+	}
+
+	@Test
+	public void testSizeIntervalLegend() throws Exception {
+		Interval size = new Interval(1, 7);
+		int nIntervals = 4;
+		Symbolizer defaultSymbol = defaultSymbols.createDefaultSymbol(
+				Point.class, Color.red, "");
+		Symbolizer template = defaultSymbols.createDefaultSymbol(Point.class,
+				Color.lightGray, "");
+		Symbolizer background = defaultSymbols.createDefaultSymbol(
+				Polygon.class, Color.blue, "");
+		SizeIntervalLegend legend = legendFactory.createSizeIntervalLegend(
+				size, Type.EQUAL, defaultSymbol, true, mockLayer(), FIELD_NAME,
+				nIntervals, template, background, true);
+
+		assertEquals(nIntervals, legend.getIntervals().length);
+		assertEquals(nIntervals, legend.getSymbols().length);
+		assertEquals(FIELD_NAME, legend.getFieldName());
+		assertEquals(background, legend.getBackground());
+		assertEquals(defaultSymbol, legend.getDefaultSymbol());
+		assertEquals(size, legend.getSize());
+		assertEquals(Type.EQUAL, legend.getType());
+
+		Style style = legend.getStyle();
+		List<FeatureTypeStyle> featureTypeStyles = style.featureTypeStyles();
+		// We only check the number of feature type styles, not the styles
+		// themselves
+		// +1 because of the selection rule, +1 because of the default rule
+		assertEquals(nIntervals + 2, featureTypeStyles.size());
+		for (FeatureTypeStyle featureTypeStyle : featureTypeStyles) {
+			// 1 rule with two symbolizers: one for the proportional symbol, one
+			// for the background
+			List<Rule> rules = featureTypeStyle.rules();
+			Rule rule = rules.get(0);
+			assertEquals(1, rules.size());
+
+			if (rule.symbolizers().size() == 1) {
+				// selection rule
+			} else {
+				assertEquals(2, rule.symbolizers().size());
+				assertTrue(rule.symbolizers().contains(background));
+			}
+		}
+	}
+
+	@Test
+	public void testSizeIntervalLegendWithGivenSymbols() throws Exception {
+		Map<Interval, Symbolizer> symbolsMap = new HashMap<Interval, Symbolizer>();
+		symbolsMap.put(new Interval(10, 20), defaultSymbols
+				.createDefaultSymbol(Point.class, Color.red, 1, ""));
+		symbolsMap.put(new Interval(20, 40), defaultSymbols
+				.createDefaultSymbol(Point.class, Color.red, 3, ""));
+		symbolsMap.put(new Interval(40, 50), defaultSymbols
+				.createDefaultSymbol(Point.class, Color.red, 5, ""));
+
+		Symbolizer defaultSymbol = defaultSymbols.createDefaultSymbol(
+				Point.class, Color.red, "");
+		Symbolizer background = defaultSymbols.createDefaultSymbol(
+				Polygon.class, Color.blue, "");
+		SizeIntervalLegend legend = legendFactory.createSizeIntervalLegend(
+				symbolsMap, defaultSymbol, false, mockLayer(), FIELD_NAME,
+				background, false);
+
+		assertEquals(symbolsMap.size(), legend.getIntervals().length);
+		assertEquals(symbolsMap.size(), legend.getSymbols().length);
+		assertEquals(FIELD_NAME, legend.getFieldName());
+		assertEquals(background, legend.getBackground());
+		assertEquals(defaultSymbol, legend.getDefaultSymbol());
+		assertEquals(new Interval(1, 5), legend.getSize());
+
+		Style style = legend.getStyle();
+		List<FeatureTypeStyle> featureTypeStyles = style.featureTypeStyles();
+		// We only check the number of feature type styles, not the styles
+		// themselves
+		// +1 because of the selection rule
+		assertEquals(symbolsMap.size() + 1, featureTypeStyles.size());
+		for (FeatureTypeStyle featureTypeStyle : featureTypeStyles) {
+			// 1 rule with 1 symbolizer
+			List<Rule> rules = featureTypeStyle.rules();
+			Rule rule = rules.get(0);
+			assertEquals(1, rules.size());
+			assertEquals(1, rule.symbolizers().size());
 		}
 	}
 
