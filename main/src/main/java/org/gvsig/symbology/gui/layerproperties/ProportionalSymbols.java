@@ -114,7 +114,7 @@ public class ProportionalSymbols extends JPanel implements ILegendPanel {
 	private JIncrementalNumberField txtMinSize, txtMaxSize;
 	private Layer layer;
 	private Class<? extends Geometry> shapeType;
-	private boolean useNormalization = true;
+	private boolean useNormalization = false;
 
 	@Inject
 	private DefaultSymbols defaultSymbols;
@@ -281,6 +281,7 @@ public class ProportionalSymbols extends JPanel implements ILegendPanel {
 		cmbValue.setModel(new DefaultComboBoxModel<String>(fieldNames));
 		cmbNormalization.setModel(new DefaultComboBoxModel<String>(fieldNames));
 		cmbNormalization.addItem(none);
+		cmbNormalization.setSelectedItem(none);
 
 		Class<? extends Geometry> type = layer.getShapeType();
 		boolean isLine = MultiLineString.class.isAssignableFrom(type)
@@ -297,65 +298,65 @@ public class ProportionalSymbols extends JPanel implements ILegendPanel {
 			symbolPanel.add(getBackgroundPanel());
 		}
 
-		ProportionalLegend legend;
 		if (l instanceof ProportionalLegend) {
-			legend = (ProportionalLegend) l;
+			ProportionalLegend legend = (ProportionalLegend) l;
+			cmbValue.setSelectedItem(legend.getValueField());
+
+			String normField = legend.getNormalizationField();
+			if (normField != null) {
+				cmbNormalization.setSelectedItem(normField);
+			} else {
+				cmbNormalization.setSelectedItem(none);
+			}
+			txtMaxSize.setDouble(legend.getSize().getMax());
+			txtMinSize.setDouble(legend.getSize().getMin());
+
+			Symbolizer template = legend.getTemplate();
+			if (template instanceof LineSymbolizer) {
+				LineSymbolizer line = (LineSymbolizer) template;
+				line.getStroke().setWidth(filterFactory.literal(2));
+			} else if (template instanceof PointSymbolizer) {
+				PointSymbolizer point = (PointSymbolizer) template;
+				point.getGraphic().setSize(filterFactory.literal(15));
+			}
+
+			getTemplateSymbol().setSymbol(template);
+
+			if (useBackground) {
+				getBtnBackground().setSymbol(legend.getBackground());
+			}
 		} else {
-			int size = isLine ? 3 : 10;
 			int templateSize = isLine ? 2 : 15;
 			Symbolizer template = defaultSymbols.createDefaultSymbol(shapeType,
 					Color.darkGray, templateSize, "");
-			legend = legendFactory.createProportionalLegend(layer,
-					fieldNames[0], fieldNames[0], template, defaultSymbols
-							.createDefaultSymbol(Polygon.class, Color.darkGray,
-									templateSize, ""), useBackground,
-					new Interval(size, size));
-		}
-
-		cmbValue.setSelectedItem(legend.getValueField());
-		Symbolizer symbol = legend.getTemplate();
-
-		String normField = legend.getNormalizationField();
-		if (normField != null) {
-			cmbNormalization.setSelectedItem(normField);
-		} else {
-			cmbNormalization.setSelectedItem(none);
-		}
-
-		Interval size = legend.getSize();
-		txtMaxSize.setDouble(size.getMax());
-		txtMinSize.setDouble(size.getMin());
-
-		if (symbol instanceof LineSymbolizer) {
-			LineSymbolizer line = (LineSymbolizer) symbol;
-			line.getStroke().setWidth(filterFactory.literal(2));
-		} else if (symbol instanceof PointSymbolizer) {
-			PointSymbolizer point = (PointSymbolizer) symbol;
-			point.getGraphic().setSize(filterFactory.literal(15));
-		}
-
-		getTemplateSymbol().setSymbol(symbol);
-
-		Symbolizer background = legend.getBackground();
-		if (background != null) {
-			getBtnBackground().setSymbol(background);
+			getTemplateSymbol().setSymbol(template);
+			if (isLine) {
+				txtMinSize.setDouble(3);
+				txtMaxSize.setDouble(3);
+			} else {
+				txtMinSize.setDouble(10);
+				txtMaxSize.setDouble(10);
+			}
 		}
 	}
 
 	@Override
 	public Legend getLegend() {
 		String valueField = cmbValue.getSelectedItem().toString();
-		String normalizationField = useNormalization ? cmbNormalization
-				.getSelectedItem().toString() : valueField;
 		Interval size = new Interval(txtMinSize.getDouble(),
 				txtMaxSize.getDouble());
 		Symbolizer template = getTemplateSymbol().getSymbol();
 		String desc = getSymbolDescription();
 		template.setDescription(new DescriptionImpl(desc, desc));
 		Symbolizer background = getBtnBackground().getSymbol();
-		return legendFactory.createProportionalLegend(layer, valueField,
-				normalizationField, template, background,
-				backgroundPanel != null, size);
+		if (useNormalization) {
+			return legendFactory.createProportionalLegend(layer, valueField,
+					cmbNormalization.getSelectedItem().toString(), template,
+					background, backgroundPanel != null, size);
+		} else {
+			return legendFactory.createProportionalLegend(layer, valueField,
+					template, background, backgroundPanel != null, size);
+		}
 	}
 
 	private String getSymbolDescription() {

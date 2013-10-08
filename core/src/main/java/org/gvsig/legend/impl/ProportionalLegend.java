@@ -2,8 +2,6 @@ package org.gvsig.legend.impl;
 
 import java.io.IOException;
 
-import javax.inject.Inject;
-
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.styling.Style;
 import org.geotools.styling.Symbolizer;
@@ -15,6 +13,7 @@ import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
 
 import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
 
 public class ProportionalLegend extends AbstractLegend {
 	private String valueField, normalizationField;
@@ -25,7 +24,16 @@ public class ProportionalLegend extends AbstractLegend {
 
 	private Expression sizeExp;
 
-	@Inject
+	@AssistedInject
+	public ProportionalLegend(@Assisted Layer layer,
+			@Assisted("value") String valueField,
+			@Assisted("template") Symbolizer template,
+			@Assisted("background") Symbolizer background,
+			@Assisted boolean useBackground, @Assisted Interval size) {
+		this(layer, valueField, null, template, background, useBackground, size);
+	}
+
+	@AssistedInject
 	public ProportionalLegend(@Assisted Layer layer,
 			@Assisted("value") String valueField,
 			@Assisted("normalization") String normalizationField,
@@ -100,7 +108,7 @@ public class ProportionalLegend extends AbstractLegend {
 			while (iterator.hasNext()) {
 				SimpleFeature feature = iterator.next();
 				double value = Double.parseDouble(feature.getAttribute(
-						normalizationField).toString());
+						valueField).toString());
 				if (value > maxValue) {
 					maxValue = value;
 				}

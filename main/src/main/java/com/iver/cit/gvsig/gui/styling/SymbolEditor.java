@@ -178,6 +178,7 @@ import javax.swing.JTabbedPane;
 import org.geotools.styling.StyleFactoryImpl;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
+import org.geotools.styling.visitor.DuplicatingStyleVisitor;
 import org.gvsig.gui.beans.AcceptCancelPanel;
 import org.gvsig.units.Unit;
 
@@ -188,7 +189,6 @@ import com.iver.andami.ui.mdiManager.WindowInfo;
 import com.iver.cit.gvsig.gui.JComboBoxUnits;
 import com.iver.cit.gvsig.project.documents.view.legend.gui.SymbolPreviewer;
 import com.iver.cit.gvsig.project.documents.view.legend.gui.SymbologyUtils;
-import com.iver.utiles.XMLEntity;
 
 /**
  * Creates the panel that is used to control the properties of a symbol in order
@@ -217,7 +217,7 @@ public class SymbolEditor extends JPanel implements IWindow {
 	private JComboBoxUnits cmbUnits;
 	private JTabbedPane tabbedPane = null;
 	private Class<? extends Symbolizer> shapeType;
-	private XMLEntity oldSymbolProperties;
+	private Symbolizer oldSymbol;
 	private ActionListener cmbTypeActionListener;
 
 	private AbstractTypeSymbolEditor[] tabs;
@@ -248,7 +248,9 @@ public class SymbolEditor extends JPanel implements IWindow {
 					.getUnitOfMeasure());
 			getCmbUnits().setSelectedUnit(unit);
 		}
-		this.oldSymbolProperties = SymbologyUtils.getXMLEntity(style);
+		DuplicatingStyleVisitor visitor = new DuplicatingStyleVisitor();
+		style.accept(visitor);
+		this.oldSymbol = (Symbolizer) visitor.getCopy();
 		this.shapeType = shapeType;
 		initialize();
 	}
@@ -367,8 +369,9 @@ public class SymbolEditor extends JPanel implements IWindow {
 			ActionListener action = new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					if ("CANCEL".equals(e.getActionCommand())) {
-						style = SymbologyUtils.createSymbolFromXML(
-								oldSymbolProperties, null);
+						DuplicatingStyleVisitor visitor = new DuplicatingStyleVisitor();
+						oldSymbol.accept(visitor);
+						style = (Symbolizer) visitor.getCopy();
 					}
 					PluginServices.getMDIManager().closeWindow(
 							SymbolEditor.this);
@@ -592,10 +595,10 @@ public class SymbolEditor extends JPanel implements IWindow {
 	 * Sets a layer to a symbol in order to create a final symbol composed by
 	 * different layers.
 	 * 
-	 * @param layer
+	 * @param symbol
 	 */
-	protected void setLayerToSymbol(Symbolizer layer) {
-		this.style = layer;
+	protected void setLayerToSymbol(Symbolizer symbol) {
+		this.style = symbol;
 		// Initialize layer manager
 		getLayerManager();
 

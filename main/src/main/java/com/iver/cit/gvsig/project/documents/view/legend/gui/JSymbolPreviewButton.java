@@ -155,6 +155,7 @@ public class JSymbolPreviewButton extends JComponent implements MouseListener {
 	public void setSymbol(Symbolizer symbolizer) {
 		this.prev = symbolizer;
 		paintImmediately(getBounds());
+		repaint();
 	}
 
 	public void mouseClicked(MouseEvent e) {

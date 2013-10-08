@@ -46,6 +46,7 @@
  */
 package com.iver.cit.gvsig.project.documents.view.legend.gui;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -63,10 +64,13 @@ import org.geotools.styling.DescriptionImpl;
 import org.geotools.styling.LineSymbolizer;
 import org.geotools.styling.PointSymbolizer;
 import org.geotools.styling.PolygonSymbolizer;
+import org.geotools.styling.StyleFactory;
 import org.geotools.styling.Symbolizer;
+import org.geotools.styling.visitor.DuplicatingStyleVisitor;
 import org.gvsig.gui.beans.swing.GridBagLayoutPanel;
 import org.gvsig.gui.beans.swing.JButton;
 import org.gvsig.layer.Layer;
+import org.gvsig.legend.DefaultSymbols;
 import org.gvsig.legend.Legend;
 import org.gvsig.legend.impl.LegendFactory;
 import org.gvsig.legend.impl.SingleSymbolLegend;
@@ -102,6 +106,10 @@ public class SingleSymbol extends JPanel implements ILegendPanel,
 
 	@Inject
 	private LegendFactory legendFactory;
+	@Inject
+	private StyleFactory styleFactory;
+	@Inject
+	private DefaultSymbols defaultSymbols;
 
 	public SingleSymbol() {
 		super();
@@ -125,21 +133,29 @@ public class SingleSymbol extends JPanel implements ILegendPanel,
 		this.layer = lyr;
 		shapeType = lyr.getShapeType();
 
-		SingleSymbolLegend legend;
+		Symbolizer symbol;
 		if (l instanceof SingleSymbolLegend) {
-			legend = (SingleSymbolLegend) l;
+			symbol = ((SingleSymbolLegend) l).getSymbol();
 		} else {
-			legend = legendFactory.createSingleSymbolLegend(layer);
+			symbol = defaultSymbols.createDefaultSymbol(layer.getShapeType(),
+					Color.blue, "");
 		}
 
-		setSymbol(legend.getSymbol());
+		setSymbol(copy(symbol));
 
-		getSymbolPreviewPanel().setSymbol(legend.getSymbol());
+		getSymbolPreviewPanel().setSymbol(copy(symbol));
 		getBtnOpenSymbolLevelsEditor().setEnabled(false);
-		Description description = legend.getSymbol().getDescription();
+		Description description = symbol.getDescription();
 		if (description != null && description.getTitle() != null) {
 			this.txtLabel.setText(description.getTitle().toString());
 		}
+	}
+
+	private Symbolizer copy(Symbolizer s) {
+		DuplicatingStyleVisitor visitor = new DuplicatingStyleVisitor(
+				styleFactory);
+		s.accept(visitor);
+		return (Symbolizer) visitor.getCopy();
 	}
 
 	@Override
@@ -280,9 +296,7 @@ public class SingleSymbol extends JPanel implements ILegendPanel,
 	}
 
 	public boolean isSuitableFor(Layer layer) {
-		// TODO gtintegration
-		// return (layer instanceof FLyrVect);
-		return true;
+		return layer.hasFeatures();
 	}
 
 	public void actionPerformed(ActionEvent e) {

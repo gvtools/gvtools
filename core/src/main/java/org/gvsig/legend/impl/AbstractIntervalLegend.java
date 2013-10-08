@@ -55,10 +55,11 @@ public abstract class AbstractIntervalLegend extends
 	@AssistedInject
 	public AbstractIntervalLegend(
 			@Assisted Map<Interval, Symbolizer> symbolsMap,
-			@Assisted Symbolizer defaultSymbol, @Assisted boolean useDefault,
-			@Assisted Layer layer, @Assisted String fieldName) {
+			@Assisted Type intervalType, @Assisted Symbolizer defaultSymbol,
+			@Assisted boolean useDefault, @Assisted Layer layer,
+			@Assisted String fieldName) {
 		super(layer, defaultSymbol, useDefault);
-		this.type = null;
+		this.type = intervalType;
 		this.fieldName = fieldName;
 		this.symbolsMap = symbolsMap;
 		this.nIntervals = symbolsMap.size();

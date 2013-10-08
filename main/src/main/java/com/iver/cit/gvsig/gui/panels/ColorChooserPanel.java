@@ -350,7 +350,6 @@ public class ColorChooserPanel extends JPanel {
 
 		if (color != null) {
 			this.color = color;
-			setAlpha(color.getAlpha());
 			updateColorPanel();
 		}
 

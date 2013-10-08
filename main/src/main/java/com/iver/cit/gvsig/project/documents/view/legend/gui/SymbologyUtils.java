@@ -203,11 +203,6 @@ public class SymbologyUtils {
 		return null;
 	}
 
-	public static Symbolizer clone(Symbolizer symbolizer) {
-		// TODO gtintegration
-		return symbolizer;
-	}
-
 	public static org.gvsig.units.Unit convert2gvsigUnits(Unit<Length> unit) {
 		if (unit == null) {
 			return null;

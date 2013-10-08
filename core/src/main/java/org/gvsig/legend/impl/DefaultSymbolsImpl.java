@@ -67,9 +67,9 @@ public class DefaultSymbolsImpl implements DefaultSymbols {
 		} else if (Polygon.class.isAssignableFrom(type)
 				|| MultiPolygon.class.isAssignableFrom(type)) {
 			Stroke stroke = styleFactory.createStroke(
-					filterFactory.literal(color), filterFactory.literal(size));
-			Fill fill = styleFactory.createFill(filterFactory.literal(color),
-					filterFactory.literal(0));
+					filterFactory.literal(Color.gray),
+					filterFactory.literal(size));
+			Fill fill = styleFactory.createFill(filterFactory.literal(color));
 			sym = styleFactory.createPolygonSymbolizer(stroke, fill, null);
 		} else {
 			RuntimeException e = new RuntimeException(

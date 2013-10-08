@@ -28,6 +28,7 @@ import org.gvsig.inject.InjectorSingleton;
 import org.gvsig.layer.Layer;
 import org.gvsig.legend.Interval;
 import org.gvsig.legend.Legend;
+import org.gvsig.legend.impl.AbstractIntervalLegend.Type;
 import org.gvsig.legend.impl.IntervalLegend;
 import org.gvsig.legend.impl.LegendFactory;
 import org.gvsig.legend.impl.QuantityByCategoryLegend;
@@ -268,6 +269,7 @@ public class QuantityByCategory extends JPanel implements ILegendPanel,
 				.getSelectedIndex());
 		Symbolizer colorDefaultSymbol = colorLegend.getDefaultSymbol();
 		boolean colorUseDefault = colorLegend.useDefaultSymbol();
+		Type colorType = colorLegend.getType();
 
 		String sizeField = cmbGraduatedSymbolField
 				.getItemAt(cmbGraduatedSymbolField.getSelectedIndex());
@@ -275,11 +277,13 @@ public class QuantityByCategory extends JPanel implements ILegendPanel,
 		boolean sizeUseDefault = sizeLegend.useDefaultSymbol();
 		Symbolizer background = sizeLegend.getBackground();
 		boolean useBackground = sizeLegend.useBackground();
+		Type sizeType = sizeLegend.getType();
 
 		colorLegend = legendFactory.createIntervalLegend(colorSymbols,
-				colorDefaultSymbol, colorUseDefault, layer, colorField);
+				colorType, colorDefaultSymbol, colorUseDefault, layer,
+				colorField);
 		sizeLegend = legendFactory.createSizeIntervalLegend(sizeSymbols,
-				sizeDefaultSymbol, sizeUseDefault, layer, sizeField,
+				sizeType, sizeDefaultSymbol, sizeUseDefault, layer, sizeField,
 				background, useBackground);
 
 		return legendFactory.createQuantityByCategoryLegend(layer, colorLegend,

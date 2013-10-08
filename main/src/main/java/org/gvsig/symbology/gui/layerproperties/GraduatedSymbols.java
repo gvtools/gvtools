@@ -230,9 +230,32 @@ public class GraduatedSymbols extends VectorialInterval implements ILegendPanel 
 
 		fillFieldNames();
 
-		SizeIntervalLegend legend;
 		if (l instanceof SizeIntervalLegend) {
-			legend = (SizeIntervalLegend) l;
+			SizeIntervalLegend legend = (SizeIntervalLegend) l;
+			Symbolizer[] symbols = legend.getSymbols();
+
+			getChkDefaultvalues().setSelected(legend.useDefaultSymbol());
+			cmbField.setSelectedItem(legend.getFieldName());
+			getTxtMaxSize().setDouble(legend.getSize().getMax());
+			getTxtMinSize().setDouble(legend.getSize().getMin());
+			if (symbols.length > 0) {
+				getBtnTemplate().setSymbol(symbols[symbols.length - 1]);
+			} else {
+				Symbolizer defaultTemplate = defaultSymbols
+						.createDefaultSymbol(templateShapeType, Color.darkGray,
+								"");
+				getBtnTemplate().setSymbol(defaultTemplate);
+			}
+			if (showBackground && isPolygon) {
+				getBtnBackground().setSymbol(legend.getBackground());
+			}
+
+			txtNumIntervals.setText(String.valueOf(symbols.length));
+			if (legend.getType() != null) {
+				cmbFieldType.setSelectedIndex(legend.getType().ordinal());
+			}
+			defaultSymbolPrev.setSymbol(legend.getDefaultSymbol());
+			symbolTable.fillTable(symbols, legend.getIntervals());
 		} else {
 			// Get first numeric field
 			String fieldName = null;
@@ -246,36 +269,26 @@ public class GraduatedSymbols extends VectorialInterval implements ILegendPanel 
 				}
 			}
 
-			legend = legendFactory.createSizeIntervalLegend(layer, fieldName);
-		}
+			getChkDefaultvalues().setSelected(false);
+			cmbField.setSelectedItem(fieldName);
+			getTxtMaxSize().setDouble(7);
+			getTxtMinSize().setDouble(1);
+			txtNumIntervals.setText(String.valueOf(3));
+			cmbFieldType.setSelectedIndex(Type.EQUAL.ordinal());
 
-		Symbolizer[] symbols = legend.getSymbols();
-
-		getChkDefaultvalues().setSelected(legend.useDefaultSymbol());
-		cmbField.setSelectedItem(legend.getFieldName());
-		symbolTable.fillTable(symbols, legend.getIntervals());
-		getTxtMaxSize().setDouble(legend.getSize().getMax());
-		getTxtMinSize().setDouble(legend.getSize().getMin());
-		if (symbols.length > 0) {
-			getBtnTemplate().setSymbol(symbols[symbols.length - 1]);
-		} else {
-			Symbolizer defaultTemplate = defaultSymbols.createDefaultSymbol(
+			Symbolizer template = defaultSymbols.createDefaultSymbol(
 					templateShapeType, Color.darkGray, "");
-			getBtnTemplate().setSymbol(defaultTemplate);
-		}
-		if (showBackground && isPolygon) {
-			getBtnBackground().setSymbol(legend.getBackground());
-		}
+			getBtnTemplate().setSymbol(template);
+			if (showBackground && isPolygon) {
+				Symbolizer background = defaultSymbols.createDefaultSymbol(
+						Polygon.class, Color.white, "background");
+				getBtnBackground().setSymbol(background);
+			}
 
-		if (legend.useDefaultSymbol()) {
-			txtNumIntervals.setText(String.valueOf(symbols.length - 1));
-		} else {
-			txtNumIntervals.setText(String.valueOf(symbols.length));
+			Symbolizer defaultSymbol = defaultSymbols.createDefaultSymbol(
+					templateShapeType, Color.black, "");
+			defaultSymbolPrev.setSymbol(defaultSymbol);
 		}
-		if (legend.getType() != null) {
-			cmbFieldType.setSelectedIndex(legend.getType().ordinal());
-		}
-		defaultSymbolPrev.setSymbol(legend.getDefaultSymbol());
 	}
 
 	@Override
@@ -302,9 +315,11 @@ public class GraduatedSymbols extends VectorialInterval implements ILegendPanel 
 		boolean useDefault = chkdefaultvalues.isSelected();
 		String fieldName = cmbField.getSelectedItem().toString();
 		Symbolizer background = getBtnBackground().getSymbol();
+		Type type = Type.values()[cmbFieldType.getSelectedIndex()];
 
-		return legendFactory.createSizeIntervalLegend(symbols, defaultSymbol,
-				useDefault, layer, fieldName, background, showBackground);
+		return legendFactory.createSizeIntervalLegend(symbols, type,
+				defaultSymbol, useDefault, layer, fieldName, background,
+				showBackground);
 	}
 
 	@Override

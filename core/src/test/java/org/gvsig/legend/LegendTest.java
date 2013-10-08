@@ -240,7 +240,7 @@ public class LegendTest extends GVSIGTestCase {
 		symbols.put(i3, blue);
 
 		IntervalLegend legend = legendFactory.createIntervalLegend(symbols,
-				defaultSymbol, false, layer, FIELD_NAME);
+				Type.EQUAL, defaultSymbol, false, layer, FIELD_NAME);
 
 		assertEquals(symbols.size(), legend.getIntervals().length);
 		assertEquals(symbols.size(), legend.getSymbols().length);
@@ -445,8 +445,8 @@ public class LegendTest extends GVSIGTestCase {
 		Symbolizer background = defaultSymbols.createDefaultSymbol(
 				Polygon.class, Color.blue, "");
 		SizeIntervalLegend legend = legendFactory.createSizeIntervalLegend(
-				symbolsMap, defaultSymbol, false, mockLayer(), FIELD_NAME,
-				background, false);
+				symbolsMap, Type.EQUAL, defaultSymbol, false, mockLayer(),
+				FIELD_NAME, background, false);
 
 		assertEquals(symbolsMap.size(), legend.getIntervals().length);
 		assertEquals(symbolsMap.size(), legend.getSymbols().length);

@@ -88,6 +88,7 @@ import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
+import org.geotools.styling.visitor.DuplicatingStyleVisitor;
 import org.gvsig.gui.beans.AcceptCancelPanel;
 import org.gvsig.gui.beans.swing.GridBagLayoutPanel;
 import org.gvsig.gui.beans.swing.JButton;
@@ -1077,11 +1078,14 @@ public class SymbolSelector extends JPanel implements ISymbolSelector,
 			throw new UnsupportedOperationException();
 			// return new MultiShapeSymbolSelector(currSymbol);
 		} else {
+			DuplicatingStyleVisitor visitor = new DuplicatingStyleVisitor();
+			currSymbol.accept(visitor);
+			Symbolizer symbol = (Symbolizer) visitor.getCopy();
 			if (filter == null) {
-				return new SymbolSelector(currSymbol, shapeType, true,
+				return new SymbolSelector(symbol, shapeType, true,
 						showAcceptPanel);
 			} else {
-				return new SymbolSelector(currSymbol, shapeType, filter, true);
+				return new SymbolSelector(symbol, shapeType, filter, true);
 			}
 		}
 	}

@@ -42,13 +42,14 @@ public class SizeIntervalLegend extends AbstractIntervalLegend {
 
 	@AssistedInject
 	public SizeIntervalLegend(@Assisted Map<Interval, Symbolizer> symbolsMap,
-			@Assisted Symbolizer defaultSymbol,
+			@Assisted Type intervalType, @Assisted Symbolizer defaultSymbol,
 			@Assisted("usedefault") boolean useDefault, @Assisted Layer layer,
 			@Assisted String fieldName,
 			@Assisted("background") Symbolizer background,
 			@Assisted("usebackground") boolean useBackground)
 			throws IOException {
-		super(symbolsMap, defaultSymbol, useDefault, layer, fieldName);
+		super(symbolsMap, intervalType, defaultSymbol, useDefault, layer,
+				fieldName);
 		this.background = background;
 		this.useBackground = useBackground;
 

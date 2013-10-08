@@ -34,10 +34,11 @@ public class IntervalLegend extends AbstractIntervalLegend {
 
 	@AssistedInject
 	public IntervalLegend(@Assisted Map<Interval, Symbolizer> symbolsMap,
-			@Assisted Symbolizer defaultSymbol, @Assisted boolean useDefault,
-			@Assisted Layer layer, @Assisted String fieldName)
-			throws IOException {
-		super(symbolsMap, defaultSymbol, useDefault, layer, fieldName);
+			@Assisted Type intervalType, @Assisted Symbolizer defaultSymbol,
+			@Assisted boolean useDefault, @Assisted Layer layer,
+			@Assisted String fieldName) throws IOException {
+		super(symbolsMap, intervalType, defaultSymbol, useDefault, layer,
+				fieldName);
 
 		Interval[] intervals = getIntervals();
 		this.nIntervals = intervals.length;

@@ -28,8 +28,8 @@ public interface LegendFactory {
 			String fieldName, int nIntervals);
 
 	IntervalLegend createIntervalLegend(Map<Interval, Symbolizer> symbols,
-			Symbolizer defaultSymbol, boolean useDefault, Layer layer,
-			String fieldName) throws IOException;
+			Type intervalType, Symbolizer defaultSymbol, boolean useDefault,
+			Layer layer, String fieldName) throws IOException;
 
 	IntervalLegend createIntervalLegend(Layer layer, String fieldName);
 
@@ -48,6 +48,12 @@ public interface LegendFactory {
 			@Assisted("background") Symbolizer background,
 			boolean useBackground, Interval size);
 
+	ProportionalLegend createProportionalLegend(Layer layer,
+			@Assisted("value") String valueField,
+			@Assisted("template") Symbolizer template,
+			@Assisted("background") Symbolizer background,
+			boolean useBackground, Interval size);
+
 	SizeIntervalLegend createSizeIntervalLegend(Interval size,
 			Type intervalType, Symbolizer defaultSymbol,
 			@Assisted("usedefault") boolean useDefault, Layer layer,
@@ -57,7 +63,8 @@ public interface LegendFactory {
 			@Assisted("usebackground") boolean useBackground);
 
 	SizeIntervalLegend createSizeIntervalLegend(
-			Map<Interval, Symbolizer> symbolsMap, Symbolizer defaultSymbol,
+			Map<Interval, Symbolizer> symbolsMap, Type intervalType,
+			Symbolizer defaultSymbol,
 			@Assisted("usedefault") boolean useDefault, Layer layer,
 			String fieldName, @Assisted("background") Symbolizer background,
 			@Assisted("usebackground") boolean useBackground);

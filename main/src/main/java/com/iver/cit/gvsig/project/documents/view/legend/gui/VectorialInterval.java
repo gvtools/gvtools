@@ -75,6 +75,7 @@ import org.geotools.styling.Symbolizer;
 import org.gvsig.gui.beans.swing.GridBagLayoutPanel;
 import org.gvsig.gui.beans.swing.JButton;
 import org.gvsig.layer.Layer;
+import org.gvsig.legend.DefaultSymbols;
 import org.gvsig.legend.Interval;
 import org.gvsig.legend.Legend;
 import org.gvsig.legend.impl.AbstractIntervalLegend.Type;
@@ -130,6 +131,8 @@ public class VectorialInterval extends JPanel implements ILegendPanel {
 
 	@Inject
 	private LegendFactory legendFactory;
+	@Inject
+	private DefaultSymbols defaultSymbols;
 
 	public VectorialInterval() {
 		super();
@@ -434,10 +437,31 @@ public class VectorialInterval extends JPanel implements ILegendPanel {
 
 	@Override
 	public void setData(Layer layer, Legend l) throws IOException {
-		IntervalLegend legend;
+		this.layer = layer;
+		if (symbolTable != null) {
+			pnlCenter.remove(symbolTable);
+		}
+		getDefaultSymbolPrev();
+		symbolTable = new SymbolTable(SymbolTable.INTERVALS_TYPE,
+				layer.getShapeType());
+		pnlCenter.add(symbolTable);
+
+		fillFieldNames();
 
 		if (l instanceof IntervalLegend) {
-			legend = (IntervalLegend) l;
+			IntervalLegend legend = (IntervalLegend) l;
+
+			chkdefaultvalues.setSelected(legend.useDefaultSymbol());
+			cmbField.getModel().setSelectedItem(legend.getFieldName());
+			Symbolizer[] symbols = legend.getSymbols();
+			startColorChooser.setColor(legend.getStartColor());
+			endColorChooser.setColor(legend.getEndColor());
+			txtNumIntervals.setText(String.valueOf(symbols.length));
+			defaultSymbolPrev.setSymbol(legend.getDefaultSymbol());
+			if (legend.getType() != null) {
+				cmbFieldType.setSelectedIndex(legend.getType().ordinal());
+			}
+			symbolTable.fillTable(symbols, legend.getIntervals());
 		} else {
 			// Get first numeric field
 			String fieldName = null;
@@ -451,48 +475,13 @@ public class VectorialInterval extends JPanel implements ILegendPanel {
 				}
 			}
 
-			legend = legendFactory.createIntervalLegend(layer, fieldName);
-		}
-
-		this.layer = layer;
-
-		if (symbolTable != null) {
-			pnlCenter.remove(symbolTable);
-		}
-
-		getDefaultSymbolPrev();
-
-		symbolTable = new SymbolTable(SymbolTable.INTERVALS_TYPE,
-				layer.getShapeType());
-		pnlCenter.add(symbolTable);
-
-		try {
-			fillFieldNames();
-		} catch (UnsupportedOperationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		chkdefaultvalues.setSelected(legend.useDefaultSymbol());
-		cmbField.getModel().setSelectedItem(legend.getFieldName());
-		Symbolizer[] symbols = legend.getSymbols();
-		symbolTable.fillTable(symbols, legend.getIntervals());
-		startColorChooser.setColor(legend.getStartColor());
-		endColorChooser.setColor(legend.getEndColor());
-		startColorChooser.repaint();
-		endColorChooser.repaint();
-		if (legend.useDefaultSymbol()) {
-			txtNumIntervals.setText(String.valueOf(symbols.length - 1));
-		} else {
-			txtNumIntervals.setText(String.valueOf(symbols.length));
-		}
-
-		defaultSymbolPrev.setSymbol(legend.getDefaultSymbol());
-		if (legend.getType() != null) {
-			cmbFieldType.setSelectedIndex(legend.getType().ordinal());
+			chkdefaultvalues.setSelected(false);
+			cmbField.getModel().setSelectedItem(fieldName);
+			startColorChooser.setColor(Color.red);
+			endColorChooser.setColor(Color.blue);
+			txtNumIntervals.setText("3");
+			defaultSymbolPrev.setSymbol(defaultSymbols.createDefaultSymbol(
+					layer.getShapeType(), Color.black, "default"));
 		}
 	}
 
@@ -541,7 +530,8 @@ public class VectorialInterval extends JPanel implements ILegendPanel {
 		Symbolizer defaultSymbol = defaultSymbolPrev.getSymbol();
 		boolean useDefault = chkdefaultvalues.isSelected();
 		String field = cmbField.getSelectedItem().toString();
-		return legendFactory.createIntervalLegend(symbols, defaultSymbol,
+		Type type = Type.values()[cmbFieldType.getSelectedIndex()];
+		return legendFactory.createIntervalLegend(symbols, type, defaultSymbol,
 				useDefault, layer, field);
 	}
 
