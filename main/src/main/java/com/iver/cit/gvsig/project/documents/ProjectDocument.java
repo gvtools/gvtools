@@ -49,6 +49,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import org.gvsig.persistence.PersistenceException;
 import org.gvsig.persistence.generated.DocumentType;
 
 import com.iver.andami.PluginServices;
@@ -190,10 +191,11 @@ public abstract class ProjectDocument implements Serializable {
 	 * DOCUMENT ME!
 	 * 
 	 * @return DOCUMENT ME!
+	 * @throws PersistenceException
 	 * @throws XMLException
 	 * @throws SaveException
 	 */
-	public abstract DocumentType getXMLEntity();
+	public abstract DocumentType getXMLEntity() throws PersistenceException;
 
 	protected void fill(DocumentType document) {
 		document.setComment(comment);

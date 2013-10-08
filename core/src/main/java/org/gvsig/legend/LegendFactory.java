@@ -14,6 +14,7 @@ import org.gvsig.legend.impl.QuantityByCategoryLegend;
 import org.gvsig.legend.impl.SingleSymbolLegend;
 import org.gvsig.legend.impl.SizeIntervalLegend;
 import org.gvsig.legend.impl.UniqueValueLegend;
+import org.gvsig.persistence.generated.LegendType;
 
 public interface LegendFactory {
 	SingleSymbolLegend createSingleSymbolLegend(Layer layer);
@@ -59,4 +60,6 @@ public interface LegendFactory {
 
 	QuantityByCategoryLegend createQuantityByCategoryLegend(Layer layer,
 			IntervalLegend colorLegend, SizeIntervalLegend sizeLegend);
+
+	Legend createLegend(LegendType xml, Layer layer);
 }

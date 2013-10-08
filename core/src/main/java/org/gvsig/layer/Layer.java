@@ -8,6 +8,7 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.gvsig.layer.filter.LayerFilter;
 import org.gvsig.legend.Legend;
 import org.gvsig.map.MapContext;
+import org.gvsig.persistence.PersistenceException;
 import org.gvsig.persistence.generated.LayerType;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -188,7 +189,7 @@ public interface Layer {
 	 */
 	ReferencedEnvelope getBounds() throws IOException;
 
-	LayerType getXML();
+	LayerType getXML() throws PersistenceException;
 
 	/**
 	 * Gets the ids of the selected features.
@@ -237,6 +238,6 @@ public interface Layer {
 	void setLegend(Legend style);
 
 	Legend getLegend();
-	
+
 	Class<? extends Geometry> getShapeType();
 }

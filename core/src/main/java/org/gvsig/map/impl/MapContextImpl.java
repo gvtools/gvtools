@@ -77,7 +77,7 @@ public class MapContextImpl implements MapContext, RenderListener {
 	}
 
 	@Override
-	public MapType getXML() {
+	public MapType getXML() throws PersistenceException {
 		MapType type = new MapType();
 		type.setAreaUnits(areaUnits.ordinal());
 		type.setMapUnits(mapUnits.ordinal());

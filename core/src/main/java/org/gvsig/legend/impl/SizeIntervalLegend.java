@@ -13,8 +13,13 @@ import org.geotools.styling.SLD;
 import org.geotools.styling.Symbolizer;
 import org.gvsig.layer.Layer;
 import org.gvsig.legend.Interval;
+import org.gvsig.persistence.PersistenceException;
+import org.gvsig.persistence.generated.LegendType;
+import org.gvsig.persistence.generated.StringPropertyType;
 
 public class SizeIntervalLegend extends AbstractIntervalLegend {
+	public static final String TYPE = "SIZE_INTERVAL";
+
 	private Interval size;
 	private Symbolizer template, background;
 
@@ -99,7 +104,7 @@ public class SizeIntervalLegend extends AbstractIntervalLegend {
 	@Override
 	protected Map<Interval, Symbolizer> getSymbols(Interval[] intervals) {
 		double range = size.getMax() - size.getMin();
-		double step = range / nIntervals;
+		double step = range / (nIntervals - 1);
 
 		Map<Interval, Symbolizer> symbolsMap = new HashMap<Interval, Symbolizer>();
 
@@ -117,5 +122,38 @@ public class SizeIntervalLegend extends AbstractIntervalLegend {
 		}
 
 		return symbolsMap;
+	}
+
+	@Override
+	public LegendType getXML() throws PersistenceException {
+		LegendType xml = super.getXML();
+		xml.setType(TYPE);
+		if (template != null) {
+			xml.getProperties().add(symbol("template", template));
+		}
+		if (background != null) {
+			xml.getProperties().add(symbol("background", background));
+		}
+		xml.getProperties().add(property("size", size.toString()));
+		return xml;
+	}
+
+	@Override
+	public void setXML(LegendType xml) {
+		assert xml.getType().equals(TYPE);
+
+		super.setXML(xml);
+
+		for (StringPropertyType property : xml.getProperties()) {
+			String name = property.getPropertyName();
+			String value = property.getPropertyValue();
+			if (name.equals("template")) {
+				this.template = decode(value);
+			} else if (name.equals("background")) {
+				this.background = decode(value);
+			} else if (name.equals("size")) {
+				this.size = Interval.parseInterval(value);
+			}
+		}
 	}
 }

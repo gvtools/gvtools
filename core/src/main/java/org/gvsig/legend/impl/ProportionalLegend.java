@@ -7,12 +7,17 @@ import org.geotools.styling.Style;
 import org.geotools.styling.Symbolizer;
 import org.gvsig.layer.Layer;
 import org.gvsig.legend.Interval;
+import org.gvsig.persistence.PersistenceException;
+import org.gvsig.persistence.generated.LegendType;
+import org.gvsig.persistence.generated.StringPropertyType;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
 
 public class ProportionalLegend extends AbstractLegend {
+	public static final String TYPE = "PROPORTIONAL";
+
 	private String valueField, normalizationField;
 	private Interval size;
 	private Symbolizer template, background;
@@ -58,6 +63,43 @@ public class ProportionalLegend extends AbstractLegend {
 		Style style = styleFactory.createStyle();
 		style.featureTypeStyles().add(featureTypeStyle(rule(symbols())));
 		return style;
+	}
+
+	@Override
+	public LegendType getXML() throws PersistenceException {
+		LegendType xml = super.getXML();
+		xml.setType(TYPE);
+		xml.getProperties().add(property("value-field", valueField));
+		if (normalizationField != null) {
+			xml.getProperties().add(property("norm-field", normalizationField));
+		}
+		xml.getProperties().add(property("size", size.toString()));
+		if (background != null) {
+			xml.getProperties().add(symbol("background", background));
+		}
+		xml.getProperties().add(symbol("template", template));
+		return xml;
+	}
+
+	@Override
+	public void setXML(LegendType xml) {
+		super.setXML(xml);
+
+		for (StringPropertyType property : xml.getProperties()) {
+			String name = property.getPropertyName();
+			String value = property.getPropertyValue();
+			if (name.equals("value-field")) {
+				this.valueField = value;
+			} else if (name.equals("norm-field")) {
+				this.normalizationField = value;
+			} else if (name.equals("size")) {
+				this.size = Interval.parseInterval(value);
+			} else if (name.equals("template")) {
+				this.template = decode(value);
+			} else if (name.equals("background")) {
+				this.background = decode(value);
+			}
+		}
 	}
 
 	private Symbolizer[] symbols() throws IOException {

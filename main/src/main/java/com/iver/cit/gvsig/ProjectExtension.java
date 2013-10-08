@@ -68,6 +68,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
+import org.apache.log4j.Logger;
 import org.gvsig.gui.beans.swing.JFileChooser;
 import org.gvsig.inject.ExtModule;
 import org.gvsig.inject.InjectorSingleton;
@@ -105,13 +106,16 @@ import com.iver.utiles.xml.XMLEncodingUtils;
 
 /**
  * Extension que proporciona controles para crear proyectos nuevos, abrirlos y
- * guardarlos. Adem�s los tipos de tabla que soporta el proyecto son
- * a�adidos en esta clase.
+ * guardarlos. Adem�s los tipos de tabla que soporta el proyecto son a�adidos en
+ * esta clase.
  * 
  * @author Fernando Gonz�lez Cort�s
  * @author Pablo Piqueras Bartolom� (pablo.piqueras@iver.es)
  */
 public class ProjectExtension extends Extension implements IExtensionStatus {
+	private static final Logger logger = Logger
+			.getLogger(ProjectExtension.class);
+
 	private static String projectPath = null;
 	// private ProjectWindow projectFrame;
 	private ProjectWindow projectFrame;
@@ -481,8 +485,8 @@ public class ProjectExtension extends Extension implements IExtensionStatus {
 	}
 
 	/**
-	 * Escribe el proyecto en XML. Pero permite decidir si se pide
-	 * confirmaci�n para sobreescribir
+	 * Escribe el proyecto en XML. Pero permite decidir si se pide confirmaci�n
+	 * para sobreescribir
 	 * 
 	 * @param file
 	 *            Fichero.
@@ -529,19 +533,18 @@ public class ProjectExtension extends Extension implements IExtensionStatus {
 			setPath(file.toString());
 
 		} catch (Exception e) {
-			JOptionPane
-					.showMessageDialog(
-							(Component) PluginServices.getMainFrame(),
-							PluginServices.getText(this,
-									"error_writing_project")
-									+ ":\n-"
-									+ PluginServices
-											.getText(this,
-													"the_user_cannot_edit_the_project_because_it_has_not_write_permissions")
-									+ ".", PluginServices.getText(this,
-									"warning"), JOptionPane.OK_OPTION);
-			// NotificationManager.addError(PluginServices.getText(this,"error_writing_project")+
-			// ": "+file.getName(), e);
+			logger.error("Cannot write project", e);
+			String message = PluginServices.getText(this,
+					"error_writing_project")
+					+ ":\n-"
+					+ PluginServices
+							.getText(this,
+									"the_user_cannot_edit_the_project_because_it_has_not_write_permissions")
+					+ ".";
+			JOptionPane.showMessageDialog(
+					(Component) PluginServices.getMainFrame(), message,
+					PluginServices.getText(this, "warning"),
+					JOptionPane.OK_OPTION);
 			return false;
 		}
 		NotificationManager.addInfo(PluginServices.getText(this,

@@ -357,7 +357,12 @@ public class SymbolTable extends JPanel {
 		@Override
 		public Object getValueAt(int row, int column) {
 			if (column == COLUMN_INDEX_LABEL) {
-				return getSymbol(row).getDescription().getTitle().toString();
+				Description description = getSymbol(row).getDescription();
+				if (description != null && description.getTitle() != null) {
+					return description.getTitle().toString();
+				} else {
+					return "";
+				}
 			} else {
 				return super.getValueAt(row, column);
 			}

@@ -19,6 +19,9 @@ import org.geotools.styling.Symbolizer;
 import org.gvsig.layer.Layer;
 import org.gvsig.legend.DefaultSymbols;
 import org.gvsig.legend.Interval;
+import org.gvsig.persistence.PersistenceException;
+import org.gvsig.persistence.generated.LegendType;
+import org.gvsig.persistence.generated.StringPropertyType;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.Filter;
 
@@ -117,7 +120,7 @@ public abstract class AbstractIntervalLegend extends
 	protected Style createStyle() throws IOException {
 		Style style = styleFactory.createStyle();
 		List<Filter> filters = new ArrayList<Filter>();
-		for (Interval interval : symbolsMap().keySet()) {
+		for (Interval interval : getIntervals()) {
 			Filter filter = filterFactory.between(
 					filterFactory.property(fieldName),
 					filterFactory.literal(interval.getMin()),
@@ -140,6 +143,46 @@ public abstract class AbstractIntervalLegend extends
 			symbolsMap = createSymbols();
 		}
 		return symbolsMap;
+	}
+
+	@Override
+	public LegendType getXML() throws PersistenceException {
+		try {
+			LegendType xml = super.getXML();
+			for (Interval interval : getIntervals()) {
+				Symbolizer symbol = symbolsMap().get(interval);
+				xml.getSymbols().add(symbol(interval.toString(), symbol));
+			}
+			xml.getProperties().add(property("field-name", fieldName));
+			xml.getProperties()
+					.add(property("interval-type",
+							Integer.toString(type.ordinal())));
+			return xml;
+		} catch (IOException e) {
+			throw new PersistenceException("Cannot obtain intervals", e);
+		}
+	}
+
+	@Override
+	public void setXML(LegendType xml) {
+		super.setXML(xml);
+		for (StringPropertyType property : xml.getProperties()) {
+			String name = property.getPropertyName();
+			String value = property.getPropertyValue();
+			if (name.equals("field-name")) {
+				this.fieldName = value;
+			} else if (name.equals("interval-type")) {
+				this.type = Type.values()[Integer.parseInt(value)];
+			}
+		}
+
+		this.symbolsMap = new HashMap<Interval, Symbolizer>();
+		for (StringPropertyType symbol : xml.getSymbols()) {
+			String value = symbol.getPropertyValue();
+			String name = symbol.getPropertyName();
+			symbolsMap.put(Interval.parseInterval(name), decode(value));
+		}
+		this.nIntervals = symbolsMap.size();
 	}
 
 	protected Map<Interval, Symbolizer> createSymbols() throws IOException {

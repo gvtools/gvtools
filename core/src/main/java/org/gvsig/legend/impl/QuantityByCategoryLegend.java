@@ -10,8 +10,12 @@ import org.geotools.styling.Style;
 import org.geotools.styling.Symbolizer;
 import org.gvsig.layer.Layer;
 import org.gvsig.legend.Interval;
+import org.gvsig.persistence.PersistenceException;
+import org.gvsig.persistence.generated.LegendType;
 
 public class QuantityByCategoryLegend extends AbstractLegend {
+	public static final String TYPE = "QUANTITY_BY_CATEGORY";
+
 	private IntervalLegend colorLegend;
 	private SizeIntervalLegend sizeLegend;
 
@@ -54,5 +58,17 @@ public class QuantityByCategoryLegend extends AbstractLegend {
 		styles.addAll(sizeLegend.createStyle().featureTypeStyles());
 		styles.addAll(colorLegend.createStyle().featureTypeStyles());
 		return style;
+	}
+
+	@Override
+	public LegendType getXML() throws PersistenceException {
+		// TODO Auto-generated method stub
+		return super.getXML();
+	}
+
+	@Override
+	public void setXML(LegendType xml) {
+		// TODO Auto-generated method stub
+		super.setXML(xml);
 	}
 }

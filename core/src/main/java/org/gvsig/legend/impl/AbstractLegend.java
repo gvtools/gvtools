@@ -1,21 +1,33 @@
 package org.gvsig.legend.impl;
 
 import java.awt.Color;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.xml.transform.TransformerException;
 
+import org.geotools.data.Base64;
+import org.geotools.styling.FeatureTypeConstraint;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Rule;
+import org.geotools.styling.SLDParser;
+import org.geotools.styling.SLDTransformer;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
+import org.geotools.styling.StyledLayerDescriptor;
 import org.geotools.styling.Symbolizer;
+import org.geotools.styling.UserLayer;
 import org.gvsig.layer.Layer;
 import org.gvsig.layer.Selection;
 import org.gvsig.legend.DefaultSymbols;
 import org.gvsig.legend.Legend;
+import org.gvsig.persistence.PersistenceException;
+import org.gvsig.persistence.generated.LegendType;
+import org.gvsig.persistence.generated.StringPropertyType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
 
@@ -34,7 +46,8 @@ public abstract class AbstractLegend implements Legend {
 	@Inject
 	protected DefaultSymbols defaultSymbols;
 
-	protected void setLayer(Layer layer) {
+	@Override
+	public void setLayer(Layer layer) {
 		this.layer = layer;
 	}
 
@@ -97,6 +110,54 @@ public abstract class AbstractLegend implements Legend {
 			rule.symbolizers().add(symbol);
 		}
 		return rule;
+	}
+
+	@Override
+	public LegendType getXML() throws PersistenceException {
+		return new LegendType();
+	}
+
+	public void setXML(LegendType xml) {
+		// do nothing
+	}
+
+	protected String encode(Symbolizer symbol) throws TransformerException {
+		Style style = styleFactory.createStyle();
+		style.featureTypeStyles().add(featureTypeStyle(rule(symbol)));
+
+		StyledLayerDescriptor sld = styleFactory.createStyledLayerDescriptor();
+		UserLayer layer = styleFactory.createUserLayer();
+		layer.setLayerFeatureConstraints(new FeatureTypeConstraint[] { null });
+		sld.addStyledLayer(layer);
+		layer.addUserStyle(style);
+
+		String xml = new SLDTransformer().transform(sld);
+		return Base64.encodeBytes(xml.getBytes());
+	}
+
+	protected Symbolizer decode(String string) {
+		InputStreamReader reader = new InputStreamReader(
+				new ByteArrayInputStream(Base64.decode(string)));
+		SLDParser parser = new SLDParser(styleFactory, reader);
+		Style[] styles = parser.readXML();
+		return styles[0].featureTypeStyles().get(0).rules().get(0)
+				.symbolizers().get(0);
+	}
+
+	protected StringPropertyType property(String name, String value) {
+		StringPropertyType property = new StringPropertyType();
+		property.setPropertyName(name);
+		property.setPropertyValue(value);
+		return property;
+	}
+
+	protected StringPropertyType symbol(String name, Symbolizer symbol)
+			throws PersistenceException {
+		try {
+			return property(name, encode(symbol));
+		} catch (TransformerException e) {
+			throw new PersistenceException("Cannot encode symbolizer", e);
+		}
 	}
 
 	@Override

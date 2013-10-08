@@ -12,8 +12,13 @@ import org.geotools.styling.SLD;
 import org.geotools.styling.Symbolizer;
 import org.gvsig.layer.Layer;
 import org.gvsig.legend.Interval;
+import org.gvsig.persistence.PersistenceException;
+import org.gvsig.persistence.generated.LegendType;
+import org.gvsig.persistence.generated.StringPropertyType;
 
 public class IntervalLegend extends AbstractIntervalLegend {
+	public static final String TYPE = "COLOR_INTERVAL";
+
 	private Color start, end;
 
 	IntervalLegend() {
@@ -102,5 +107,31 @@ public class IntervalLegend extends AbstractIntervalLegend {
 		}
 
 		return symbolsMap;
+	}
+
+	@Override
+	public void setXML(LegendType xml) {
+		assert xml.getType().equals(TYPE);
+		super.setXML(xml);
+		for (StringPropertyType property : xml.getProperties()) {
+			String name = property.getPropertyName();
+			String value = property.getPropertyValue();
+			if (name.equals("start-color")) {
+				this.start = new Color(Integer.parseInt(value));
+			} else if (name.equals("end-color")) {
+				this.end = new Color(Integer.parseInt(value));
+			}
+		}
+	}
+
+	@Override
+	public LegendType getXML() throws PersistenceException {
+		LegendType xml = super.getXML();
+		xml.setType(TYPE);
+		xml.getProperties().add(
+				property("start-color", Integer.toString(start.getRGB())));
+		xml.getProperties().add(
+				property("end-color", Integer.toString(end.getRGB())));
+		return xml;
 	}
 }

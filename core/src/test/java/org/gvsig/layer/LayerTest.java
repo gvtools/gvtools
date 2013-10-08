@@ -6,16 +6,24 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import geomatico.events.Event;
 import geomatico.events.EventBus;
 
+import java.io.StringWriter;
+
+import javax.xml.transform.TransformerException;
+
 import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.filter.identity.FeatureIdImpl;
+import org.geotools.styling.SLDTransformer;
+import org.geotools.styling.Style;
 import org.gvsig.GVSIGTestCase;
 import org.gvsig.events.FeatureSelectionChangeEvent;
 import org.gvsig.events.LayerAddedEvent;
@@ -23,6 +31,7 @@ import org.gvsig.events.LayerNameChangeEvent;
 import org.gvsig.events.LayerSelectionChangeEvent;
 import org.gvsig.events.LayerVisibilityChangeEvent;
 import org.gvsig.layer.filter.LayerFilter;
+import org.gvsig.legend.LegendFactory;
 import org.gvsig.persistence.generated.LayerType;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -41,7 +50,8 @@ import com.vividsolutions.jts.geom.Point;
 public class LayerTest extends GVSIGTestCase {
 	@Inject
 	private LayerFactory layerFactory;
-
+	@Inject
+	private LegendFactory legendFactory;
 	@Inject
 	private EventBus eventBus;
 
@@ -330,9 +340,40 @@ public class LayerTest extends GVSIGTestCase {
 		assertTrue(copy.getSelection().equals(layer.getSelection()));
 	}
 
-	@Ignore
 	@Test
-	public void testLayerStyleXML() throws Exception {
+	public void testLayerLegendXML() throws Exception {
+		Answer<Class<? extends Geometry>> answerPoint = new Answer<Class<? extends Geometry>>() {
+			@Override
+			public Class<? extends Geometry> answer(InvocationOnMock invocation)
+					throws Throwable {
+				return Point.class;
+			}
+		};
+
+		// Mock original layer with legend and point type
+		Layer original = spy(mockLayerWithType("layer"));
+		when(original.getShapeType()).then(answerPoint);
+		original.setLegend(legendFactory
+				.createIntervalLegend(original, "field"));
+
+		// Mock copy from XML. Dirty hack: we set the layer in the legend so the
+		// legend has the mock with custom getShapeType answer instead of the
+		// original layer (which has a null source and cannot be used to obtain
+		// the shape type)
+		Layer copy = spy(layerFactory.createLayer(original.getXML()));
+		doAnswer(answerPoint).when(copy).getShapeType();
+		copy.getLegend().setLayer(copy);
+
+		// Test
+		Style originalStyle = original.getLegend().getStyle();
+		Style copyStyle = copy.getLegend().getStyle();
+		assertEquals(toString(originalStyle), toString(copyStyle));
+	}
+
+	private String toString(Style style) throws TransformerException {
+		StringWriter writer = new StringWriter();
+		new SLDTransformer().transform(style, writer);
+		return writer.toString();
 	}
 
 	@Test

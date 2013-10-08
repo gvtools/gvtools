@@ -59,6 +59,7 @@ import org.geotools.referencing.CRS;
 import org.gvsig.exceptions.DriverException;
 import org.gvsig.layer.FeatureSourceCache;
 import org.gvsig.layer.Layer;
+import org.gvsig.persistence.PersistenceException;
 import org.gvsig.persistence.generated.DocumentType;
 import org.gvsig.persistence.generated.LabeledExtentType;
 import org.gvsig.tools.file.PathGenerator;
@@ -451,11 +452,13 @@ public class Project implements Serializable, PropertyChangeListener {
 	 * DOCUMENT ME!
 	 * 
 	 * @return DOCUMENT ME!
+	 * @throws PersistenceException
 	 * 
 	 * @throws DriverException
 	 * @throws XMLException
 	 */
-	public org.gvsig.persistence.generated.Project getXMLEntity() {
+	public org.gvsig.persistence.generated.Project getXMLEntity()
+			throws PersistenceException {
 		org.gvsig.persistence.generated.Project ret = new org.gvsig.persistence.generated.Project();
 		ret.setVersion(VERSION);
 		ret.setName(name);

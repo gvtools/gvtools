@@ -17,6 +17,7 @@ import org.gvsig.layer.LayerFactory;
 import org.gvsig.layer.Selection;
 import org.gvsig.layer.filter.LayerFilter;
 import org.gvsig.legend.Legend;
+import org.gvsig.persistence.PersistenceException;
 import org.gvsig.persistence.generated.CompositeLayerType;
 import org.gvsig.persistence.generated.LayerType;
 
@@ -154,7 +155,7 @@ public class CompositeLayer extends AbstractLayer implements Layer {
 	}
 
 	@Override
-	public LayerType getXML() {
+	public LayerType getXML() throws PersistenceException {
 		CompositeLayerType xml = new CompositeLayerType();
 
 		super.fill(xml);

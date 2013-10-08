@@ -20,6 +20,7 @@ import org.gvsig.layer.SourceFactory;
 import org.gvsig.layer.filter.LayerFilter;
 import org.gvsig.legend.Legend;
 import org.gvsig.legend.LegendFactory;
+import org.gvsig.persistence.PersistenceException;
 import org.gvsig.persistence.generated.DataLayerType;
 import org.gvsig.persistence.generated.LayerType;
 import org.opengis.filter.identity.FeatureId;
@@ -164,12 +165,13 @@ public class FeatureLayer extends AbstractLayer implements Layer {
 	}
 
 	@Override
-	public LayerType getXML() {
+	public LayerType getXML() throws PersistenceException {
 		DataLayerType xml = new DataLayerType();
 
 		super.fill(xml);
 
 		xml.setSource(source.getXML());
+		xml.setStyle(getLegend().getXML());
 		xml.getSelection().clear();
 		Iterator<FeatureId> iterator = selection.iterator();
 		while (iterator.hasNext()) {
@@ -186,6 +188,7 @@ public class FeatureLayer extends AbstractLayer implements Layer {
 
 		DataLayerType dataLayerType = (DataLayerType) layer;
 		source = sourceFactory.createSource(dataLayerType.getSource());
+		legend = legendFactory.createLegend(dataLayerType.getStyle(), this);
 		dataLayerType.getSelection();
 		this.selection = new Selection();
 		for (String id : dataLayerType.getSelection()) {

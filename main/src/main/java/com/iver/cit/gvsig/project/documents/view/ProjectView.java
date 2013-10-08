@@ -46,6 +46,7 @@ import javax.inject.Inject;
 
 import org.exolab.castor.xml.XMLException;
 import org.gvsig.map.MapContext;
+import org.gvsig.persistence.PersistenceException;
 import org.gvsig.persistence.generated.DocumentType;
 import org.gvsig.persistence.generated.ViewDocumentType;
 
@@ -78,10 +79,11 @@ public class ProjectView extends ProjectViewBase {
 	 * DOCUMENT ME!
 	 * 
 	 * @return DOCUMENT ME!
+	 * @throws PersistenceException 
 	 * @throws XMLException
 	 * @throws SaveException
 	 */
-	public ViewDocumentType getXMLEntity() {
+	public ViewDocumentType getXMLEntity() throws PersistenceException {
 
 		ViewDocumentType xml = new ViewDocumentType();
 		super.fill(xml);

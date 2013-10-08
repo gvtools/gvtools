@@ -116,10 +116,20 @@
 						maxOccurs="1" minOccurs="1" />
 					<xs:element name="selection" type="xs:string" maxOccurs="unbounded"
 						minOccurs="0" />
-					<xs:element name="style" type="xs:string" maxOccurs="1"
+					<xs:element name="style" type="LegendType" maxOccurs="1"
 						minOccurs="1" />
 				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="LegendType">
+		<xs:sequence>
+			<xs:element name="type" type="xs:string" minOccurs="1"
+				maxOccurs="1" />
+			<xs:element name="properties" type="StringPropertyType"
+				maxOccurs="unbounded" />
+			<xs:element name="symbols" type="StringPropertyType"
+				maxOccurs="unbounded" />
+		</xs:sequence>
 	</xs:complexType>
 </xs:schema>

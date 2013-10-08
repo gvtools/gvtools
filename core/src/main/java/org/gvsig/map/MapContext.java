@@ -39,7 +39,7 @@ public interface MapContext {
 
 	Color getBackgroundColor();
 
-	MapType getXML();
+	MapType getXML() throws PersistenceException;
 
 	void setXML(MapType mainMap) throws PersistenceException;
 

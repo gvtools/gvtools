@@ -15,11 +15,16 @@ import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Style;
 import org.geotools.styling.Symbolizer;
 import org.gvsig.layer.Layer;
+import org.gvsig.persistence.PersistenceException;
+import org.gvsig.persistence.generated.LegendType;
+import org.gvsig.persistence.generated.StringPropertyType;
 import org.opengis.filter.Filter;
 
 import com.vividsolutions.jts.geom.Geometry;
 
 public class UniqueValueLegend extends AbstractDefaultSymbolLegend {
+	public static final String TYPE = "UNIQUE_VALUE";
+
 	private String fieldName;
 	private Map<Object, Symbolizer> symbolsMap;
 	private Object[] values;
@@ -116,5 +121,43 @@ public class UniqueValueLegend extends AbstractDefaultSymbolLegend {
 			}
 		}
 		return symbolsMap;
+	}
+
+	@Override
+	public LegendType getXML() throws PersistenceException {
+		LegendType xml = super.getXML();
+		List<StringPropertyType> props = xml.getProperties();
+		props.add(property("field-name", fieldName));
+		for (Color color : colorScheme) {
+			props.add(property("color", Integer.toString(color.getRGB())));
+		}
+		props.add(property("field-name", fieldName));
+		return xml;
+	}
+
+	@Override
+	public void setXML(LegendType xml) {
+		assert xml.getType().equals(TYPE);
+
+		super.setXML(xml);
+
+		List<Color> colorList = new ArrayList<Color>();
+		for (StringPropertyType property : xml.getProperties()) {
+			String name = property.getPropertyName();
+			String value = property.getPropertyValue();
+			if (name.equals("field-name")) {
+				this.fieldName = value;
+			} else if (name.equals("color")) {
+				colorList.add(new Color(Integer.parseInt(value)));
+			}
+		}
+
+		this.colorScheme = colorList.toArray(new Color[colorList.size()]);
+		this.order = new Comparator<Object>() {
+			@Override
+			public int compare(Object o1, Object o2) {
+				return o1.toString().compareTo(o2.toString());
+			}
+		};
 	}
 }

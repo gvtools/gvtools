@@ -314,8 +314,8 @@ public class GraduatedSymbols extends VectorialInterval implements ILegendPanel 
 		Symbolizer defaultSymbol = defaultSymbolPrev.getSymbol();
 		boolean useDefault = chkdefaultvalues.isSelected();
 		String fieldName = cmbField.getSelectedItem().toString();
-		Symbolizer background = showBackground ? getBtnBackground().getSymbol()
-				: null;
+		Symbolizer background = btnBackground != null ? btnBackground
+				.getSymbol() : null;
 		Type type = Type.values()[cmbFieldType.getSelectedIndex()];
 
 		return legendFactory.createSizeIntervalLegend(symbols, type,
@@ -371,8 +371,8 @@ public class GraduatedSymbols extends VectorialInterval implements ILegendPanel 
 		Symbolizer defaultSymbol = defaultSymbolPrev.getSymbol();
 		boolean useDefault = chkdefaultvalues.isSelected();
 		String fieldName = cmbField.getSelectedItem().toString();
-		Symbolizer background = showBackground ? getBtnBackground().getSymbol()
-				: null;
+		Symbolizer background = btnBackground != null ? btnBackground
+				.getSymbol() : null;
 
 		SizeIntervalLegend legend = legendFactory.createSizeIntervalLegend(
 				size, intervalType, defaultSymbol, useDefault, layer,

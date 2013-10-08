@@ -5,16 +5,24 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.geotools.styling.Symbolizer;
+import org.gvsig.inject.LibModule;
 import org.gvsig.layer.Layer;
 import org.gvsig.legend.Interval;
+import org.gvsig.legend.Legend;
 import org.gvsig.legend.LegendFactory;
 import org.gvsig.legend.impl.AbstractIntervalLegend.Type;
+import org.gvsig.persistence.generated.LegendType;
 
+import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
 public class LegendFactoryImpl implements LegendFactory {
+	private static final Logger logger = Logger
+			.getLogger(LegendFactoryImpl.class);
+
 	@Inject
 	private Provider<SingleSymbolLegend> singleSymbolLegendProvider;
 	@Inject
@@ -25,6 +33,8 @@ public class LegendFactoryImpl implements LegendFactory {
 	private Provider<ProportionalLegend> proportionalLegendProvider;
 	@Inject
 	private Provider<SizeIntervalLegend> sizeIntervalLegendProvider;
+	@Inject
+	private Provider<QuantityByCategoryLegend> quantityByCategoryLegendProvider;
 
 	@Override
 	public SingleSymbolLegend createSingleSymbolLegend(Layer layer) {
@@ -141,6 +151,41 @@ public class LegendFactoryImpl implements LegendFactory {
 	@Override
 	public QuantityByCategoryLegend createQuantityByCategoryLegend(Layer layer,
 			IntervalLegend colorLegend, SizeIntervalLegend sizeLegend) {
-		return createQuantityByCategoryLegend(layer, colorLegend, sizeLegend);
+		QuantityByCategoryLegend legend = quantityByCategoryLegendProvider
+				.get();
+		legend.init(layer, colorLegend, sizeLegend);
+		return legend;
+	}
+
+	@Override
+	public Legend createLegend(LegendType xml, Layer layer) {
+		String type = xml.getType();
+		Legend legend;
+		if (type.equals(SingleSymbolLegend.TYPE)) {
+			legend = singleSymbolLegendProvider.get();
+		} else if (type.equals(UniqueValueLegend.TYPE)) {
+			legend = uniqueValueLegendProvider.get();
+		} else if (type.equals(IntervalLegend.TYPE)) {
+			legend = intervalLegendProvider.get();
+		} else if (type.equals(SizeIntervalLegend.TYPE)) {
+			legend = sizeIntervalLegendProvider.get();
+		} else if (type.equals(ProportionalLegend.TYPE)) {
+			legend = proportionalLegendProvider.get();
+		} else if (type.equals(QuantityByCategoryLegend.TYPE)) {
+			legend = quantityByCategoryLegendProvider.get();
+		} else {
+			try {
+				legend = (Legend) Guice.createInjector(new LibModule())
+						.getInstance(Class.forName(type));
+			} catch (ClassNotFoundException e) {
+				logger.error(
+						"Cannot create legend. Unrecognized type: " + type, e);
+				return null;
+			}
+		}
+
+		legend.setXML(xml);
+		legend.setLayer(layer);
+		return legend;
 	}
 }
