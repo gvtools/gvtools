@@ -19,32 +19,36 @@ import org.gvsig.legend.Legend;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
 
-import com.google.inject.assistedinject.Assisted;
-
 public abstract class AbstractLegend implements Legend {
 	private Rule selectionRule;
 	private Filter selectionFilter;
 	private Map<Rule, Filter> ruleFilters;
 	private Style style;
 
-	protected Layer layer;
+	private Layer layer;
 
 	@Inject
 	protected StyleFactory styleFactory;
-
 	@Inject
 	protected FilterFactory2 filterFactory;
-
 	@Inject
 	protected DefaultSymbols defaultSymbols;
 
-	@Inject
-	public AbstractLegend(@Assisted Layer layer) {
+	protected void setLayer(Layer layer) {
 		this.layer = layer;
 	}
 
+	protected Layer getLayer() {
+		return layer;
+	}
+
 	@Override
-	public Style getStyle() throws IOException {
+	public final Style getStyle() throws IOException {
+		if (layer == null) {
+			throw new IllegalStateException("bug! You must initialize "
+					+ "the legend first!");
+		}
+
 		if (style == null) {
 			selectionFilter = filterFactory.id(layer.getSelection());
 			ruleFilters = new HashMap<Rule, Filter>();

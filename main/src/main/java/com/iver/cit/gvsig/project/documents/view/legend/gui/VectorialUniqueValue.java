@@ -74,7 +74,7 @@ import org.gvsig.gui.beans.swing.JButton;
 import org.gvsig.layer.Layer;
 import org.gvsig.legend.DefaultSymbols;
 import org.gvsig.legend.Legend;
-import org.gvsig.legend.impl.LegendFactory;
+import org.gvsig.legend.LegendFactory;
 import org.gvsig.legend.impl.UniqueValueLegend;
 import org.gvsig.raster.datastruct.ColorItem;
 import org.opengis.feature.simple.SimpleFeatureType;

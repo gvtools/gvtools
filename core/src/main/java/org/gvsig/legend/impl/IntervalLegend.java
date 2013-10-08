@@ -11,34 +11,28 @@ import org.geotools.styling.PolygonSymbolizer;
 import org.geotools.styling.SLD;
 import org.geotools.styling.Symbolizer;
 import org.gvsig.layer.Layer;
-import org.gvsig.legend.DefaultSymbols;
 import org.gvsig.legend.Interval;
-
-import com.google.inject.assistedinject.Assisted;
-import com.google.inject.assistedinject.AssistedInject;
 
 public class IntervalLegend extends AbstractIntervalLegend {
 	private Color start, end;
 
-	@AssistedInject
-	public IntervalLegend(@Assisted("start") Color start,
-			@Assisted("end") Color end, @Assisted Type intervalType,
-			@Assisted Symbolizer defaultSymbol, @Assisted boolean useDefault,
-			@Assisted Layer layer, @Assisted String fieldName,
-			@Assisted int nIntervals) {
-		super(intervalType, defaultSymbol, useDefault, layer, fieldName,
-				nIntervals);
+	IntervalLegend() {
+	}
+
+	public void init(Color start, Color end, Type intervalType,
+			Symbolizer defaultSymbol, boolean useDefault, Layer layer,
+			String fieldName, int nIntervals) {
+		super.initialize(intervalType, defaultSymbol, useDefault, layer,
+				fieldName, nIntervals);
 		this.start = start;
 		this.end = end;
 	}
 
-	@AssistedInject
-	public IntervalLegend(@Assisted Map<Interval, Symbolizer> symbolsMap,
-			@Assisted Type intervalType, @Assisted Symbolizer defaultSymbol,
-			@Assisted boolean useDefault, @Assisted Layer layer,
-			@Assisted String fieldName) throws IOException {
-		super(symbolsMap, intervalType, defaultSymbol, useDefault, layer,
-				fieldName);
+	public void init(Map<Interval, Symbolizer> symbolsMap, Type intervalType,
+			Symbolizer defaultSymbol, boolean useDefault, Layer layer,
+			String fieldName) throws IOException {
+		super.initialize(symbolsMap, intervalType, defaultSymbol, useDefault,
+				layer, fieldName);
 
 		Interval[] intervals = getIntervals();
 		this.nIntervals = intervals.length;
@@ -49,10 +43,8 @@ public class IntervalLegend extends AbstractIntervalLegend {
 		}
 	}
 
-	@AssistedInject
-	public IntervalLegend(@Assisted Layer layer, @Assisted String fieldName,
-			DefaultSymbols defaultSymbols) {
-		super(layer, fieldName, defaultSymbols);
+	public void init(Layer layer, String fieldName) {
+		super.initialize(layer, fieldName);
 		this.start = Color.red;
 		this.end = Color.blue;
 	}
@@ -98,9 +90,9 @@ public class IntervalLegend extends AbstractIntervalLegend {
 			int red = Math.max(0, Math.min(255, (int) r));
 			int green = Math.max(0, Math.min(255, (int) g));
 			int blue = Math.max(0, Math.min(255, (int) b));
-			Symbolizer symbol = defaultSymbols.createDefaultSymbol(
-					layer.getShapeType(), new Color(red, green, blue),
-					interval.toString());
+			Symbolizer symbol = defaultSymbols.createDefaultSymbol(getLayer()
+					.getShapeType(), new Color(red, green, blue), interval
+					.toString());
 
 			r += stepR;
 			g += stepG;

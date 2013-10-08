@@ -11,7 +11,7 @@ import org.gvsig.layer.Layer;
 import org.gvsig.layer.LayerFactory;
 import org.gvsig.layer.Source;
 import org.gvsig.layer.SourceFactory;
-import org.gvsig.legend.impl.LegendFactory;
+import org.gvsig.legend.LegendFactory;
 import org.gvsig.persistence.generated.CompositeLayerType;
 import org.gvsig.persistence.generated.DataLayerType;
 import org.gvsig.persistence.generated.LayerType;

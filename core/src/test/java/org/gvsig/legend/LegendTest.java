@@ -31,7 +31,6 @@ import org.gvsig.layer.Selection;
 import org.gvsig.layer.Source;
 import org.gvsig.legend.impl.AbstractIntervalLegend.Type;
 import org.gvsig.legend.impl.IntervalLegend;
-import org.gvsig.legend.impl.LegendFactory;
 import org.gvsig.legend.impl.ProportionalLegend;
 import org.gvsig.legend.impl.SizeIntervalLegend;
 import org.gvsig.legend.impl.UniqueValueLegend;
@@ -365,17 +364,13 @@ public class LegendTest extends GVSIGTestCase {
 		Layer layer = mockLayer();
 		Symbolizer template = defaultSymbols.createDefaultSymbol(
 				layer.getShapeType(), Color.black, null);
-		Symbolizer background = defaultSymbols.createDefaultSymbol(
-				Polygon.class, Color.black, null);
 		Interval size = new Interval(1, 10);
 		ProportionalLegend legend = legendFactory.createProportionalLegend(
-				layer, FIELD_NAME, FIELD_NAME, template, background, false,
-				size);
+				layer, FIELD_NAME, FIELD_NAME, template, null, size);
 
 		assertEquals(FIELD_NAME, legend.getNormalizationField());
 		assertEquals(FIELD_NAME, legend.getValueField());
 		assertEquals(template, legend.getTemplate());
-		assertEquals(background, legend.getBackground());
 		assertEquals(size, legend.getSize());
 
 		// +1 for selection style, +1 for the proportional style
@@ -398,7 +393,7 @@ public class LegendTest extends GVSIGTestCase {
 				Polygon.class, Color.blue, "");
 		SizeIntervalLegend legend = legendFactory.createSizeIntervalLegend(
 				size, Type.EQUAL, defaultSymbol, true, mockLayer(), FIELD_NAME,
-				nIntervals, template, background, true);
+				nIntervals, template, background);
 
 		assertEquals(nIntervals, legend.getIntervals().length);
 		assertEquals(nIntervals, legend.getSymbols().length);
@@ -442,16 +437,13 @@ public class LegendTest extends GVSIGTestCase {
 
 		Symbolizer defaultSymbol = defaultSymbols.createDefaultSymbol(
 				Point.class, Color.red, "");
-		Symbolizer background = defaultSymbols.createDefaultSymbol(
-				Polygon.class, Color.blue, "");
 		SizeIntervalLegend legend = legendFactory.createSizeIntervalLegend(
 				symbolsMap, Type.EQUAL, defaultSymbol, false, mockLayer(),
-				FIELD_NAME, background, false);
+				FIELD_NAME, null);
 
 		assertEquals(symbolsMap.size(), legend.getIntervals().length);
 		assertEquals(symbolsMap.size(), legend.getSymbols().length);
 		assertEquals(FIELD_NAME, legend.getFieldName());
-		assertEquals(background, legend.getBackground());
 		assertEquals(defaultSymbol, legend.getDefaultSymbol());
 		assertEquals(new Interval(1, 5), legend.getSize());
 

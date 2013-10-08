@@ -28,9 +28,9 @@ import org.gvsig.inject.InjectorSingleton;
 import org.gvsig.layer.Layer;
 import org.gvsig.legend.Interval;
 import org.gvsig.legend.Legend;
+import org.gvsig.legend.LegendFactory;
 import org.gvsig.legend.impl.AbstractIntervalLegend.Type;
 import org.gvsig.legend.impl.IntervalLegend;
-import org.gvsig.legend.impl.LegendFactory;
 import org.gvsig.legend.impl.QuantityByCategoryLegend;
 import org.gvsig.legend.impl.SizeIntervalLegend;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -276,7 +276,6 @@ public class QuantityByCategory extends JPanel implements ILegendPanel,
 		Symbolizer sizeDefaultSymbol = sizeLegend.getDefaultSymbol();
 		boolean sizeUseDefault = sizeLegend.useDefaultSymbol();
 		Symbolizer background = sizeLegend.getBackground();
-		boolean useBackground = sizeLegend.useBackground();
 		Type sizeType = sizeLegend.getType();
 
 		colorLegend = legendFactory.createIntervalLegend(colorSymbols,
@@ -284,7 +283,7 @@ public class QuantityByCategory extends JPanel implements ILegendPanel,
 				colorField);
 		sizeLegend = legendFactory.createSizeIntervalLegend(sizeSymbols,
 				sizeType, sizeDefaultSymbol, sizeUseDefault, layer, sizeField,
-				background, useBackground);
+				background);
 
 		return legendFactory.createQuantityByCategoryLegend(layer, colorLegend,
 				sizeLegend);

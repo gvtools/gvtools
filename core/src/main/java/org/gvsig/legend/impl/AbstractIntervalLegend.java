@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import org.apache.log4j.Logger;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.styling.FeatureTypeStyle;
@@ -20,8 +22,6 @@ import org.gvsig.legend.Interval;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.Filter;
 
-import com.google.inject.assistedinject.Assisted;
-import com.google.inject.assistedinject.AssistedInject;
 import com.iver.cit.gvsig.fmap.rendering.NaturalIntervalGenerator;
 import com.iver.cit.gvsig.fmap.rendering.QuantileIntervalGenerator;
 
@@ -41,35 +41,30 @@ public abstract class AbstractIntervalLegend extends
 	protected int nIntervals;
 	private String fieldName;
 
-	@AssistedInject
-	public AbstractIntervalLegend(@Assisted Type intervalType,
-			@Assisted Symbolizer defaultSymbol, @Assisted boolean useDefault,
-			@Assisted Layer layer, @Assisted String fieldName,
-			@Assisted int nIntervals) {
-		super(layer, defaultSymbol, useDefault);
+	@Inject
+	protected DefaultSymbols defaultSymbols;
+
+	protected void initialize(Type intervalType, Symbolizer defaultSymbol,
+			boolean useDefault, Layer layer, String fieldName, int nIntervals) {
+		super.initialize(layer, defaultSymbol, useDefault);
 		this.type = intervalType;
 		this.fieldName = fieldName;
 		this.nIntervals = nIntervals;
 	}
 
-	@AssistedInject
-	public AbstractIntervalLegend(
-			@Assisted Map<Interval, Symbolizer> symbolsMap,
-			@Assisted Type intervalType, @Assisted Symbolizer defaultSymbol,
-			@Assisted boolean useDefault, @Assisted Layer layer,
-			@Assisted String fieldName) {
-		super(layer, defaultSymbol, useDefault);
+	protected void initialize(Map<Interval, Symbolizer> symbolsMap,
+			Type intervalType, Symbolizer defaultSymbol, boolean useDefault,
+			Layer layer, String fieldName) {
+		super.initialize(layer, defaultSymbol, useDefault);
 		this.type = intervalType;
 		this.fieldName = fieldName;
 		this.symbolsMap = symbolsMap;
 		this.nIntervals = symbolsMap.size();
 	}
 
-	@AssistedInject
-	public AbstractIntervalLegend(@Assisted Layer layer,
-			@Assisted String fieldName, DefaultSymbols defaultSymbols) {
-		super(layer, defaultSymbols.createDefaultSymbol(layer.getShapeType(),
-				Color.blue, ""), false);
+	protected void initialize(Layer layer, String fieldName) {
+		super.initialize(layer, defaultSymbols.createDefaultSymbol(
+				layer.getShapeType(), Color.blue, ""), false);
 		this.type = Type.EQUAL;
 		this.fieldName = fieldName;
 		this.nIntervals = 0;
@@ -152,8 +147,8 @@ public abstract class AbstractIntervalLegend extends
 		double max = Double.NEGATIVE_INFINITY;
 		List<Double> valueList = new ArrayList<Double>();
 
-		SimpleFeatureIterator features = layer.getFeatureSource().getFeatures()
-				.features();
+		SimpleFeatureIterator features = getLayer().getFeatureSource()
+				.getFeatures().features();
 
 		while (features.hasNext()) {
 			SimpleFeature feature = features.next();

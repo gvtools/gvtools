@@ -11,18 +11,16 @@ import org.geotools.styling.Symbolizer;
 import org.gvsig.layer.Layer;
 import org.gvsig.legend.Interval;
 
-import com.google.inject.assistedinject.Assisted;
-import com.google.inject.assistedinject.AssistedInject;
-
 public class QuantityByCategoryLegend extends AbstractLegend {
 	private IntervalLegend colorLegend;
 	private SizeIntervalLegend sizeLegend;
 
-	@AssistedInject
-	public QuantityByCategoryLegend(@Assisted Layer layer,
-			@Assisted IntervalLegend colorLegend,
-			@Assisted SizeIntervalLegend sizeLegend) {
-		super(layer);
+	QuantityByCategoryLegend() {
+	}
+
+	public void init(Layer layer, IntervalLegend colorLegend,
+			SizeIntervalLegend sizeLegend) {
+		super.setLayer(layer);
 		this.colorLegend = colorLegend;
 		this.sizeLegend = sizeLegend;
 	}

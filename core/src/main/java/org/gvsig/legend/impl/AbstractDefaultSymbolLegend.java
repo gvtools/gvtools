@@ -2,24 +2,19 @@ package org.gvsig.legend.impl;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Style;
 import org.geotools.styling.Symbolizer;
 import org.gvsig.layer.Layer;
 import org.opengis.filter.Filter;
 
-import com.google.inject.assistedinject.Assisted;
-
 public abstract class AbstractDefaultSymbolLegend extends AbstractLegend {
 	private boolean useDefault;
 	private Symbolizer defaultSymbol;
 
-	@Inject
-	public AbstractDefaultSymbolLegend(@Assisted Layer layer,
-			@Assisted Symbolizer defaultSymbol, @Assisted boolean useDefault) {
-		super(layer);
+	protected void initialize(Layer layer, Symbolizer defaultSymbol,
+			boolean useDefault) {
+		super.setLayer(layer);
 		this.defaultSymbol = defaultSymbol;
 		this.useDefault = useDefault;
 	}

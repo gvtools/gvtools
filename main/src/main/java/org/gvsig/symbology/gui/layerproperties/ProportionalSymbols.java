@@ -70,7 +70,7 @@ import org.gvsig.layer.Layer;
 import org.gvsig.legend.DefaultSymbols;
 import org.gvsig.legend.Interval;
 import org.gvsig.legend.Legend;
-import org.gvsig.legend.impl.LegendFactory;
+import org.gvsig.legend.LegendFactory;
 import org.gvsig.legend.impl.ProportionalLegend;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -348,15 +348,13 @@ public class ProportionalSymbols extends JPanel implements ILegendPanel {
 		Symbolizer template = getTemplateSymbol().getSymbol();
 		String desc = getSymbolDescription();
 		template.setDescription(new DescriptionImpl(desc, desc));
-		Symbolizer background = getBtnBackground().getSymbol();
-		if (useNormalization) {
-			return legendFactory.createProportionalLegend(layer, valueField,
-					cmbNormalization.getSelectedItem().toString(), template,
-					background, backgroundPanel != null, size);
-		} else {
-			return legendFactory.createProportionalLegend(layer, valueField,
-					template, background, backgroundPanel != null, size);
-		}
+		Symbolizer background = backgroundPanel != null ? getBtnBackground()
+				.getSymbol() : null;
+		String normField = useNormalization ? cmbNormalization
+				.getSelectedItem().toString() : null;
+
+		return legendFactory.createProportionalLegend(layer, valueField,
+				normField, template, background, size);
 	}
 
 	private String getSymbolDescription() {

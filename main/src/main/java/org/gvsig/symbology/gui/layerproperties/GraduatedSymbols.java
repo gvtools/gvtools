@@ -102,8 +102,8 @@ import org.gvsig.layer.Layer;
 import org.gvsig.legend.DefaultSymbols;
 import org.gvsig.legend.Interval;
 import org.gvsig.legend.Legend;
+import org.gvsig.legend.LegendFactory;
 import org.gvsig.legend.impl.AbstractIntervalLegend.Type;
-import org.gvsig.legend.impl.LegendFactory;
 import org.gvsig.legend.impl.SizeIntervalLegend;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -298,7 +298,7 @@ public class GraduatedSymbols extends VectorialInterval implements ILegendPanel 
 	}
 
 	@Override
-	public Legend getLegend() {
+	public Legend getLegend() throws IOException {
 		Map<Interval, Symbolizer> symbols = new HashMap<Interval, Symbolizer>();
 		for (int row = 0; row < symbolTable.getRowCount(); row++) {
 			Object value = symbolTable.getValue(row);
@@ -314,12 +314,12 @@ public class GraduatedSymbols extends VectorialInterval implements ILegendPanel 
 		Symbolizer defaultSymbol = defaultSymbolPrev.getSymbol();
 		boolean useDefault = chkdefaultvalues.isSelected();
 		String fieldName = cmbField.getSelectedItem().toString();
-		Symbolizer background = getBtnBackground().getSymbol();
+		Symbolizer background = showBackground ? getBtnBackground().getSymbol()
+				: null;
 		Type type = Type.values()[cmbFieldType.getSelectedIndex()];
 
 		return legendFactory.createSizeIntervalLegend(symbols, type,
-				defaultSymbol, useDefault, layer, fieldName, background,
-				showBackground);
+				defaultSymbol, useDefault, layer, fieldName, background);
 	}
 
 	@Override
@@ -371,12 +371,13 @@ public class GraduatedSymbols extends VectorialInterval implements ILegendPanel 
 		Symbolizer defaultSymbol = defaultSymbolPrev.getSymbol();
 		boolean useDefault = chkdefaultvalues.isSelected();
 		String fieldName = cmbField.getSelectedItem().toString();
-		Symbolizer background = getBtnBackground().getSymbol();
+		Symbolizer background = showBackground ? getBtnBackground().getSymbol()
+				: null;
 
 		SizeIntervalLegend legend = legendFactory.createSizeIntervalLegend(
 				size, intervalType, defaultSymbol, useDefault, layer,
 				fieldName, intervalCount, getBtnTemplate().getSymbol(),
-				background, showBackground);
+				background);
 
 		symbolTable.fillTable(legend.getSymbols(), legend.getIntervals());
 

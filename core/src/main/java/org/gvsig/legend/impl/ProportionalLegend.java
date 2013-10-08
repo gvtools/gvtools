@@ -12,41 +12,25 @@ import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
 
-import com.google.inject.assistedinject.Assisted;
-import com.google.inject.assistedinject.AssistedInject;
-
 public class ProportionalLegend extends AbstractLegend {
 	private String valueField, normalizationField;
 	private Interval size;
 	private Symbolizer template, background;
 	private Symbolizer[] symbols;
-	private boolean useBackground;
 
 	private Expression sizeExp;
 
-	@AssistedInject
-	public ProportionalLegend(@Assisted Layer layer,
-			@Assisted("value") String valueField,
-			@Assisted("template") Symbolizer template,
-			@Assisted("background") Symbolizer background,
-			@Assisted boolean useBackground, @Assisted Interval size) {
-		this(layer, valueField, null, template, background, useBackground, size);
+	ProportionalLegend() {
 	}
 
-	@AssistedInject
-	public ProportionalLegend(@Assisted Layer layer,
-			@Assisted("value") String valueField,
-			@Assisted("normalization") String normalizationField,
-			@Assisted("template") Symbolizer template,
-			@Assisted("background") Symbolizer background,
-			@Assisted boolean useBackground, @Assisted Interval size) {
-		super(layer);
+	public void init(Layer layer, String valueField, String normalizationField,
+			Symbolizer template, Symbolizer background, Interval size) {
+		super.setLayer(layer);
 		this.valueField = valueField;
 		this.normalizationField = normalizationField;
 		this.size = size;
 		this.template = template;
 		this.background = background;
-		this.useBackground = useBackground;
 	}
 
 	public String getValueField() {
@@ -83,7 +67,7 @@ public class ProportionalLegend extends AbstractLegend {
 					sizeExp, styleFactory, filterFactory);
 			template.accept(visitor);
 			Symbolizer symbol = (Symbolizer) visitor.getCopy();
-			if (useBackground) {
+			if (background != null) {
 				symbols = new Symbolizer[] { background, symbol };
 			} else {
 				symbols = new Symbolizer[] { symbol };
@@ -103,7 +87,7 @@ public class ProportionalLegend extends AbstractLegend {
 		double valueRange = 0;
 
 		if (!useNormalization) {
-			SimpleFeatureIterator iterator = layer.getFeatureSource()
+			SimpleFeatureIterator iterator = getLayer().getFeatureSource()
 					.getFeatures().features();
 			while (iterator.hasNext()) {
 				SimpleFeature feature = iterator.next();

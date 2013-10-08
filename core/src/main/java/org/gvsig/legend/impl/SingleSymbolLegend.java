@@ -7,30 +7,24 @@ import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Style;
 import org.geotools.styling.Symbolizer;
 import org.gvsig.layer.Layer;
-import org.gvsig.legend.DefaultSymbols;
-
-import com.google.inject.assistedinject.Assisted;
-import com.google.inject.assistedinject.AssistedInject;
 
 public class SingleSymbolLegend extends AbstractLegend {
+	public static final String TYPE = "SINGLE_SYMBOL";
+
 	private Symbolizer symbol;
 
-	@AssistedInject
-	public SingleSymbolLegend(@Assisted Layer layer,
-			DefaultSymbols defaultSymbols) {
-		this(layer, null, defaultSymbols);
+	SingleSymbolLegend() {
 	}
 
-	@AssistedInject
-	public SingleSymbolLegend(@Assisted Layer layer,
-			@Assisted Symbolizer symbol, DefaultSymbols defaultSymbols) {
-		super(layer);
-		if (symbol != null) {
-			this.symbol = symbol;
-		} else {
-			this.symbol = defaultSymbols.createDefaultSymbol(
-					layer.getShapeType(), Color.blue, null);
-		}
+	public void init(Layer layer) {
+		super.setLayer(layer);
+		this.symbol = defaultSymbols.createDefaultSymbol(layer.getShapeType(),
+				Color.blue, null);
+	}
+
+	public void init(Layer layer, Symbolizer symbol) {
+		super.setLayer(layer);
+		this.symbol = symbol;
 	}
 
 	public Symbolizer getSymbol() {

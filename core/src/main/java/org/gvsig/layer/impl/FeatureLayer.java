@@ -19,7 +19,7 @@ import org.gvsig.layer.Source;
 import org.gvsig.layer.SourceFactory;
 import org.gvsig.layer.filter.LayerFilter;
 import org.gvsig.legend.Legend;
-import org.gvsig.legend.impl.LegendFactory;
+import org.gvsig.legend.LegendFactory;
 import org.gvsig.persistence.generated.DataLayerType;
 import org.gvsig.persistence.generated.LayerType;
 import org.opengis.filter.identity.FeatureId;
@@ -186,7 +186,6 @@ public class FeatureLayer extends AbstractLayer implements Layer {
 
 		DataLayerType dataLayerType = (DataLayerType) layer;
 		source = sourceFactory.createSource(dataLayerType.getSource());
-
 		dataLayerType.getSelection();
 		this.selection = new Selection();
 		for (String id : dataLayerType.getSelection()) {

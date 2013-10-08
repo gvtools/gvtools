@@ -15,11 +15,8 @@ import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Style;
 import org.geotools.styling.Symbolizer;
 import org.gvsig.layer.Layer;
-import org.gvsig.legend.DefaultSymbols;
 import org.opengis.filter.Filter;
 
-import com.google.inject.assistedinject.Assisted;
-import com.google.inject.assistedinject.AssistedInject;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class UniqueValueLegend extends AbstractDefaultSymbolLegend {
@@ -30,25 +27,22 @@ public class UniqueValueLegend extends AbstractDefaultSymbolLegend {
 	private Color[] colorScheme;
 	private Comparator<Object> order;
 
-	@AssistedInject
-	public UniqueValueLegend(@Assisted Layer layer, @Assisted String fieldName,
-			@Assisted Symbolizer defaultSymbol, @Assisted boolean useDefault,
-			@Assisted Color[] colorScheme,
-			@Assisted Map<Object, Symbolizer> symbols,
-			@Assisted Comparator<Object> order) {
-		super(layer, defaultSymbol, useDefault);
+	UniqueValueLegend() {
+	}
+
+	public void init(Layer layer, String fieldName, Symbolizer defaultSymbol,
+			boolean useDefault, Color[] colorScheme,
+			Map<Object, Symbolizer> symbols, Comparator<Object> order) {
+		super.initialize(layer, defaultSymbol, useDefault);
 		this.fieldName = fieldName;
 		this.symbolsMap = symbols;
 		this.order = order;
 		this.colorScheme = colorScheme;
 	}
 
-	@AssistedInject
-	public UniqueValueLegend(@Assisted Layer layer, @Assisted String fieldName,
-			@Assisted Symbolizer defaultSymbol, @Assisted boolean useDefault,
-			@Assisted Color[] colorScheme, @Assisted Comparator<Object> order,
-			DefaultSymbols defaultSymbols) {
-		super(layer, defaultSymbol, useDefault);
+	public void init(Layer layer, String fieldName, Symbolizer defaultSymbol,
+			boolean useDefault, Color[] colorScheme, Comparator<Object> order) {
+		super.initialize(layer, defaultSymbol, useDefault);
 		this.fieldName = fieldName;
 		this.colorScheme = colorScheme;
 		this.order = order;
@@ -107,13 +101,13 @@ public class UniqueValueLegend extends AbstractDefaultSymbolLegend {
 			this.symbolsMap = new HashMap<Object, Symbolizer>();
 
 			Random rand = new Random(System.currentTimeMillis());
-			SimpleFeatureIterator iterator = layer.getFeatureSource()
+			SimpleFeatureIterator iterator = getLayer().getFeatureSource()
 					.getFeatures().features();
 			while (iterator.hasNext()) {
 				Object value = iterator.next().getAttribute(fieldName);
 
 				if (symbolsMap.get(value) == null) {
-					Class<? extends Geometry> type = layer.getShapeType();
+					Class<? extends Geometry> type = getLayer().getShapeType();
 					Color color = colorScheme[rand.nextInt(colorScheme.length)];
 					Symbolizer symbol = defaultSymbols.createDefaultSymbol(
 							type, color, value.toString());

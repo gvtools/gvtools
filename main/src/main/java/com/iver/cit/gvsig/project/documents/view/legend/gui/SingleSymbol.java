@@ -72,7 +72,7 @@ import org.gvsig.gui.beans.swing.JButton;
 import org.gvsig.layer.Layer;
 import org.gvsig.legend.DefaultSymbols;
 import org.gvsig.legend.Legend;
-import org.gvsig.legend.impl.LegendFactory;
+import org.gvsig.legend.LegendFactory;
 import org.gvsig.legend.impl.SingleSymbolLegend;
 
 import com.google.inject.Inject;
