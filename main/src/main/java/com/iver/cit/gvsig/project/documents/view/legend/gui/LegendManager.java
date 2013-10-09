@@ -204,6 +204,7 @@ public class LegendManager extends AbstractThemeManagerPage {
 						layer.addUserStyle(style);
 
 						SLDTransformer styleTransform = new SLDTransformer();
+						styleTransform.setIndentation(2);
 						String xml = styleTransform.transform(sld);
 						FileWriter writer = new FileWriter(file);
 						writer.write(xml);

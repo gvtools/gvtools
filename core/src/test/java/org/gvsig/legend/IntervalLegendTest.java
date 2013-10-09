@@ -184,8 +184,7 @@ public class IntervalLegendTest extends AbstractLegendTest {
 		List<FeatureTypeStyle> featureTypeStyles = style.featureTypeStyles();
 		// We only check the number of feature type styles, not the styles
 		// themselves
-		// +1 because of the selection rule
-		assertEquals(nIntervals + 1, featureTypeStyles.size());
+		assertEquals(nIntervals, featureTypeStyles.size());
 		for (FeatureTypeStyle featureTypeStyle : featureTypeStyles) {
 			assertEquals(1, featureTypeStyle.rules().size());
 		}
@@ -207,8 +206,8 @@ public class IntervalLegendTest extends AbstractLegendTest {
 		List<FeatureTypeStyle> featureTypeStyles = style.featureTypeStyles();
 		// We only check the number of feature type styles, not the styles
 		// themselves
-		// +2 for selection and default symbol
-		assertEquals(nIntervals + 2, featureTypeStyles.size());
+		// +1 for default symbol
+		assertEquals(nIntervals + 1, featureTypeStyles.size());
 		for (FeatureTypeStyle featureTypeStyle : featureTypeStyles) {
 			assertEquals(1, featureTypeStyle.rules().size());
 		}

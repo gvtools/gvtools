@@ -45,8 +45,8 @@ public class SizeIntervalLegendTest extends AbstractLegendTest {
 		List<FeatureTypeStyle> featureTypeStyles = style.featureTypeStyles();
 		// We only check the number of feature type styles, not the styles
 		// themselves
-		// +1 because of the selection rule, +1 because of the default rule
-		assertEquals(nIntervals + 2, featureTypeStyles.size());
+		// +1 because of the default rule
+		assertEquals(nIntervals + 1, featureTypeStyles.size());
 		for (FeatureTypeStyle featureTypeStyle : featureTypeStyles) {
 			// 1 rule with two symbolizers: one for the proportional symbol, one
 			// for the background
@@ -94,8 +94,7 @@ public class SizeIntervalLegendTest extends AbstractLegendTest {
 		List<FeatureTypeStyle> featureTypeStyles = style.featureTypeStyles();
 		// We only check the number of feature type styles, not the styles
 		// themselves
-		// +1 because of the selection rule
-		assertEquals(symbolsMap.size() + 1, featureTypeStyles.size());
+		assertEquals(symbolsMap.size(), featureTypeStyles.size());
 		for (FeatureTypeStyle featureTypeStyle : featureTypeStyles) {
 			// 1 rule with 1 symbolizer
 			List<Rule> rules = featureTypeStyle.rules();

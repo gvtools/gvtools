@@ -6,15 +6,18 @@ import java.io.IOException;
 
 import javax.inject.Inject;
 
+import org.geotools.styling.StyleFactory;
 import org.gvsig.layer.FeatureSourceCache;
 import org.gvsig.layer.Layer;
 import org.gvsig.layer.LayerFactory;
 import org.gvsig.layer.Source;
 import org.gvsig.layer.SourceFactory;
+import org.gvsig.legend.DefaultSymbols;
 import org.gvsig.legend.LegendFactory;
 import org.gvsig.persistence.generated.CompositeLayerType;
 import org.gvsig.persistence.generated.DataLayerType;
 import org.gvsig.persistence.generated.LayerType;
+import org.opengis.filter.FilterFactory2;
 
 import com.google.inject.Provider;
 
@@ -24,6 +27,15 @@ public class LayerFactoryImpl implements LayerFactory {
 
 	@Inject
 	private Provider<LegendFactory> legendFactoryProvider;
+
+	@Inject
+	private Provider<StyleFactory> styleFactoryProvider;
+
+	@Inject
+	private Provider<DefaultSymbols> defaultSymbolsProvider;
+
+	@Inject
+	private Provider<FilterFactory2> filterFactoryProvider;
 
 	@Inject
 	private Provider<SourceFactory> sourceFactoryProvider;
@@ -45,7 +57,8 @@ public class LayerFactoryImpl implements LayerFactory {
 	private FeatureLayer newFeatureLayer(String name) {
 		return new FeatureLayer(eventBusProvider.get(),
 				featureSourceCache.get(), sourceFactoryProvider.get(),
-				legendFactoryProvider.get(), name);
+				legendFactoryProvider.get(), styleFactoryProvider.get(),
+				filterFactoryProvider.get(), defaultSymbolsProvider.get(), name);
 	}
 
 	@Override

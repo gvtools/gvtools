@@ -36,9 +36,8 @@ public class UniqueValuesLegendTest extends AbstractLegendTest {
 		assertEquals(defaultSymbol, legend.getDefaultSymbol());
 		assertArrayEquals(scheme, legend.getColorScheme());
 
-		// +1 for selection style, +1 for default style
-		int nStyles = useDefault ? (numUniqueValues + 2)
-				: (numUniqueValues + 1);
+		// +1 for default style
+		int nStyles = useDefault ? (numUniqueValues + 1) : numUniqueValues;
 		List<FeatureTypeStyle> styles = legend.getStyle().featureTypeStyles();
 		assertEquals(nStyles, styles.size());
 		for (FeatureTypeStyle style : styles) {
@@ -63,9 +62,9 @@ public class UniqueValuesLegendTest extends AbstractLegendTest {
 		assertEquals(defaultSymbol, legend.getDefaultSymbol());
 		assertArrayEquals(scheme, legend.getColorScheme());
 
-		// +1 for selection style, +1 for default style
+		// +1 for default style
 		List<FeatureTypeStyle> styles = legend.getStyle().featureTypeStyles();
-		assertEquals(symbols.size() + 2, styles.size());
+		assertEquals(symbols.size() + 1, styles.size());
 		for (FeatureTypeStyle style : styles) {
 			assertEquals(1, style.rules().size());
 		}

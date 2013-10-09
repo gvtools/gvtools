@@ -26,9 +26,8 @@ public class ProportionalLegendTest extends AbstractLegendTest {
 		assertEquals(template, legend.getTemplate());
 		assertEquals(size, legend.getSize());
 
-		// +1 for selection style, +1 for the proportional style
 		List<FeatureTypeStyle> styles = legend.getStyle().featureTypeStyles();
-		assertEquals(2, styles.size());
+		assertEquals(1, styles.size());
 		for (FeatureTypeStyle style : styles) {
 			assertEquals(1, style.rules().size());
 		}

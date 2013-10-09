@@ -1,11 +1,8 @@
 package org.gvsig.legend.impl;
 
-import java.awt.Color;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.inject.Inject;
 import javax.xml.transform.TransformerException;
@@ -22,7 +19,6 @@ import org.geotools.styling.StyledLayerDescriptor;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.UserLayer;
 import org.gvsig.layer.Layer;
-import org.gvsig.layer.Selection;
 import org.gvsig.legend.DefaultSymbols;
 import org.gvsig.legend.Legend;
 import org.gvsig.persistence.PersistenceException;
@@ -32,9 +28,6 @@ import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
 
 public abstract class AbstractLegend implements Legend {
-	private Rule selectionRule;
-	private Filter selectionFilter;
-	private Map<Rule, Filter> ruleFilters;
 	private Style style;
 
 	private Layer layer;
@@ -63,20 +56,7 @@ public abstract class AbstractLegend implements Legend {
 		}
 
 		if (style == null) {
-			selectionFilter = filterFactory.id(layer.getSelection());
-			ruleFilters = new HashMap<Rule, Filter>();
-
 			style = createStyle();
-			for (FeatureTypeStyle featureTypeStyle : style.featureTypeStyles()) {
-				for (Rule rule : featureTypeStyle.rules()) {
-					ruleFilters.put(rule, rule.getFilter());
-				}
-			}
-
-			Symbolizer selectionSymbol = defaultSymbols.createDefaultSymbol(
-					layer.getShapeType(), Color.yellow, null);
-			selectionRule = rule(selectionFilter, selectionSymbol);
-			style.featureTypeStyles().add(featureTypeStyle(selectionRule));
 		}
 		return style;
 	}
@@ -157,20 +137,6 @@ public abstract class AbstractLegend implements Legend {
 			return property(name, encode(symbol));
 		} catch (TransformerException e) {
 			throw new PersistenceException("Cannot encode symbolizer", e);
-		}
-	}
-
-	@Override
-	public void updateSelection(Selection selection) {
-		if (selectionRule != null) {
-			selectionFilter = filterFactory.id(selection);
-
-			selectionRule.setFilter(selectionFilter);
-			for (Rule rule : ruleFilters.keySet()) {
-				Filter filter = filterFactory.and(ruleFilters.get(rule),
-						filterFactory.not(selectionFilter));
-				rule.setFilter(filter);
-			}
 		}
 	}
 }

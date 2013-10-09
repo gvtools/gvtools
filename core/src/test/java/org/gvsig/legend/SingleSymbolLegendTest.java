@@ -75,9 +75,7 @@ public class SingleSymbolLegendTest extends AbstractLegendTest {
 		Legend legend = legendFactory
 				.createSingleSymbolLegend(mockLayer(geomType));
 		List<FeatureTypeStyle> styles = legend.getStyle().featureTypeStyles();
-		// 2 feature type styles (each one with a single rule): default and
-		// selected
-		assertEquals(2, styles.size());
+		assertEquals(1, styles.size());
 		for (FeatureTypeStyle style : styles) {
 			List<Rule> rules = style.rules();
 			assertEquals(1, rules.size());
