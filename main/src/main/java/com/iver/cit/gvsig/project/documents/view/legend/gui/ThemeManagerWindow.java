@@ -47,6 +47,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.JPanel;
@@ -95,8 +96,7 @@ public final class ThemeManagerWindow extends JPanel implements IWindow,
 			Class<? extends AbstractThemeManagerPage> pageClass = pages.get(i);
 			AbstractThemeManagerPage tab;
 			try {
-				tab = (AbstractThemeManagerPage) pageClass.newInstance();
-				// if (tab.isSuitableFor(layer)) {
+				tab = pageClass.newInstance();
 				if (tab.accepts(layer)) {
 					tab.setModel(layer);
 					tabs.addTab(tab.getName(), tab);
@@ -111,6 +111,8 @@ public final class ThemeManagerWindow extends JPanel implements IWindow,
 				NotificationManager.addError("IllegalAccessException: does "
 						+ pageClass.getName() + " class have an anonymous"
 						+ " constructor?", e);
+			} catch (IOException e) {
+				NotificationManager.addError("Error setting labeling", e);
 			}
 		}
 

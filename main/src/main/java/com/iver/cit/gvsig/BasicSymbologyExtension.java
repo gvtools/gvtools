@@ -110,6 +110,7 @@ import com.iver.cit.gvsig.gui.styling.SimpleText;
 import com.iver.cit.gvsig.gui.styling.SymbolEditor;
 import com.iver.cit.gvsig.project.documents.view.legend.gui.Categories;
 import com.iver.cit.gvsig.project.documents.view.legend.gui.Features;
+import com.iver.cit.gvsig.project.documents.view.legend.gui.LabelingManager;
 import com.iver.cit.gvsig.project.documents.view.legend.gui.LegendManager;
 import com.iver.cit.gvsig.project.documents.view.legend.gui.MultipleAttributes;
 import com.iver.cit.gvsig.project.documents.view.legend.gui.Quantities;
@@ -144,8 +145,7 @@ public class BasicSymbologyExtension extends Extension implements
 		// TODO gtintegration
 		// ThemeManagerWindow.addPage(General.class);
 		ThemeManagerWindow.addPage(LegendManager.class);
-		// TODO gtintegration
-		// ThemeManagerWindow.addPage(LabelingManager.class);
+		ThemeManagerWindow.addPage(LabelingManager.class);
 
 		// TODO gtintegration
 		// ThemeManagerWindow.setTabEnabledForLayer(General.class,

@@ -1,5 +1,7 @@
 package com.iver.cit.gvsig.project.documents.view.legend.gui;
 
+import java.io.IOException;
+
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
@@ -107,7 +109,7 @@ public abstract class AbstractThemeManagerPage extends JPanel {
 	 * @param layer
 	 *            , the target FLayer
 	 */
-	public abstract void setModel(Layer layer);
+	public abstract void setModel(Layer layer) throws IOException;
 
 	/**
 	 * Returns true if the tab should be shown for the specified layer. Returs
